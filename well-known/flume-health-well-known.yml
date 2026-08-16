@@ -1,0 +1,179 @@
+generated: '2026-08-16'
+method: probed
+source: live unauthenticated GET of /.well-known/* on every Flume Health host named in apis.yml
+note: >-
+  Flume Health serves three real /.well-known/ documents, all of them OAuth/OIDC metadata. The Flume Console
+  advertises RFC 9728 protected-resource metadata for its Model Context Protocol endpoint, and auth.flumehealth.com
+  (an Auth0 tenant on Flume's own domain) serves OAuth 2.0 authorization-server metadata, an identical OpenID
+  Connect discovery document, and a JWKS. No security.txt, api-catalog, ai-plugin.json, or A2A agent card is served
+  on any host. IMPORTANT: console.flumehealth.com is a single-page app whose catch-all returns HTTP 200 with a
+  1,107-byte HTML shell for most unknown paths — every 200 recorded below as `spa-shell` is that shell, NOT a
+  document, and is treated as a miss. The security.txt served at status.flumehealth.com is Atlassian Statuspage's
+  own (Canonical: https://www.atlassian.com/.well-known/security.txt) and is NOT Flume's, so it is recorded as a
+  third-party document and earns Flume nothing.
+hits: 3
+probes:
+- host: console.flumehealth.com
+  path: /.well-known/oauth-protected-resource
+  status: 200
+  content_type: application/json; charset=utf-8
+  document: true
+  file: well-known/flume-health-oauth-protected-resource.json
+  summary: >-
+    resource https://console.flumehealth.com/api/v1/context/mcp; authorization_servers
+    [https://auth.flumehealth.com]; bearer_methods_supported [header]; scopes_supported
+    [openid, profile, email, offline_access]
+- host: auth.flumehealth.com
+  path: /.well-known/oauth-authorization-server
+  status: 200
+  content_type: application/json; charset=utf-8
+  document: true
+  file: well-known/flume-health-oauth-authorization-server.json
+  summary: >-
+    issuer https://auth.flumehealth.com/; authorize, oauth/token, oauth/device/code, userinfo, oidc/register,
+    oauth/revoke, oidc/logout, bc-authorize; PKCE S256; DPoP ES256; 14 scopes; 13 grant types
+- host: auth.flumehealth.com
+  path: /.well-known/openid-configuration
+  status: 200
+  content_type: application/json; charset=utf-8
+  document: true
+  file: well-known/flume-health-openid-configuration.json
+  summary: byte-identical to the oauth-authorization-server document above
+- host: auth.flumehealth.com
+  path: /.well-known/jwks.json
+  status: 200
+  content_type: application/json; charset=utf-8
+  document: true
+  file: null
+  summary: >-
+    3,052-byte JWKS served for the auth.flumehealth.com issuer. Indexed but deliberately not saved to the repo —
+    signing-key material rotates and has no archival value here.
+- host: console.flumehealth.com
+  path: /.well-known/security.txt
+  status: 200
+  document: false
+  result: spa-shell
+- host: console.flumehealth.com
+  path: /.well-known/openid-configuration
+  status: 200
+  document: false
+  result: spa-shell
+- host: console.flumehealth.com
+  path: /.well-known/oauth-authorization-server
+  status: 200
+  document: false
+  result: spa-shell
+- host: console.flumehealth.com
+  path: /.well-known/api-catalog
+  status: 200
+  document: false
+  result: spa-shell
+- host: console.flumehealth.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+  document: false
+- host: console.flumehealth.com
+  path: /.well-known/agent-card.json
+  status: 404
+  document: false
+- host: console.flumehealth.com
+  path: /.well-known/agent.json
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/security.txt
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/openid-configuration
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/oauth-authorization-server
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/oauth-protected-resource
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/api-catalog
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/agent-card.json
+  status: 404
+  document: false
+- host: www.flumehealth.com
+  path: /.well-known/agent.json
+  status: 404
+  document: false
+- host: flumehealth.com
+  path: /.well-known/security.txt
+  status: 404
+  document: false
+- host: flumehealth.com
+  path: /.well-known/agent-card.json
+  status: 404
+  document: false
+- host: flumehealth.com
+  path: /.well-known/agent.json
+  status: 404
+  document: false
+- host: flumehealth.com
+  path: /.well-known/api-catalog
+  status: 404
+  document: false
+- host: flumehealth.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+  document: false
+- host: auth.flumehealth.com
+  path: /.well-known/security.txt
+  status: 404
+  document: false
+- host: auth.flumehealth.com
+  path: /.well-known/oauth-protected-resource
+  status: 404
+  document: false
+- host: auth.flumehealth.com
+  path: /.well-known/agent-card.json
+  status: 404
+  document: false
+- host: auth.flumehealth.com
+  path: /.well-known/agent.json
+  status: 404
+  document: false
+- host: auth.flumehealth.com
+  path: /.well-known/api-catalog
+  status: 404
+  document: false
+- host: docs.flumehealth.com
+  path: /.well-known/security.txt
+  status: 404
+  document: false
+- host: docs.flumehealth.com
+  path: /.well-known/agent-card.json
+  status: 404
+  document: false
+- host: docs.flumehealth.com
+  path: /.well-known/agent.json
+  status: 404
+  document: false
+- host: status.flumehealth.com
+  path: /.well-known/security.txt
+  status: 200
+  document: false
+  result: third-party
+  note: >-
+    Atlassian Statuspage's own PGP-signed security.txt, Canonical
+    https://www.atlassian.com/.well-known/security.txt, Contact security@atlassian.com. Not Flume Health's.
+- host: status.flumehealth.com
+  path: /.well-known/agent-card.json
+  status: 404
+  document: false
+checked: '2026-08-16'

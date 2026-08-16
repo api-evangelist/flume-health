@@ -1,0 +1,71 @@
+generated: '2026-08-16'
+method: searched
+source: https://status.flumehealth.com/ + https://status.flumehealth.com/api/v2/summary.json + openapi/flume-health-console-api-openapi.yml
+note: >-
+  Flume Health runs a real, public Atlassian Statuspage. It publishes no versioning policy, no deprecation policy,
+  no changelog, and no SLA that a member of the public can reach — those are recorded as absent below rather than
+  omitted.
+
+versioning:
+  scheme: uri-path
+  current: v1
+  also_live: v2
+  detail: >-
+    /api/v1/ carries 148 of 153 operations; /api/v2/trades/jobs carries 5. info.version in the contract is "1.0".
+    No version header, no dated pinning, no documented policy for how a version is introduced or retired.
+  policy_url: null
+  source: openapi/flume-health-console-api-openapi.yml
+
+deprecation:
+  policy_published: false
+  policy_url: null
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: 0
+  detail: >-
+    Zero operations carry `deprecated: true` in the contract, and no Sunset or Deprecation response headers are
+    declared. There is no published deprecation policy page on flumehealth.com, docs.flumehealth.com, or the
+    support portal.
+
+status_page:
+  published: true
+  url: https://status.flumehealth.com/
+  provider: Atlassian Statuspage
+  page_id: bz1w9ywlg07s
+  machine_readable: https://status.flumehealth.com/api/v2/summary.json
+  components:
+  - name: flumehealth.com
+    description: Public facing website.
+    tracked_since: '2022-04-01'
+  - name: Console & Platform
+  evidence:
+    url: https://status.flumehealth.com/api/v2/summary.json
+    http_status: 200
+    fetched: '2026-08-16'
+
+sla:
+  published: false
+  url: null
+  detail: No public uptime commitment, credit schedule, or support-response SLA. Terms at https://www.flumehealth.com/terms do not publish one.
+
+changelog:
+  published: false
+  url: null
+  detail: >-
+    No /changelog, no release-notes section on docs.flumehealth.com (14 pages, all conceptual), and no dated
+    entries in the support portal. www.flumehealth.com/changelog returns 404.
+
+support:
+  url: https://support.flumehealth.com/portal/en/home
+  provider: Zoho Desk portal
+
+corporate_events:
+- date: '2023-09-25'
+  event: >-
+    Vitori Health acquired Flume Health's third-party administrator (TPA) operations — team, clients, and
+    administrative technology — leaving Flume focused on the software platform (Relay). Relevant to API discovery:
+    api.flumehealth.com still resolves but serves a certificate for api.vitorihealth.com and 404s on every path,
+    and the Vitori-branded Redoc reference now at api.vitorihealth.com/docs/index.html is Vitori's contract, not
+    Flume's. Flume's live contract moved to console.flumehealth.com/api/docs.
+  source: https://www.globenewswire.com/news-release/2023/10/10/2757677/0/en/Vitori-Health-Announces-Acquisition-of-Flume-Health-s-TPA-Operations.html

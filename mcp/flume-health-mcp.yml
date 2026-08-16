@@ -1,0 +1,67 @@
+generated: '2026-08-16'
+method: probed
+source: https://console.flumehealth.com/.well-known/oauth-protected-resource
+name: Flume Context MCP Server
+status: published
+summary: >-
+  Flume Health runs a remote Model Context Protocol server at https://console.flumehealth.com/api/v1/context/mcp.
+  It was not found in any directory, registry, docs page, or llms.txt — it was discovered by probing
+  /.well-known/oauth-protected-resource on the Flume Console host, which names the MCP endpoint as its protected
+  resource. The endpoint is live and OAuth-protected: an unauthenticated JSON-RPC POST returns HTTP 401 with
+  `WWW-Authenticate: Bearer resource_metadata="https://console.flumehealth.com/.well-known/oauth-protected-resource"`,
+  which is the RFC 9728 discovery pattern MCP clients follow. The live tool list therefore requires an authenticated
+  introspection and is NOT recorded here. Flume publishes no MCP tool documentation and no llms.txt, so no tool
+  names or inputSchemas exist to fall back on — recording any would be fabrication.
+
+deployment:
+  mode: remote
+  endpoint: https://console.flumehealth.com/api/v1/context/mcp
+  install: null
+  package: null
+  auth: oauth
+  verified: probed
+
+authorization:
+  protected_resource_metadata: https://console.flumehealth.com/.well-known/oauth-protected-resource
+  authorization_servers:
+  - https://auth.flumehealth.com
+  authorization_server_metadata: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+  bearer_methods_supported:
+  - header
+  scopes_supported:
+  - openid
+  - profile
+  - email
+  - offline_access
+  dynamic_client_registration: https://auth.flumehealth.com/oidc/register
+  pkce: S256
+  rfc9728: true
+
+tools: []
+tools_note: >-
+  Empty by design. tools/list returned HTTP 401 and Flume publishes no tool catalog anywhere public. The tool
+  surface can be recovered only by an authenticated introspection with a Flume Console account.
+
+x-evidence:
+- fetched: '2026-08-16'
+  url: https://console.flumehealth.com/.well-known/oauth-protected-resource
+  method: GET
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  note: names https://console.flumehealth.com/api/v1/context/mcp as the protected resource
+- fetched: '2026-08-16'
+  url: https://console.flumehealth.com/api/v1/context/mcp
+  method: POST
+  body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+  http_status: 401
+  www_authenticate: >-
+    Bearer resource_metadata="https://console.flumehealth.com/.well-known/oauth-protected-resource"
+- fetched: '2026-08-16'
+  url: https://console.flumehealth.com/api/v1/context/mcp
+  method: POST
+  body: '{"jsonrpc":"2.0","id":1,"method":"initialize",...}'
+  http_status: 401
+- fetched: '2026-08-16'
+  url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+  method: GET
+  http_status: 200

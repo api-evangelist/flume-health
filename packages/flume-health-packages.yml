@@ -1,0 +1,56 @@
+generated: '2026-08-16'
+method: searched
+source: >-
+  registry.npmjs.org, pypi.org, github.com/flumehealth, https://www.flumehealth.com/developers
+note: >-
+  Flume Health publishes no client libraries in any public package registry. Its own developers page claims
+  "Python and TypeScript SDKs with type-safe clients, retry logic, and streaming support" and shows code samples,
+  but nothing behind that claim is installable: npm has no flume-health, @flumehealth/*, or flume-relay package;
+  PyPI has no flume-health, flumehealth, flume-sdk, or flume-relay project; and the company's GitHub organization
+  (github.com/flumehealth, which does exist) has ZERO public repositories. The same page advertises a CLI with
+  `trace`, `impact`, `recover` and `status` commands and REST endpoints /api/v1/trace, /api/v1/impact,
+  /api/v1/recover, /api/v1/audit and /api/v1/status — none of which exist in Flume's actual published contract
+  (openapi/flume-health-console-api-openapi.yml). That page is marketing copy describing a product surface Flume has
+  not shipped publicly, so nothing from it is recorded as a package here. An integrator's only real option today is
+  raw HTTP against the Swagger 2.0 contract.
+package_count: 0
+official_sdks: 0
+packages: []
+registries_checked:
+- registry: npm
+  endpoint: https://registry.npmjs.org/
+  queries:
+  - name: flume-health
+    http_status: 404
+  - name: '@flumehealth/sdk'
+    http_status: 404
+  - name: flume-relay
+    http_status: 404
+  - name: '@flume/sdk'
+    http_status: 404
+  - name: 'search: "flume health"'
+    http_status: 200
+    result: no first-party result; hits are unrelated (Flume Water home automation, an unrelated flume.dev package)
+- registry: pypi
+  endpoint: https://pypi.org/pypi/<name>/json
+  queries:
+  - name: flume-health
+    http_status: 404
+  - name: flumehealth
+    http_status: 404
+  - name: flume-sdk
+    http_status: 404
+  - name: flume-relay
+    http_status: 404
+- registry: github
+  endpoint: https://api.github.com/orgs/flumehealth/repos
+  http_status: 200
+  result: organization exists, public_repos = 0
+sources_probed:
+- url: https://www.flumehealth.com/developers
+  http_status: 200
+  detail: claims Python and TypeScript SDKs and a CLI; provides no install command, no registry name, and no repository link
+- url: https://github.com/flumehealth
+  http_status: 200
+  detail: 0 public repositories
+checked: '2026-08-16'

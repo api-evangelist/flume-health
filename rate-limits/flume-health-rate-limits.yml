@@ -1,0 +1,33 @@
+generated: '2026-08-16'
+method: probed
+source: openapi/flume-health-console-api-openapi.yml + live response headers from https://console.flumehealth.com/api/v1/accounts
+note: >-
+  Flume Health documents no rate limits and signals none at runtime. The Swagger 2.0 contract contains no 429
+  response on any of its 153 operations, declares no Retry-After, X-RateLimit-* or RateLimit-* response headers, and
+  the words "rate limit" appear nowhere in it. Live unauthenticated requests to the Console API return no
+  rate-limiting headers either. An agent integrating with Flume therefore has no runtime backpressure signal to
+  read and no documented budget to plan against — it can only back off on 503, which the contract does declare on
+  18 operations. This is an honest zero, not an unchecked field.
+limit_count: 0
+limits: []
+response_headers: []
+exhaustion_status_code: null
+retry_after: false
+documented: false
+related_status_codes:
+- code: 503
+  count: 18
+  detail: Service Unavailable — declared on dependency-backed operations (SFTP, database, warehouse, worker pool). The nearest thing to a backpressure signal in the contract.
+- code: 408
+  count: 1
+  detail: Request Timeout.
+evidence:
+- url: https://console.flumehealth.com/api/v1/accounts
+  http_status: 401
+  detail: >-
+    response headers observed — permissions-policy, vary, x-trace-id, content-security-policy, referrer-policy,
+    strict-transport-security, x-content-type-options, x-frame-options, alt-svc. No rate-limit family header.
+- url: https://console.flumehealth.com/api/docs/docs.json
+  http_status: 200
+  detail: no 429 responses, no rate-limit headers, no rate-limit prose in the contract
+checked: '2026-08-16'

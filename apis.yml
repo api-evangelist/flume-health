@@ -1,23 +1,167 @@
 aid: flume-health
 name: Flume Health
-description: 'Flume Health is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: Flume Health is a New York based healthcare data platform for the payer ecosystem. Its Relay product is an
+  integration platform (iPaaS) that maps eligibility, claims, and other health plan data between source and destination
+  Endpoints — SFTP, cloud storage, databases, Snowflake, and APIs — through a canonical Flume Data Model, with Connections,
+  Shards, Transactions, and mapping jobs managed from the Flume Console. A newer Context layer adds a knowledge graph over
+  a customer's data estate, natural-language query, and domain agents for actuarial, claims, coding, and compliance work,
+  exposed to AI clients through an OAuth-protected Model Context Protocol endpoint. The public Flume Console API is a 153-operation
+  Swagger 2.0 contract served from console.flumehealth.com, authenticated with OpenID Connect / OAuth 2.0 at auth.flumehealth.com.
+  Flume sold its third-party administrator operations to Vitori Health in 2023 to focus on the software platform.
+image: https://flumehealth.com/og-image.png
 url: https://raw.githubusercontent.com/api-evangelist/flume-health/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
-specificationVersion: '0.20'
+specificationVersion: '0.21'
 created: '2026-08-16'
 modified: '2026-08-16'
 tags:
-- Company
-apis: []
+- healthcare
+- health-plans
+- payers
+- healthcare-data
+- data-integration
+- ipaas
+- eligibility
+- claims
+- knowledge-graph
+- mcp
+- agent-native
+- oauth2
+- data-engineering
+- interoperability
+apis:
+- name: Flume Console API
+  description: The REST API for Relay by Flume Health. Manages Accounts, Account Contracts, Connections, Endpoints and their
+    per-protocol secrets and tests (API, cloud storage, database, SFTP, Snowflake, Flume Lakehouse), Endpoint Maps, Shards,
+    Transactions, Source Files, Business Objects and Instances, Users, Flags, Worker Sizes, Reports, Telemetry, and v2 trade/automap
+    jobs — plus the Context Discovery, Context Graph, and Context Knowledge surfaces. Swagger 2.0, 153 operations across
+    108 paths, OAuth 2.0 / OIDC bearer auth, account scoping via the X-Flume-Account-ID header, and pageToken/pageSize cursor
+    pagination.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - healthcare
+  - health-plans
+  - data-integration
+  - ipaas
+  - eligibility
+  - claims
+  - knowledge-graph
+  - oauth2
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-console-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: Overlay
+    url: overlays/flume-health-console-api-overlay.yaml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- name: Flume Context MCP Server
+  description: A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp. It is protected
+    by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401 with a WWW-Authenticate Bearer challenge
+    and a resource_metadata pointer to unauthenticated callers, so the live tool list requires an authenticated introspection.
+    Discovered by probe; Flume publishes no MCP documentation page.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - mcp
+  - agent-native
+  - knowledge-graph
+  - healthcare
+  properties:
+  - type: MCPServer
+    url: mcp/flume-health-mcp.yml
+  - type: MCPServer
+    url: https://console.flumehealth.com/api/v1/context/mcp
+  - type: ToolCrosswalk
+    url: mcp/flume-health-tool-crosswalk.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+common:
+- type: TrustCenter
+  url: security/flume-health-trust-center.yml
+- type: Website
+  url: https://www.flumehealth.com/
+- type: DeveloperPortal
+  url: https://www.flumehealth.com/developers
+- type: Documentation
+  url: https://docs.flumehealth.com/
+- type: APIReference
+  url: https://console.flumehealth.com/api/docs
+- type: Support
+  url: https://support.flumehealth.com/portal/en/home
+- type: StatusPage
+  url: https://status.flumehealth.com/
+- type: Login
+  url: https://console.flumehealth.com/
+- type: TermsOfService
+  url: https://www.flumehealth.com/terms
+- type: PrivacyPolicy
+  url: https://www.flumehealth.com/privacy
+- type: GitHubOrganization
+  url: https://github.com/flumehealth
+- type: OpenAPI
+  url: openapi/flume-health-console-api-openapi.yml
+- type: MCPServer
+  url: mcp/flume-health-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/flume-health-tool-crosswalk.yml
+- type: WellKnown
+  url: well-known/flume-health-well-known.yml
+- type: Authentication
+  url: authentication/flume-health-authentication.yml
+- type: OAuthScopes
+  url: scopes/flume-health-scopes.yml
+- type: Conventions
+  url: conventions/flume-health-conventions.yml
+- type: ErrorCatalog
+  url: errors/flume-health-problem-types.yml
+- type: DataModel
+  url: data-model/flume-health-data-model.yml
+- type: Lifecycle
+  url: lifecycle/flume-health-lifecycle.yml
+- type: Conformance
+  url: conformance/flume-health-conformance.yml
+- type: Compliance
+  url: conformance/flume-health-conformance.yml
+- type: DomainSecurity
+  url: security/flume-health-domain-security.yml
+- type: Overlay
+  url: overlays/flume-health-console-api-overlay.yaml
+- type: LLMsTxt
+  url: llms/flume-health-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Packages
+  url: packages/flume-health-packages.yml
+- type: Plans
+  url: plans/flume-health-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/flume-health-rate-limits.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
-common:
-- type: Website
-  url: https://www.nasdaqprivatemarket.com/
+
+x-enrichment:
+  date: '2026-08-16'
+  status: enriched
+  artifacts_added: 27
+  pass: local-v1

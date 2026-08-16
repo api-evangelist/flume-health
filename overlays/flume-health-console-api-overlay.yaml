@@ -1,0 +1,132 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Flume Console API
+  version: 1.0.0
+x-generated: '2026-08-16'
+x-method: generated
+x-source: openapi/flume-health-console-api-openapi.yml
+x-extends: openapi/flume-health-console-api-openapi.yml
+x-note: >-
+  Overlay of API Evangelist's enrichment onto Flume Health's published Swagger 2.0 contract. It does not change any
+  path, operation, parameter, or schema. It adds (1) the contact and licence metadata the contract leaves empty,
+  (2) the OAuth grants and endpoints the live authorization server at auth.flumehealth.com advertises but the
+  contract's securityDefinitions block omits, (3) the tenancy, pagination, error-envelope and tracing conventions
+  documented in conventions/flume-health-conventions.yml, and (4) a pointer to the OAuth-protected MCP endpoint
+  that sits inside the same /api/v1/context/ namespace. Never mutate the original.
+
+actions:
+- target: $.info
+  description: Add the contact block the contract leaves as an empty object, taken from info.description's own mailto and Flume's public site.
+  update:
+    contact:
+      name: Flume Health
+      email: sales@flumehealth.com
+      url: https://www.flumehealth.com/
+    x-documentation: https://docs.flumehealth.com/
+    x-api-reference: https://console.flumehealth.com/api/docs
+    x-support: https://support.flumehealth.com/portal/en/home
+    x-status-page: https://status.flumehealth.com/
+    x-terms-of-service: https://www.flumehealth.com/terms
+    x-privacy-policy: https://www.flumehealth.com/privacy
+
+- target: $
+  description: >-
+    Record the runtime conventions that are true of the whole API but stated nowhere in the contract — the
+    X-Flume-Account-ID tenancy header, cursor pagination, the vendor error envelope, the x-trace-id response
+    header, the absence of idempotency keys, and the absence of any rate-limit signal.
+  update:
+    x-conventions:
+      tenancy:
+        header: X-Flume-Account-ID
+        required_on: 122 of 153 operations
+        source_of_ids: GET /api/v1/accounts
+      pagination:
+        style: cursor
+        request: [pageToken, pageSize]
+        response_field: nextPageToken
+      sorting:
+        request: [orderBy, orderDesc]
+      custom_methods:
+        style: aip-136-colon-verb
+        examples: ['sessions/{id}:approve', 'knowledge/{id}:supersede', 'sourceFiles:search', 'objects/{objId}/instances:bulk']
+      errors:
+        schema: responses.ErrorResponse
+        media_type: application/json
+        rfc9457: false
+      tracing:
+        response_header: x-trace-id
+      idempotency:
+        supported: false
+      rate_limits:
+        documented: false
+        headers: none
+      versioning:
+        style: uri-path
+        live: [v1, v2]
+        deprecation_policy: none-published
+
+- target: $.securityDefinitions.OAuth2Implicit
+  description: >-
+    Annotate the single declared security scheme with what the live authorization-server metadata at
+    auth.flumehealth.com actually advertises. The contract declares only the implicit flow; the deployed server
+    supports authorization_code with PKCE, client_credentials, refresh_token, device_code and token exchange, and
+    offers dynamic client registration.
+  update:
+    x-token-endpoint: https://auth.flumehealth.com/oauth/token
+    x-issuer: https://auth.flumehealth.com/
+    x-jwks-uri: https://auth.flumehealth.com/.well-known/jwks.json
+    x-userinfo-endpoint: https://auth.flumehealth.com/userinfo
+    x-revocation-endpoint: https://auth.flumehealth.com/oauth/revoke
+    x-registration-endpoint: https://auth.flumehealth.com/oidc/register
+    x-device-authorization-endpoint: https://auth.flumehealth.com/oauth/device/code
+    x-end-session-endpoint: https://auth.flumehealth.com/oidc/logout
+    x-discovery:
+    - https://auth.flumehealth.com/.well-known/oauth-authorization-server
+    - https://auth.flumehealth.com/.well-known/openid-configuration
+    x-grant-types-supported:
+    - authorization_code
+    - client_credentials
+    - refresh_token
+    - implicit
+    - password
+    - 'urn:ietf:params:oauth:grant-type:device_code'
+    - 'urn:ietf:params:oauth:grant-type:token-exchange'
+    - 'urn:ietf:params:oauth:grant-type:jwt-bearer'
+    x-code-challenge-methods-supported: [S256, plain]
+    x-dpop-signing-alg-values-supported: [ES256]
+    x-audience: https://console.flumehealth.com/api
+    x-note: >-
+      The spec's implicit flow is the browser flow the Console itself uses. Machine-to-machine integrators should
+      use authorization_code + PKCE or client_credentials against the token endpoint above.
+
+- target: $
+  description: Point at the OAuth-protected Model Context Protocol endpoint served from the same host and namespace, which the contract itself does not describe.
+  update:
+    x-mcp:
+      endpoint: https://console.flumehealth.com/api/v1/context/mcp
+      transport: streamable-http
+      auth: oauth2
+      protected_resource_metadata: https://console.flumehealth.com/.well-known/oauth-protected-resource
+      scopes_supported: [openid, profile, email, offline_access]
+      tools_readable_anonymously: false
+      note: >-
+        Not declared in the contract. Discovered by probing /.well-known/oauth-protected-resource on this host;
+        POST tools/list returns 401 with an RFC 9728 Bearer challenge.
+
+- target: $
+  description: Record the contract's own currency and provenance for downstream consumers.
+  update:
+    x-contract-provenance:
+      spec_url: https://console.flumehealth.com/api/docs/docs.json
+      rendered_at: https://console.flumehealth.com/api/docs
+      renderer: Redoc
+      format: swagger-2.0
+      harvested: '2026-08-16'
+      http_status: 200
+      size_bytes: 644100
+      paths: 108
+      operations: 153
+      definitions: 270
+      upgrade_note: >-
+        Swagger 2.0. Flume has not published an OpenAPI 3.x or 3.1 rendering, which limits JSON Schema 2020-12
+        fidelity, callbacks, and multi-server declarations for consumers and tooling.

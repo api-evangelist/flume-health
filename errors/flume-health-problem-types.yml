@@ -1,0 +1,201 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/flume-health-console-api-openapi.yml
+note: Derived from the 4xx/5xx and default responses of the Flume Console API (Swagger 2.0, 153 operations). Flume does
+  NOT use RFC 9457 application/problem+json. Every error is the same JSON envelope, responses.ErrorResponse, served as application/json.
+  Titles and remediation below are written from the spec's own response descriptions and the operation semantics - Flume
+  publishes no separate error reference page to search, so nothing here is quoted from prose documentation.
+format: vendor-json
+media_type: application/json
+envelope:
+  schema: responses.ErrorResponse
+  fields:
+  - name: code
+    type: integer
+    description: Numeric error code; mirrors the HTTP status on most paths.
+  - name: message
+    type: string
+    description: Human-readable error message.
+  - name: details
+    type: array<string>
+    description: Zero or more additional detail strings.
+trace_header: x-trace-id
+problem_types:
+- status: 400
+  code: '400'
+  title: Bad Request
+  occurrences: 124
+  schemas:
+    responses.ErrorResponse: 124
+  remediation: The request body, path, or query parameters failed validation. Check required fields and the X-Flume-Account-ID
+    header.
+  example_operations:
+  - approveDiscoverySession
+  - approveKnowledgeReviewItem
+  - attachKnowledge
+  - bulkWriteKnowledge
+  - cancelDiscoverySession
+  - createAccount
+- status: 401
+  code: '401'
+  title: Unauthorized
+  occurrences: 30
+  schemas:
+    responses.ErrorResponse: 30
+  remediation: No bearer token, or an expired/invalid one. Obtain a token from https://auth.flumehealth.com/oauth/token
+    for audience https://console.flumehealth.com/api and retry.
+  example_operations:
+  - approveKnowledgeReviewItem
+  - attachKnowledge
+  - bulkWriteKnowledge
+  - createKnowledge
+  - createKnowledgeArtifact
+  - deleteKnowledge
+- status: 403
+  code: '403'
+  title: Forbidden
+  occurrences: 30
+  schemas:
+    responses.ErrorResponse: 30
+  remediation: The authenticated principal is not permitted on this account or resource. Verify the account the X-Flume-Account-ID
+    header names and the grants on the user.
+  example_operations:
+  - approveKnowledgeReviewItem
+  - attachKnowledge
+  - bulkWriteKnowledge
+  - createDiscoveryApprover
+  - createDiscoveryConnection
+  - createKnowledge
+- status: 404
+  code: '404'
+  title: Not Found
+  occurrences: 90
+  schemas:
+    responses.ErrorResponse: 90
+  remediation: The addressed resource does not exist, or is not visible to the account in X-Flume-Account-ID.
+  example_operations:
+  - approveDiscoverySession
+  - approveKnowledgeReviewItem
+  - attachKnowledge
+  - cancelDiscoverySession
+  - createAccountContract
+  - createConnection
+- status: 408
+  code: '408'
+  title: Request Timeout
+  occurrences: 1
+  schemas:
+    responses.ErrorResponse: 1
+  remediation: The upstream operation did not complete in time. Retry with backoff.
+  example_operations:
+  - queryGraph
+- status: 409
+  code: '409'
+  title: Conflict
+  occurrences: 7
+  schemas:
+    responses.ErrorResponse: 6
+    knowledge.DisambiguationResponse: 1
+  remediation: The write conflicts with current state (duplicate key, concurrent modification, or a knowledge-write conflict).
+  example_operations:
+  - approveKnowledgeReviewItem
+  - attachKnowledge
+  - createDiscoveryConnection
+  - getKnowledgePromotionPreflight
+  - mergeKnowledgeReviewItem
+  - rejectKnowledgeReviewItem
+- status: 413
+  code: '413'
+  title: Payload Too Large
+  occurrences: 3
+  schemas:
+    responses.ErrorResponse: 3
+  remediation: The uploaded body exceeds the accepted size for this endpoint.
+  example_operations:
+  - bulkWriteKnowledge
+  - feedbackKnowledge
+  - queryGraph
+- status: 422
+  code: '422'
+  title: Unprocessable Entity
+  occurrences: 1
+  schemas:
+    responses.ErrorResponse: 1
+  remediation: The request was well-formed but semantically rejected.
+  example_operations:
+  - executeDiscoveryExtraction
+- status: 500
+  code: '500'
+  title: Internal Server Error
+  occurrences: 128
+  schemas:
+    responses.ErrorResponse: 128
+  remediation: An unhandled server-side failure. Retry with backoff; include the x-trace-id response header when contacting
+    support.
+  example_operations:
+  - approveDiscoverySession
+  - bulkWriteKnowledge
+  - cancelDiscoverySession
+  - createAccount
+  - createAccountContract
+  - createAutomapJob
+- status: 501
+  code: '501'
+  title: Not Implemented
+  occurrences: 6
+  schemas:
+    responses.ErrorResponse: 6
+  remediation: The operation or the requested variant is not implemented for this endpoint type.
+  example_operations:
+  - detachKnowledge
+  - getAttachCandidates
+  - getFullEntity
+  - getGraphPeekNode
+  - getKnowledgeGraph
+  - listKnowledgeFeedback
+- status: 503
+  code: '503'
+  title: Service Unavailable
+  occurrences: 18
+  schemas:
+    responses.ErrorResponse: 18
+  remediation: A dependency (SFTP, database, warehouse, or worker pool) is unavailable. Retry with backoff.
+  example_operations:
+  - approveKnowledgeReviewItem
+  - attachKnowledge
+  - bulkWriteKnowledge
+  - createKnowledge
+  - createKnowledgeArtifact
+  - deleteKnowledge
+- status: null
+  code: default
+  title: Unspecified Error
+  occurrences: 118
+  schemas:
+    responses.ErrorResponse: 118
+  remediation: Catch-all error response; the payload is the same responses.ErrorResponse envelope.
+  example_operations:
+  - approveDiscoverySession
+  - cancelDiscoverySession
+  - createAccount
+  - createAccountContract
+  - createAutomapJob
+  - createBulkInstances
+domain_error_codes:
+- domain: Context Knowledge writes
+  schema: knowledgemanager.KnowledgeWriteError
+  fields:
+  - code
+  - field
+  - message
+  codes:
+  - code: invalid_input
+  - code: disambiguation_required
+  - code: conflict
+  - code: scope_forbidden
+  - code: not_found
+  - code: internal
+  note: Returned inside bulk knowledge write results (knowledgemanager.BulkItemError) as well as on direct writes.
+totals:
+  distinct_codes: 12
+  error_responses: 556

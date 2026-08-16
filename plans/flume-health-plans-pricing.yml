@@ -1,0 +1,27 @@
+generated: '2026-08-16'
+method: searched
+source: https://www.flumehealth.com/
+note: >-
+  Flume Health publishes no pricing. www.flumehealth.com/pricing returns HTTP 404 and there is no pricing item in
+  the site navigation or footer; the only commercial call to action anywhere on the public surface is the
+  "contact us" mailto in the API contract's own description ("For more information about how Flume can power your
+  health plan, please contact us" -> sales@flumehealth.com). Access to the Console API requires a provisioned
+  account — GET /api/v1/accounts is the entry point and every operation is scoped by an X-Flume-Account-ID header,
+  so there is no self-serve tier to price. This is an enterprise, contract-only motion.
+plan_count: 0
+plans: []
+pricing_model: contact-sales
+self_serve_signup: false
+free_tier: false
+trial: false
+contact: sales@flumehealth.com
+evidence:
+- url: https://www.flumehealth.com/pricing
+  http_status: 404
+- url: https://www.flumehealth.com/
+  http_status: 200
+  detail: navigation and footer expose Platform, Why Flume, Security, Careers, Docs, Privacy, Terms — no pricing
+- url: https://console.flumehealth.com/api/docs/docs.json
+  http_status: 200
+  detail: info.description names sales@flumehealth.com as the commercial contact
+checked: '2026-08-16'

@@ -1,0 +1,1 @@
+{"resource":"https://console.flumehealth.com/api/v1/context/mcp","authorization_servers":["https://auth.flumehealth.com"],"bearer_methods_supported":["header"],"scopes_supported":["openid","profile","email","offline_access"]}

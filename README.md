@@ -42,5 +42,11 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Flume Health is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://www.nasdaqprivatemarket.com/
+Flume Health is a New York based healthcare data platform for the payer ecosystem. Its Relay product is an integration platform (iPaaS) that moves eligibility, claims, and other health plan data between source and destination Endpoints — SFTP, cloud storage, databases, Snowflake, and APIs — through a canonical Flume Data Model. A newer Context layer builds a knowledge graph over a customer's data estate and exposes it to AI agents through an OAuth-protected Model Context Protocol endpoint.
+
+- Website: https://www.flumehealth.com/
+- Developers: https://www.flumehealth.com/developers
+- Documentation: https://docs.flumehealth.com/
+- API reference: https://console.flumehealth.com/api/docs
+- Status: https://status.flumehealth.com/
+- Support: https://support.flumehealth.com/portal/en/home

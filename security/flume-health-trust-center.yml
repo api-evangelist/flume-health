@@ -1,0 +1,50 @@
+generated: '2026-08-16'
+method: searched
+probe: true
+source: https://www.flumehealth.com/security
+url: https://www.flumehealth.com/security
+note: >-
+  Flume Health names its compliance posture on a marketing security page. There is no trust portal, no evidence
+  room, no auditor named, no attestation date, no report request flow, and no downloadable artifact behind any of
+  the three claims — the page states them and stops. That is recorded faithfully below: `claimed`, not `verified`.
+trust_portal: false
+trust_portal_url: null
+report_request_flow: false
+certifications:
+- name: SOC 2 Type II
+  id: soc2-type-ii
+  claimed: true
+  verified: false
+  evidence_url: https://www.flumehealth.com/security
+  detail: Named on the public security page. No auditor, no report period, no attestation date, no report access flow.
+- name: HITRUST CSF
+  id: hitrust-csf
+  claimed: true
+  verified: false
+  evidence_url: https://www.flumehealth.com/security
+  detail: Named on the public security page. Certification level (e1/i1/r2) and validity dates not published.
+- name: HIPAA
+  id: hipaa
+  claimed: partial
+  verified: false
+  evidence_url: https://www.flumehealth.com/security
+  detail: >-
+    The page says "HIPAA-aligned controls" — it does not claim certification (no such certification exists) and
+    publishes no BAA, covered-entity/business-associate posture, or breach-notification commitment.
+data_residency:
+  claim: >-
+    The platform is described on www.flumehealth.com as running on portable, customer-owned infrastructure —
+    "your data never leaves your environment."
+  evidence_url: https://www.flumehealth.com/
+gaps:
+- No trust center or evidence portal.
+- No named auditor or attestation dates for SOC 2 or HITRUST.
+- No subprocessor list published.
+- No penetration-test summary published.
+evidence:
+- url: https://www.flumehealth.com/security
+  http_status: 200
+  keywords: [soc 2 type ii, hitrust csf, hipaa-aligned controls]
+- url: https://www.flumehealth.com/trust
+  http_status: 404
+checked: '2026-08-16'

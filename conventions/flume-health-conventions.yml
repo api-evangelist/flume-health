@@ -1,0 +1,142 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/flume-health-console-api-openapi.yml + probed response headers on https://console.flumehealth.com/api/v1/accounts
+note: >-
+  Cross-cutting runtime semantics of the Flume Console API. Derived from the Swagger 2.0 contract (153 operations,
+  108 paths) plus live unauthenticated header observation. Flume publishes no prose "API conventions" or "getting
+  started" page, so nothing here is quoted from documentation — every statement below is either present in the spec
+  or was observed on the wire, and the gaps are recorded as gaps rather than filled in.
+
+auth:
+  style: oauth2-bearer
+  scheme_name: OAuth2Implicit
+  flow_declared_in_spec: implicit
+  authorization_url: https://auth.flumehealth.com/authorize
+  audience: https://console.flumehealth.com/api
+  token_endpoint: https://auth.flumehealth.com/oauth/token
+  header: 'Authorization: Bearer <jwt>'
+  note: >-
+    The spec declares only the implicit flow, but the live authorization-server metadata at
+    auth.flumehealth.com/.well-known/oauth-authorization-server advertises authorization_code with PKCE (S256),
+    client_credentials, refresh_token, device_code and token-exchange, plus dynamic client registration at
+    /oidc/register. The spec's securityDefinitions block is thinner than the deployed authorization server.
+  see: authentication/flume-health-authentication.yml
+
+tenancy:
+  mechanism: request-header
+  header: X-Flume-Account-ID
+  required_on: 122 of 153 operations
+  description: >-
+    Almost every operation takes an X-Flume-Account-ID header that selects the health-plan account the call operates
+    against. This is the dominant convention of the API — an agent that omits it will fail on most paths. Account
+    IDs come from GET /api/v1/accounts.
+
+pagination:
+  style: cursor
+  request_params:
+  - name: pageToken
+    in: query
+    description: Opaque cursor returned as nextPageToken by the previous page. Omit for the first page.
+    used_on: 20 operations
+  - name: pageSize
+    in: query
+    description: Maximum items to return in one page.
+    used_on: 20 operations
+  response_fields:
+  - name: nextPageToken
+    description: >-
+      Opaque cursor for the next page, present on every list-response envelope (account.ListResponse,
+      endpoint.ListResponse and siblings). Absent or empty means the last page.
+  envelope: >-
+    List responses are objects, not bare arrays — a named collection field (accounts, endpoints, connections, ...)
+    alongside nextPageToken.
+
+sorting:
+  params:
+  - name: orderBy
+    in: query
+    used_on: 7 operations
+  - name: orderDesc
+    in: query
+    used_on: 7 operations
+
+filtering:
+  params:
+  - name: ids
+    description: Filter a list by explicit ids.
+  - name: view
+    description: Selects a response projection on 5 operations.
+  - name: status
+    description: Filter by resource status on 5 operations.
+  - name: q
+    description: Free-text query on the Context Graph search and Source File search paths.
+
+action_sub_resources:
+  style: colon-verb
+  description: >-
+    Non-CRUD state transitions are expressed as a colon suffix on the resource path rather than a nested noun —
+    e.g. POST /api/v1/context/discovery/sessions/{id}:approve, :deny, :cancel, :extend, :revoke, and
+    /api/v1/context/knowledge/{id}:attach, :detach, :erase, :supersede, :link-artifact. This is Google AIP-136
+    custom-method style and is used consistently across the Context surface and the bulk endpoints
+    (:bulk, :search, :grant, :query).
+
+idempotency:
+  supported: false
+  evidence: >-
+    The spec declares no Idempotency-Key header, no idempotency parameter, and no idempotent-replay semantics on any
+    of the 153 operations; the string "idempoten" does not appear anywhere in the contract. Retries of POST
+    operations are not documented as safe.
+
+versioning:
+  style: uri-path
+  versions:
+  - v1
+  - v2
+  detail: >-
+    /api/v1/ carries 148 operations; /api/v2/trades/jobs carries the 5 newer trade/automap job operations. Both are
+    live on the same host at the same time. info.version in the spec is "1.0". No version header, no dated version
+    pinning, and no published deprecation policy.
+  see: lifecycle/flume-health-lifecycle.yml
+
+errors:
+  format: vendor-json
+  media_type: application/json
+  envelope: '{ code: integer, message: string, details: [string] }'
+  rfc9457: false
+  see: errors/flume-health-problem-types.yml
+
+tracing:
+  request_id_header: x-trace-id
+  direction: response
+  observed_value_shape: 'ctx-<hex>'
+  evidence: >-
+    Observed on live unauthenticated 401 responses from console.flumehealth.com — the header is emitted before
+    authentication, on every request. There is no documented client-supplied request-id header.
+
+rate_limits:
+  documented: false
+  headers_observed: none
+  see: rate-limits/flume-health-rate-limits.yml
+
+security_headers_observed:
+  strict_transport_security: max-age=31536000; includeSubDomains
+  x_content_type_options: nosniff
+  x_frame_options: SAMEORIGIN
+  referrer_policy: strict-origin-when-cross-origin
+  permissions_policy: geolocation=(), microphone=(), camera=()
+  content_security_policy: present, with a strict default-src 'self'
+  observed_on: https://console.flumehealth.com/api/v1/accounts
+
+expansion:
+  supported: false
+  note: No field-expansion, sparse-fieldset, or `fields=` projection parameter exists; the `view` query parameter on 5 operations is the only projection control.
+
+metadata:
+  user_defined_fields: not documented
+
+content_negotiation:
+  produces:
+  - application/json
+  schemes:
+  - https
+  - http

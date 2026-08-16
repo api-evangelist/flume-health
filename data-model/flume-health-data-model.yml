@@ -1,0 +1,1492 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/flume-health-console-api-openapi.yml
+note: 'Entity-relationship graph derived mechanically from the 270 Swagger 2.0 definitions of the Flume Console API: $ref
+  links become has_one/has_many, and *Id / *ID scalar fields become belongs_to edges with the referenced entity recorded
+  as a hint (Flume publishes no object reference page and no id-prefix scheme, so belongs_to targets are inferred from the
+  field name and are marked as hints, not resolved links). Only definitions carrying at least one relationship are listed.'
+definitions_total: 270
+entities_with_relationships: 143
+resource_families:
+- tag: Account Contracts
+  paths:
+  - /api/v1/accounts/{id}/contracts
+  - /api/v1/accounts/{id}/contracts/{contractId}
+- tag: Accounts
+  paths:
+  - /api/v1/accounts
+  - /api/v1/accounts/{id}
+  - /api/v1/accounts/{id}/config
+  - /api/v1/accounts/{id}/secret
+- tag: AutomapJobs
+  paths:
+  - /api/v2/trades/jobs/{jobId}/automapjobs
+  - /api/v2/trades/jobs/{jobId}/automapjobs/{automapversion}
+  - /api/v2/trades/jobs/{jobId}/automapjobs/{automapversion}/outputs
+- tag: Connections
+  paths:
+  - /api/v1/connections
+  - /api/v1/connections/{id}
+- tag: Context Discovery
+  paths:
+  - /api/v1/context/discovery/approvers
+  - /api/v1/context/discovery/approvers/{id}
+  - /api/v1/context/discovery/approvers/{id}:revoke
+  - /api/v1/context/discovery/connections
+  - /api/v1/context/discovery/connections/{id}
+  - /api/v1/context/discovery/connections/{id}:test
+  - /api/v1/context/discovery/extractions
+  - /api/v1/context/discovery/extractions/{id}
+  - /api/v1/context/discovery/sessions
+  - /api/v1/context/discovery/sessions/{id}
+  - /api/v1/context/discovery/sessions/{id}/launches
+  - /api/v1/context/discovery/sessions/{id}:approve
+  - /api/v1/context/discovery/sessions/{id}:cancel
+  - /api/v1/context/discovery/sessions/{id}:deny
+  - /api/v1/context/discovery/sessions/{id}:extend
+  - /api/v1/context/discovery/sessions/{id}:revoke
+  - /api/v1/context/discovery/sessions:grant
+- tag: Context Graph
+  paths:
+  - /api/v1/context/graph
+  - /api/v1/context/graph:query
+  - /api/v1/context/graph:search
+- tag: Context Knowledge
+  paths:
+  - /api/v1/context/knowledge
+  - /api/v1/context/knowledge/artifacts
+  - /api/v1/context/knowledge/artifacts/{content_hash}/content
+  - /api/v1/context/knowledge/graph
+  - /api/v1/context/knowledge/prefix
+  - /api/v1/context/knowledge/proposals
+  - /api/v1/context/knowledge/review-items
+  - /api/v1/context/knowledge/review-items/{review_item_id}/promotion-preflight
+  - /api/v1/context/knowledge/review-items/{review_item_id}:approve
+  - /api/v1/context/knowledge/review-items/{review_item_id}:dismiss
+  - /api/v1/context/knowledge/review-items/{review_item_id}:merge
+  - /api/v1/context/knowledge/review-items/{review_item_id}:reject
+  - /api/v1/context/knowledge/turns/{message_id}
+  - /api/v1/context/knowledge/{id}
+  - /api/v1/context/knowledge/{id}/attach-candidates
+  - /api/v1/context/knowledge/{id}/feedback
+  - /api/v1/context/knowledge/{id}/full
+  - /api/v1/context/knowledge/{id}/peek
+  - /api/v1/context/knowledge/{id}:attach
+  - /api/v1/context/knowledge/{id}:detach
+  - /api/v1/context/knowledge/{id}:erase
+  - /api/v1/context/knowledge/{id}:feedback
+  - /api/v1/context/knowledge/{id}:link-artifact
+  - /api/v1/context/knowledge/{id}:supersede
+  - /api/v1/context/knowledge:bulk
+- tag: Endpoint Maps
+  paths:
+  - /api/v1/endpoints/{id}/maps/{fieldType}
+  - /api/v1/endpoints/{id}/maps/{fieldType}/{ordinal}
+- tag: Endpoints
+  paths:
+  - /api/v1/endpoints
+  - /api/v1/endpoints/datatypes
+  - /api/v1/endpoints/datatypes/{datatype}
+  - /api/v1/endpoints/lambdas
+  - /api/v1/endpoints/{id}
+  - /api/v1/endpoints/{id}/datalake-ingest
+  - /api/v1/endpoints/{id}/datalake-query
+  - /api/v1/endpoints/{id}/datalake-write
+  - /api/v1/endpoints/{id}/secrets/api
+  - /api/v1/endpoints/{id}/secrets/cloudstorage
+  - /api/v1/endpoints/{id}/secrets/cloudstorage/encryption
+  - /api/v1/endpoints/{id}/secrets/database
+  - /api/v1/endpoints/{id}/secrets/flumelakehouse
+  - /api/v1/endpoints/{id}/secrets/sftp
+  - /api/v1/endpoints/{id}/secrets/sftp/encryption
+  - /api/v1/endpoints/{id}/secrets/snowflake
+  - /api/v1/endpoints/{id}/tests/cloudstorage
+  - /api/v1/endpoints/{id}/tests/database
+  - /api/v1/endpoints/{id}/tests/map
+  - /api/v1/endpoints/{id}/tests/sftp
+  - /api/v1/endpoints/{id}/tests/snowflake
+  - /api/v1/endpoints/{id}/{fieldType}/resources
+  - /api/v1/endpoints/{id}/{fieldType}/resources/{key}
+- tag: Flags
+  paths:
+  - /api/v1/flags
+  - /api/v1/flags/{key}
+- tag: Jobs v2
+  paths:
+  - /api/v2/trades/jobs
+  - /api/v2/trades/jobs/{id}
+  - /api/v2/trades/jobs/{id}/tests/map
+- tag: Objects
+  paths:
+  - /api/v1/objects
+  - /api/v1/objects/{id}
+  - /api/v1/objects/{objId}/instances
+  - /api/v1/objects/{objId}/instances/{id}
+  - /api/v1/objects/{objId}/instances:bulk
+- tag: Reports
+  paths:
+  - /api/v1/reports/groupsTraded
+- tag: Shards
+  paths:
+  - /api/v1/endpoints/{endpointId}/shards
+  - /api/v1/endpoints/{endpointId}/shards/{shardId}
+- tag: SourceFile
+  paths:
+  - /api/v1/sourceFiles
+  - /api/v1/sourceFiles/{id}
+  - /api/v1/sourceFiles:bulk
+  - /api/v1/sourceFiles:search
+- tag: Telemetry
+  paths:
+  - /api/v1/telemetry
+- tag: Transactions
+  paths:
+  - /api/v1/endpoints/{endpointId}/transactions
+  - /api/v1/endpoints/{endpointId}/transactions/{id}
+- tag: Users
+  paths:
+  - /api/v1/users
+  - /api/v1/users/me
+  - /api/v1/users/{id}
+  - /api/v1/users/{id}/query-engine-grant
+  - /api/v1/users/{id}/query-engine-revoke
+- tag: WorkerSizes
+  paths:
+  - /api/v1/workersizes
+  - /api/v1/workersizes/{id}
+entities:
+- entity: endpoint.ReadModel
+  fields: 39
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: api
+    cardinality: has_one
+    target: api.ReadModel
+  - field: cloudStorage
+    cardinality: has_one
+    target: cloudstorage.ReadModel
+  - field: connection
+    cardinality: has_one
+    target: endpoint.ConnectionName
+  - field: controlFile
+    cardinality: has_one
+    target: endpoint.File
+  - field: dataType
+    cardinality: has_one
+    target: endpoint.DataType
+  - field: database
+    cardinality: has_one
+    target: database.ReadModel
+  - field: file
+    cardinality: has_one
+    target: endpoint.File
+  - field: flumeLakehouse
+    cardinality: has_one
+    target: flumelakehouse.ReadModel
+  - field: lastTransaction
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+  - field: lookbackModifiedBy
+    cardinality: has_one
+    target: endpoint.LookbackModifiedByUser
+  - field: lookbackUnit
+    cardinality: has_one
+    target: endpoint.LoopbackUnit
+  - field: operation
+    cardinality: has_one
+    target: endpoint.Operation
+  - field: protocol
+    cardinality: has_one
+    target: endpoint.Protocol
+  - field: recentTransactions
+    cardinality: has_one
+    target: endpoint.RecentTransactions
+  - field: recordDestinationId
+    cardinality: belongs_to
+    target_hint: recordDestination
+  - field: sftp
+    cardinality: has_one
+    target: sftp.ReadModel
+  - field: snowflake
+    cardinality: has_one
+    target: snowflake.ReadModel
+  - field: state
+    cardinality: has_one
+    target: endpoint.State
+  - field: supplementalDataTypes
+    cardinality: has_many
+    target: endpoint.DataType
+  - field: type
+    cardinality: has_one
+    target: endpoint.EndpointType
+  - field: workerSize
+    cardinality: has_one
+    target: endpoint.WorkerSize
+- entity: endpoint.WriteModel
+  fields: 29
+  relationships:
+  - field: api
+    cardinality: has_one
+    target: api.WriteModel
+  - field: cloudStorage
+    cardinality: has_one
+    target: cloudstorage.WriteModel
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+  - field: controlFile
+    cardinality: has_one
+    target: endpoint.File
+  - field: dataType
+    cardinality: has_one
+    target: endpoint.DataType
+  - field: database
+    cardinality: has_one
+    target: database.WriteModel
+  - field: file
+    cardinality: has_one
+    target: endpoint.File
+  - field: flumeLakehouse
+    cardinality: has_one
+    target: flumelakehouse.WriteModel
+  - field: lookbackModifiedBy
+    cardinality: has_one
+    target: endpoint.LookbackModifiedByUser
+  - field: lookbackUnit
+    cardinality: has_one
+    target: endpoint.LoopbackUnit
+  - field: operation
+    cardinality: has_one
+    target: endpoint.Operation
+  - field: protocol
+    cardinality: has_one
+    target: endpoint.Protocol
+  - field: recordDestinationId
+    cardinality: belongs_to
+    target_hint: recordDestination
+  - field: sftp
+    cardinality: has_one
+    target: sftp.WriteModel
+  - field: snowflake
+    cardinality: has_one
+    target: snowflake.WriteModel
+  - field: supplementalDataTypes
+    cardinality: has_many
+    target: endpoint.DataType
+  - field: type
+    cardinality: has_one
+    target: endpoint.EndpointType
+  - field: workerSize
+    cardinality: has_one
+    target: endpoint.WorkerSize
+- entity: knowledge.KnowledgeEntityPayload
+  fields: 16
+  relationships:
+  - field: account_id
+    cardinality: belongs_to
+    target_hint: account
+  - field: artifacts
+    cardinality: has_many
+    target: knowledge.EntityArtifact
+  - field: attachments
+    cardinality: has_many
+    target: knowledge.EntityAttachment
+  - field: badges
+    cardinality: has_one
+    target: knowledge.EntityBadges
+  - field: conflict_edges
+    cardinality: has_many
+    target: knowledge.ConflictEdgeRef
+  - field: lifecycle
+    cardinality: has_one
+    target: knowledge.EntityLifecycle
+  - field: provenance
+    cardinality: has_one
+    target: knowledge.EntityProvenance
+  - field: scope_id
+    cardinality: belongs_to
+    target_hint: scope
+- entity: transaction.ReadModel
+  fields: 16
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: endpointId
+    cardinality: belongs_to
+    target_hint: endpoint
+  - field: operation
+    cardinality: has_one
+    target: transaction.Operation
+  - field: shardId
+    cardinality: belongs_to
+    target_hint: shard
+  - field: state
+    cardinality: has_one
+    target: transaction.State
+  - field: steps
+    cardinality: has_one
+    target: transaction.Steps
+  - field: trigger
+    cardinality: has_one
+    target: transaction.Trigger
+  - field: workerId
+    cardinality: belongs_to
+    target_hint: worker
+- entity: automapjob.ReadModel
+  fields: 13
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: createdBy
+    cardinality: has_one
+    target: user.ReadModel
+  - field: fieldMappings
+    cardinality: has_many
+    target: automapjob.FieldMapping
+  - field: jobId
+    cardinality: belongs_to
+    target_hint: job
+  - field: maps
+    cardinality: has_one
+    target: automapjob.Maps
+  - field: outputs
+    cardinality: has_one
+    target: automapjob.Outputs
+  - field: status
+    cardinality: has_one
+    target: automapjob.Status
+- entity: endpoint.RecentTransactions
+  fields: 6
+  relationships:
+  - field: last
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+  - field: lastFinished
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+  - field: lastFinishedOp
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+  - field: lastSuccessful
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+  - field: lastSuccessfulNonExtract
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+  - field: lastVisible
+    cardinality: has_one
+    target: endpoint.TransactionSummary
+- entity: job.ReadModel
+  fields: 13
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: dataType
+    cardinality: has_one
+    target: endpoint.DataType
+  - field: destinationEndpoint
+    cardinality: has_one
+    target: job.EndpointSummary
+  - field: sourceEndpoints
+    cardinality: has_many
+    target: job.EndpointSummary
+  - field: status
+    cardinality: has_one
+    target: job.Status
+  - field: supplementalDataTypes
+    cardinality: has_many
+    target: endpoint.DataType
+- entity: transaction.WriteModel
+  fields: 9
+  relationships:
+  - field: operation
+    cardinality: has_one
+    target: transaction.Operation
+  - field: shardId
+    cardinality: belongs_to
+    target_hint: shard
+  - field: state
+    cardinality: has_one
+    target: transaction.State
+  - field: steps
+    cardinality: has_one
+    target: transaction.Steps
+  - field: trigger
+    cardinality: has_one
+    target: transaction.Trigger
+  - field: workerId
+    cardinality: belongs_to
+    target_hint: worker
+- entity: endpoint.File
+  fields: 15
+  relationships:
+  - field: duckDb
+    cardinality: has_one
+    target: duckdb.Config
+  - field: fields
+    cardinality: has_many
+    target: endpoint.Field
+  - field: filterType
+    cardinality: has_one
+    target: endpoint.FileFilterType
+  - field: mapType
+    cardinality: has_one
+    target: endpoint.MapType
+  - field: type
+    cardinality: has_one
+    target: endpoint.FileType
+- entity: knowledge.TurnKnowledgePayload
+  fields: 8
+  relationships:
+  - field: conversation_id
+    cardinality: belongs_to
+    target_hint: conversation
+  - field: injected
+    cardinality: has_many
+    target: knowledge.InjectedItem
+  - field: message_id
+    cardinality: belongs_to
+    target_hint: message
+  - field: recall_trace
+    cardinality: has_many
+    target: knowledge.RecallTraceItem
+  - field: suppressed
+    cardinality: has_many
+    target: knowledge.SuppressedItem
+- entity: shard.ReadModel
+  fields: 8
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: endpointId
+    cardinality: belongs_to
+    target_hint: endpoint
+  - field: lastTransaction
+    cardinality: has_one
+    target: shard.TransactionSummary
+  - field: recentTransactions
+    cardinality: has_one
+    target: shard.RecentTransactions
+  - field: state
+    cardinality: has_one
+    target: endpoint.State
+- entity: shard.RecentTransactions
+  fields: 5
+  relationships:
+  - field: last
+    cardinality: has_one
+    target: shard.TransactionSummary
+  - field: lastFinished
+    cardinality: has_one
+    target: shard.TransactionSummary
+  - field: lastFinishedOp
+    cardinality: has_one
+    target: shard.TransactionSummary
+  - field: lastSuccessful
+    cardinality: has_one
+    target: shard.TransactionSummary
+  - field: lastVisible
+    cardinality: has_one
+    target: shard.TransactionSummary
+- entity: cloudstorage.WriteModel
+  fields: 8
+  relationships:
+  - field: credentialType
+    cardinality: has_one
+    target: cloudstoragecredentials.CredentialType
+  - field: credentials
+    cardinality: has_one
+    target: cloudstoragecredentials.CloudStorageCredentials
+  - field: encryption
+    cardinality: has_one
+    target: encryption.WriteModel
+  - field: sortingMethod
+    cardinality: has_one
+    target: sorting.Method
+- entity: discovery.ExtractionReadModel
+  fields: 15
+  relationships:
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+  - field: extractionType
+    cardinality: has_one
+    target: discovery.ExtractionType
+  - field: sessionId
+    cardinality: belongs_to
+    target_hint: session
+  - field: status
+    cardinality: has_one
+    target: discovery.ExtractionStatus
+- entity: discovery.ExtractionResultModel
+  fields: 17
+  relationships:
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+  - field: extractionType
+    cardinality: has_one
+    target: discovery.ExtractionType
+  - field: sessionId
+    cardinality: belongs_to
+    target_hint: session
+  - field: status
+    cardinality: has_one
+    target: discovery.ExtractionStatus
+- entity: knowledgemanager.CreateKnowledgeInput
+  fields: 19
+  relationships:
+  - field: knowledge_scope_id
+    cardinality: belongs_to
+    target_hint: knowledge_scope
+  - field: knowledge_scope_type
+    cardinality: has_one
+    target: knowledgestore.KnowledgeScopeType
+  - field: recall_policy
+    cardinality: has_one
+    target: knowledgestore.RecallPolicy
+  - field: status
+    cardinality: has_one
+    target: knowledgestore.KnowledgeStatus
+- entity: sourcefile.ReadModel
+  fields: 19
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: archiveType
+    cardinality: has_one
+    target: sourcefile.ArchiveType
+  - field: controlFile
+    cardinality: has_one
+    target: sourcefile.ControlFile
+  - field: endpointId
+    cardinality: belongs_to
+    target_hint: endpoint
+- entity: cloudstorage.ReadModel
+  fields: 8
+  relationships:
+  - field: credentialType
+    cardinality: has_one
+    target: cloudstoragecredentials.CredentialType
+  - field: encryption
+    cardinality: has_one
+    target: encryption.ReadModel
+  - field: sortingMethod
+    cardinality: has_one
+    target: sorting.Method
+- entity: database.ReadModel
+  fields: 11
+  relationships:
+  - field: engine
+    cardinality: has_one
+    target: database.Engine
+  - field: maps
+    cardinality: has_many
+    target: database.DatabaseMap
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+- entity: database.WriteModel
+  fields: 11
+  relationships:
+  - field: engine
+    cardinality: has_one
+    target: database.Engine
+  - field: maps
+    cardinality: has_many
+    target: database.DatabaseMap
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+- entity: endpoint.UpdateModel
+  fields: 29
+  relationships:
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+  - field: recordDestinationId
+    cardinality: belongs_to
+    target_hint: recordDestination
+  - field: supplementalDataTypes
+    cardinality: has_many
+    target: endpoint.DataType
+- entity: endpointmap.ReadModel
+  fields: 6
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: fieldType
+    cardinality: has_one
+    target: endpointmap.FieldType
+  - field: maps
+    cardinality: has_many
+    target: endpointmap.MapVersion
+- entity: flumelakehouse.WriteModel
+  fields: 3
+  relationships:
+  - field: credentialType
+    cardinality: has_one
+    target: flumelakehousecredentials.CredentialType
+  - field: credentials
+    cardinality: has_one
+    target: flumelakehousecredentials.FlumeLakehouseCredentials
+  - field: maps
+    cardinality: has_many
+    target: flumelakehouse.FlumeLakehouseMap
+- entity: job.EndpointSummary
+  fields: 6
+  relationships:
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+  - field: operation
+    cardinality: has_one
+    target: endpoint.Operation
+  - field: state
+    cardinality: has_one
+    target: endpoint.State
+- entity: knowledge.GraphPeekNode
+  fields: 9
+  relationships:
+  - field: attachments
+    cardinality: has_many
+    target: knowledge.GraphPeekAttachment
+  - field: badge
+    cardinality: has_one
+    target: knowledgestore.KnowledgeResultBadge
+  - field: scope
+    cardinality: has_one
+    target: knowledge.KnowledgeScope
+- entity: knowledge.PromotionPreflightResponse
+  fields: 4
+  relationships:
+  - field: artifact_freshness
+    cardinality: has_one
+    target: knowledge.PromotionArtifactFreshness
+  - field: proposal
+    cardinality: has_one
+    target: knowledge.ProposalPayload
+  - field: review_item_id
+    cardinality: belongs_to
+    target_hint: review_item
+- entity: knowledgemanager.AttachResult
+  fields: 3
+  relationships:
+  - field: additional_conflicts
+    cardinality: has_many
+    target: knowledgemanager.ConflictWarning
+  - field: conflict_warning
+    cardinality: has_one
+    target: knowledgemanager.ConflictWarning
+  - field: edges
+    cardinality: has_many
+    target: knowledgestore.AppliesToEdge
+- entity: knowledgestore.ReviewItem
+  fields: 9
+  relationships:
+  - field: account_id
+    cardinality: belongs_to
+    target_hint: account
+  - field: review_item_id
+    cardinality: belongs_to
+    target_hint: review_item
+  - field: source_event_id
+    cardinality: belongs_to
+    target_hint: source_event
+- entity: sftp.ReadModel
+  fields: 14
+  relationships:
+  - field: encryption
+    cardinality: has_one
+    target: encryption.ReadModel
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+  - field: sortingMethod
+    cardinality: has_one
+    target: sorting.Method
+- entity: sftp.WriteModel
+  fields: 14
+  relationships:
+  - field: encryption
+    cardinality: has_one
+    target: encryption.WriteModel
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+  - field: sortingMethod
+    cardinality: has_one
+    target: sorting.Method
+- entity: sourcefile.WriteModel
+  fields: 16
+  relationships:
+  - field: archiveType
+    cardinality: has_one
+    target: sourcefile.ArchiveType
+  - field: controlFile
+    cardinality: has_one
+    target: sourcefile.ControlFile
+  - field: endpointId
+    cardinality: belongs_to
+    target_hint: endpoint
+- entity: transaction.Steps
+  fields: 3
+  relationships:
+  - field: extract
+    cardinality: has_one
+    target: transaction.Step
+  - field: load
+    cardinality: has_one
+    target: transaction.Step
+  - field: transform
+    cardinality: has_one
+    target: transaction.Step
+- entity: account.ReadAccountConfigModel
+  fields: 5
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: colors
+    cardinality: has_one
+    target: account.AccountConfigColors
+- entity: automapjob.FieldMapping
+  fields: 6
+  relationships:
+  - field: confidenceLevel
+    cardinality: has_one
+    target: automapjob.ConfidenceLevel
+  - field: fieldStatus
+    cardinality: has_one
+    target: automapjob.FieldStatus
+- entity: datatypes.DataType
+  fields: 3
+  relationships:
+  - field: fields
+    cardinality: has_many
+    target: datatypes.Field
+  - field: type
+    cardinality: has_one
+    target: endpoint.DataType
+- entity: discovery.ExtractionCreateRequest
+  fields: 5
+  relationships:
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+  - field: sessionId
+    cardinality: belongs_to
+    target_hint: session
+- entity: flumelakehouse.ReadModel
+  fields: 3
+  relationships:
+  - field: credentialType
+    cardinality: has_one
+    target: flumelakehousecredentials.CredentialType
+  - field: maps
+    cardinality: has_many
+    target: flumelakehouse.FlumeLakehouseMap
+- entity: graph.SearchResponse
+  fields: 2
+  relationships:
+  - field: _meta
+    cardinality: has_one
+    target: graph.SearchMeta
+  - field: results
+    cardinality: has_many
+    target: knowledgestore.SearchResult
+- entity: job.WriteModel
+  fields: 7
+  relationships:
+  - field: destinationEndpointId
+    cardinality: belongs_to
+    target_hint: destinationEndpoint
+  - field: status
+    cardinality: has_one
+    target: job.Status
+- entity: knowledge.AttachCandidatesResponse
+  fields: 2
+  relationships:
+  - field: candidates
+    cardinality: has_many
+    target: knowledge.AttachCandidate
+  - field: conflict_warning
+    cardinality: has_one
+    target: knowledge.ConflictWarningResp
+- entity: knowledge.FeedbackEvent
+  fields: 5
+  relationships:
+  - field: conversation_id
+    cardinality: belongs_to
+    target_hint: conversation
+  - field: message_id
+    cardinality: belongs_to
+    target_hint: message
+- entity: knowledge.FeedbackRequest
+  fields: 4
+  relationships:
+  - field: conversation_id
+    cardinality: belongs_to
+    target_hint: conversation
+  - field: message_id
+    cardinality: belongs_to
+    target_hint: message
+- entity: knowledge.InjectedItem
+  fields: 7
+  relationships:
+  - field: badge
+    cardinality: has_one
+    target: knowledgestore.KnowledgeResultBadge
+  - field: scope
+    cardinality: has_one
+    target: knowledge.KnowledgeScope
+- entity: knowledge.KnowledgeGraphResponse
+  fields: 2
+  relationships:
+  - field: edges
+    cardinality: has_many
+    target: knowledge.KnowledgeGraphEdge
+  - field: nodes
+    cardinality: has_many
+    target: knowledge.KnowledgeGraphNode
+- entity: knowledge.KnowledgeListResponse
+  fields: 2
+  relationships:
+  - field: _meta
+    cardinality: has_one
+    target: knowledge.Meta
+  - field: results
+    cardinality: has_many
+    target: knowledgestore.KnowledgeEntity
+- entity: knowledge.KnowledgePrefixResponse
+  fields: 2
+  relationships:
+  - field: index
+    cardinality: has_one
+    target: knowledge.KnowledgePrefixBlock
+  - field: ontology
+    cardinality: has_one
+    target: knowledge.KnowledgePrefixBlock
+- entity: knowledge.PatchKnowledgeRequest
+  fields: 9
+  relationships:
+  - field: recall_policy
+    cardinality: has_one
+    target: knowledgestore.RecallPolicy
+  - field: status
+    cardinality: has_one
+    target: knowledgestore.KnowledgeStatus
+- entity: knowledgemanager.BulkItem
+  fields: 4
+  relationships:
+  - field: inheritance
+    cardinality: has_one
+    target: knowledgestore.InheritanceMode
+  - field: payload
+    cardinality: has_one
+    target: knowledgemanager.CreateKnowledgeInput
+- entity: knowledgemanager.BulkResult
+  fields: 3
+  relationships:
+  - field: deferred
+    cardinality: has_many
+    target: knowledgestore.ReviewItem
+  - field: errors
+    cardinality: has_many
+    target: knowledgemanager.BulkItemError
+- entity: knowledgestore.KnowledgeEntity
+  fields: 29
+  relationships:
+  - field: account_id
+    cardinality: belongs_to
+    target_hint: account
+  - field: knowledge_scope_id
+    cardinality: belongs_to
+    target_hint: knowledge_scope
+- entity: objectinstance.ReadModel
+  fields: 7
+  relationships:
+  - field: connectionCustomValues
+    cardinality: has_one
+    target: objectinstance.CustomValuesByConnection
+  - field: object
+    cardinality: has_one
+    target: objectinstance.ObjectSummary
+- entity: secret.ApiEncryptionSecret
+  fields: 2
+  relationships:
+  - field: passphrase
+    cardinality: has_one
+    target: secret.ApiSecret
+  - field: privateKey
+    cardinality: has_one
+    target: secret.ApiSecret
+- entity: snowflake.ReadModel
+  fields: 13
+  relationships:
+  - field: fields
+    cardinality: has_many
+    target: snowflake.Field
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+- entity: snowflake.WriteModel
+  fields: 13
+  relationships:
+  - field: fields
+    cardinality: has_many
+    target: snowflake.Field
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+- entity: transaction.Step
+  fields: 10
+  relationships:
+  - field: file
+    cardinality: has_one
+    target: transaction.FileDetail
+  - field: state
+    cardinality: has_one
+    target: transaction.State
+- entity: user.ReadModel
+  fields: 14
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: role
+    cardinality: has_one
+    target: user.Role
+- entity: user.SelfUser
+  fields: 6
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+  - field: role
+    cardinality: has_one
+    target: user.Role
+- entity: account.BlobConfig
+  fields: 5
+  relationships:
+  - field: credentialType
+    cardinality: has_one
+    target: cloudstoragecredentials.CredentialType
+- entity: account.ListResponse
+  fields: 2
+  relationships:
+  - field: accounts
+    cardinality: has_many
+    target: account.ReadModel
+- entity: account.ReadModel
+  fields: 6
+  relationships:
+  - field: blobConfig
+    cardinality: has_one
+    target: account.BlobConfig
+- entity: account.UpdateAccountConfigModel
+  fields: 3
+  relationships:
+  - field: colors
+    cardinality: has_one
+    target: account.AccountConfigColors
+- entity: account.UpdateModel
+  fields: 4
+  relationships:
+  - field: blobConfig
+    cardinality: has_one
+    target: account.BlobConfig
+- entity: account.WriteModel
+  fields: 4
+  relationships:
+  - field: blobConfig
+    cardinality: has_one
+    target: account.BlobConfig
+- entity: accountcontract.ListResponse
+  fields: 2
+  relationships:
+  - field: accountContracts
+    cardinality: has_many
+    target: accountcontract.ReadModel
+- entity: accountcontract.ReadModel
+  fields: 7
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+- entity: api.ReadModel
+  fields: 3
+  relationships:
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+- entity: api.WriteModel
+  fields: 3
+  relationships:
+  - field: secretType
+    cardinality: has_one
+    target: secret.SecretType
+- entity: automapjob.ListResponse
+  fields: 2
+  relationships:
+  - field: automapJobs
+    cardinality: has_many
+    target: automapjob.ReadModel
+- entity: automapjob.UpdateModel
+  fields: 9
+  relationships:
+  - field: fieldMappings
+    cardinality: has_many
+    target: automapjob.FieldMappingUpdate
+- entity: connection.ListResponse
+  fields: 2
+  relationships:
+  - field: connections
+    cardinality: has_many
+    target: connection.ReadModel
+- entity: database.UpdateModel
+  fields: 11
+  relationships:
+  - field: maps
+    cardinality: has_many
+    target: database.DatabaseMap
+- entity: datatypes.DataTypes
+  fields: 1
+  relationships:
+  - field: dataTypes
+    cardinality: has_many
+    target: datatypes.DataType
+- entity: datatypes.Field
+  fields: 4
+  relationships:
+  - field: fieldType
+    cardinality: has_one
+    target: datatypes.FieldType
+- entity: discovery.ApproverCreateRequest
+  fields: 4
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+- entity: discovery.ApproverListResponse
+  fields: 2
+  relationships:
+  - field: approvers
+    cardinality: has_many
+    target: discovery.ApproverReadModel
+- entity: discovery.ApproverReadModel
+  fields: 13
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+- entity: discovery.ConnectionListResponse
+  fields: 2
+  relationships:
+  - field: connections
+    cardinality: has_many
+    target: discovery.ConnectionReadModel
+- entity: discovery.ConnectionReadModel
+  fields: 14
+  relationships:
+  - field: connectionType
+    cardinality: has_one
+    target: discovery.ConnectionType
+- entity: discovery.ConnectionWriteModel
+  fields: 9
+  relationships:
+  - field: connectionType
+    cardinality: has_one
+    target: discovery.ConnectionType
+- entity: discovery.ExtractionListResponse
+  fields: 2
+  relationships:
+  - field: extractions
+    cardinality: has_many
+    target: discovery.ExtractionReadModel
+- entity: discovery.SessionGrantReadModel
+  fields: 2
+  relationships:
+  - field: connectionId
+    cardinality: belongs_to
+    target_hint: connection
+- entity: discovery.SessionLaunchResponse
+  fields: 6
+  relationships:
+  - field: sessionId
+    cardinality: belongs_to
+    target_hint: session
+- entity: discovery.SessionListResponse
+  fields: 2
+  relationships:
+  - field: sessions
+    cardinality: has_many
+    target: discovery.SessionReadModel
+- entity: discovery.SessionReadModel
+  fields: 19
+  relationships:
+  - field: grants
+    cardinality: has_many
+    target: discovery.SessionGrantReadModel
+- entity: duckdb.Config
+  fields: 1
+  relationships:
+  - field: files
+    cardinality: has_many
+    target: duckdb.File
+- entity: encryption.ReadModel
+  fields: 4
+  relationships:
+  - field: method
+    cardinality: has_one
+    target: encryption.Method
+- entity: encryption.WriteModel
+  fields: 4
+  relationships:
+  - field: method
+    cardinality: has_one
+    target: encryption.Method
+- entity: endpoint.FileUpdate
+  fields: 14
+  relationships:
+  - field: fields
+    cardinality: has_many
+    target: endpoint.Field
+- entity: endpoint.LambdaList
+  fields: 2
+  relationships:
+  - field: lambdas
+    cardinality: has_many
+    target: endpoint.LambdaResponse
+- entity: endpoint.ListResponse
+  fields: 2
+  relationships:
+  - field: endpoints
+    cardinality: has_many
+    target: endpoint.ReadModel
+- entity: endpoint.LookbackModifiedByUser
+  fields: 3
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+- entity: endpoint.TransactionSummary
+  fields: 5
+  relationships:
+  - field: state
+    cardinality: has_one
+    target: transaction.State
+- entity: endpointmap.ListResponse
+  fields: 2
+  relationships:
+  - field: endpointMaps
+    cardinality: has_many
+    target: endpointmap.ReadModel
+- entity: endpointmap.MapVersion
+  fields: 5
+  relationships:
+  - field: createdBy
+    cardinality: has_one
+    target: user.ReadModel
+- entity: flag.ListReadModel
+  fields: 1
+  relationships:
+  - field: flags
+    cardinality: has_many
+    target: flag.Flag
+- entity: flumelakehouse.UpdateModel
+  fields: 3
+  relationships:
+  - field: maps
+    cardinality: has_many
+    target: flumelakehouse.FlumeLakehouseMap
+- entity: flumelakehousecredentials.FlumeLakehouseCredentials
+  fields: 1
+  relationships:
+  - field: catalogConfigs
+    cardinality: has_many
+    target: flumelakehousecredentials.CatalogConfig
+- entity: graph.QueryResponse
+  fields: 3
+  relationships:
+  - field: _meta
+    cardinality: has_one
+    target: graph.QueryMeta
+- entity: graph.StatusResponse
+  fields: 5
+  relationships:
+  - field: _meta
+    cardinality: has_one
+    target: graph.Meta
+- entity: job.ListResponse
+  fields: 2
+  relationships:
+  - field: jobs
+    cardinality: has_many
+    target: job.ReadModel
+- entity: job.TestFile
+  fields: 2
+  relationships:
+  - field: endpointId
+    cardinality: belongs_to
+    target_hint: endpoint
+- entity: job.TestRequest
+  fields: 1
+  relationships:
+  - field: files
+    cardinality: has_many
+    target: job.TestFile
+- entity: job.UpdateModel
+  fields: 7
+  relationships:
+  - field: destinationEndpointId
+    cardinality: belongs_to
+    target_hint: destinationEndpoint
+- entity: knowledge.DisambiguationResponse
+  fields: 2
+  relationships:
+  - field: candidates
+    cardinality: has_many
+    target: knowledgemanager.AttachCandidate
+- entity: knowledge.FeedbackEventListResponse
+  fields: 1
+  relationships:
+  - field: events
+    cardinality: has_many
+    target: knowledge.FeedbackEvent
+- entity: knowledge.KnowledgeGraphNode
+  fields: 5
+  relationships:
+  - field: badges
+    cardinality: has_one
+    target: knowledge.GraphNodeBadges
+- entity: knowledge.KnowledgeScope
+  fields: 2
+  relationships:
+  - field: scope_id
+    cardinality: belongs_to
+    target_hint: scope
+- entity: knowledge.PromotionArtifactFreshness
+  fields: 2
+  relationships:
+  - field: artifacts
+    cardinality: has_many
+    target: knowledge.PromotionArtifactCheck
+- entity: knowledge.ProposalListResponse
+  fields: 1
+  relationships:
+  - field: proposals
+    cardinality: has_many
+    target: knowledge.ProposalPayload
+- entity: knowledge.ProposalPayload
+  fields: 12
+  relationships:
+  - field: scope_id
+    cardinality: belongs_to
+    target_hint: scope
+- entity: knowledge.ReviewItemPayload
+  fields: 7
+  relationships:
+  - field: review_item_id
+    cardinality: belongs_to
+    target_hint: review_item
+- entity: knowledge.ReviewQueueResponse
+  fields: 1
+  relationships:
+  - field: items
+    cardinality: has_many
+    target: knowledge.ReviewItemPayload
+- entity: knowledge.SupersedeRequest
+  fields: 1
+  relationships:
+  - field: payload
+    cardinality: has_one
+    target: knowledgemanager.CreateKnowledgeInput
+- entity: knowledgemanager.AttachInput
+  fields: 7
+  relationships:
+  - field: inheritance
+    cardinality: has_one
+    target: knowledgestore.InheritanceMode
+- entity: knowledgemanager.BulkItemError
+  fields: 2
+  relationships:
+  - field: error
+    cardinality: has_one
+    target: knowledgemanager.KnowledgeWriteError
+- entity: knowledgemanager.BulkWriteInput
+  fields: 2
+  relationships:
+  - field: manifest
+    cardinality: has_many
+    target: knowledgemanager.BulkItem
+- entity: knowledgemanager.KnowledgeWriteError
+  fields: 3
+  relationships:
+  - field: code
+    cardinality: has_one
+    target: knowledgemanager.KnowledgeWriteErrorCode
+- entity: object.CanonicalColumn
+  fields: 2
+  relationships:
+  - field: dataType
+    cardinality: has_one
+    target: endpoint.DataType
+- entity: object.ListResponse
+  fields: 2
+  relationships:
+  - field: objects
+    cardinality: has_many
+    target: object.ReadModel
+- entity: object.ReadModel
+  fields: 4
+  relationships:
+  - field: canonicalColumns
+    cardinality: has_many
+    target: object.CanonicalColumn
+- entity: object.UpdateModel
+  fields: 2
+  relationships:
+  - field: canonicalColumns
+    cardinality: has_many
+    target: object.CanonicalColumn
+- entity: object.WriteModel
+  fields: 2
+  relationships:
+  - field: canonicalColumns
+    cardinality: has_many
+    target: object.CanonicalColumn
+- entity: objectinstance.BulkWriteModel
+  fields: 1
+  relationships:
+  - field: instances
+    cardinality: has_many
+    target: objectinstance.WriteModel
+- entity: objectinstance.ListResponse
+  fields: 2
+  relationships:
+  - field: instances
+    cardinality: has_many
+    target: objectinstance.ReadModel
+- entity: objectinstance.UpdateModel
+  fields: 5
+  relationships:
+  - field: connectionCustomValues
+    cardinality: has_one
+    target: objectinstance.CustomValuesByConnection
+- entity: objectinstance.WriteModel
+  fields: 5
+  relationships:
+  - field: connectionCustomValues
+    cardinality: has_one
+    target: objectinstance.CustomValuesByConnection
+- entity: report.GroupsTradedLine
+  fields: 4
+  relationships:
+  - field: accountId
+    cardinality: belongs_to
+    target_hint: account
+- entity: secret.ApiCloudCredSecret
+  fields: 2
+  relationships:
+  - field: value
+    cardinality: has_one
+    target: cloudstoragecredentials.CloudStorageCredentials
+- entity: secret.ApiFlumeLakehouseSecret
+  fields: 2
+  relationships:
+  - field: value
+    cardinality: has_one
+    target: flumelakehousecredentials.FlumeLakehouseCredentials
+- entity: sftp.UpdateModel
+  fields: 14
+  relationships:
+  - field: encryption
+    cardinality: has_one
+    target: encryption.UpdateModel
+- entity: shard.BulkWriteModel
+  fields: 1
+  relationships:
+  - field: shards
+    cardinality: has_many
+    target: shard.WriteModel
+- entity: shard.TransactionSummary
+  fields: 4
+  relationships:
+  - field: state
+    cardinality: has_one
+    target: transaction.State
+- entity: snowflake.UpdateModel
+  fields: 13
+  relationships:
+  - field: fields
+    cardinality: has_many
+    target: snowflake.Field
+- entity: sourcefile.BulkPatchModel
+  fields: 4
+  relationships:
+  - field: endpointId
+    cardinality: belongs_to
+    target_hint: endpoint
+- entity: sourcefile.BulkWriteModel
+  fields: 1
+  relationships:
+  - field: sourceFiles
+    cardinality: has_many
+    target: sourcefile.WriteModel
+- entity: sourcefile.ListResponse
+  fields: 2
+  relationships:
+  - field: sourceFiles
+    cardinality: has_many
+    target: sourcefile.ReadModel
+- entity: sourcefile.PatchModel
+  fields: 6
+  relationships:
+  - field: controlFile
+    cardinality: has_one
+    target: sourcefile.ControlFile
+- entity: transaction.ListReadModel
+  fields: 2
+  relationships:
+  - field: transactions
+    cardinality: has_many
+    target: transaction.ReadModel
+- entity: user.ListModel
+  fields: 2
+  relationships:
+  - field: users
+    cardinality: has_many
+    target: user.ReadModel
+- entity: user.QueryEngineGrantResponse
+  fields: 4
+  relationships:
+  - field: userId
+    cardinality: belongs_to
+    target_hint: user
+- entity: user.WriteModel
+  fields: 6
+  relationships:
+  - field: role
+    cardinality: has_one
+    target: user.Role
+- entity: workersize.ListResponse
+  fields: 2
+  relationships:
+  - field: workerSizes
+    cardinality: has_many
+    target: workersize.ReadModel
+- entity: workersize.ReadModel
+  fields: 4
+  relationships:
+  - field: label
+    cardinality: has_one
+    target: endpoint.WorkerSize

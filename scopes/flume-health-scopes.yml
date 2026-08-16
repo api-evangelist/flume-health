@@ -1,0 +1,130 @@
+generated: '2026-08-16'
+method: probed
+source: >-
+  https://auth.flumehealth.com/.well-known/oauth-authorization-server +
+  https://console.flumehealth.com/.well-known/oauth-protected-resource + openapi/flume-health-console-api-openapi.yml
+note: >-
+  Upgraded from the spec-only derivation. Flume Health publishes NO scopes or permissions reference page — there is
+  nothing to search — so the scope inventory below is assembled from three machine-readable sources: the
+  securityDefinitions block of the published contract (3 scopes), the live authorization-server metadata (14
+  scopes), and the MCP protected-resource metadata (4 scopes). The important finding is that all of them are
+  standard OIDC identity scopes. Flume declares NO resource or permission scopes of its own — no read/write scope,
+  no per-resource scope, nothing that constrains what a bearer token may do to accounts, endpoints, source files, or
+  the Context knowledge graph. Authorization is not expressed in the token's scope; it is enforced server-side
+  through the X-Flume-Account-ID account scoping and the Context Discovery approval/session model. An agent cannot
+  request least privilege from this API, because least privilege is not expressible in its scopes.
+docs: null
+scope_model: identity-only
+resource_scopes_declared: 0
+
+schemes:
+- name: OAuth2Implicit
+  source: openapi/flume-health-console-api-openapi.yml
+  flows:
+  - flow: implicit
+    authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api
+- name: Flume authorization server
+  source: well-known/flume-health-oauth-authorization-server.json
+  issuer: https://auth.flumehealth.com/
+- name: MCP protected resource
+  source: well-known/flume-health-oauth-protected-resource.json
+  resource: https://console.flumehealth.com/api/v1/context/mcp
+
+scopes:
+- scope: openid
+  description: OpenID Connect scope. Requests an ID token.
+  kind: identity
+  flows: [implicit, authorization_code]
+  surfaces: [rest, mcp]
+  sources:
+  - openapi/flume-health-console-api-openapi.yml
+  - well-known/flume-health-oauth-authorization-server.json
+  - well-known/flume-health-oauth-protected-resource.json
+- scope: profile
+  description: User profile information.
+  kind: identity
+  flows: [implicit, authorization_code]
+  surfaces: [rest, mcp]
+  sources:
+  - openapi/flume-health-console-api-openapi.yml
+  - well-known/flume-health-oauth-authorization-server.json
+  - well-known/flume-health-oauth-protected-resource.json
+- scope: email
+  description: User email address.
+  kind: identity
+  flows: [implicit, authorization_code]
+  surfaces: [rest, mcp]
+  sources:
+  - openapi/flume-health-console-api-openapi.yml
+  - well-known/flume-health-oauth-authorization-server.json
+  - well-known/flume-health-oauth-protected-resource.json
+- scope: offline_access
+  description: Issue a refresh token so the client can obtain new access tokens without user interaction.
+  kind: identity
+  flows: [authorization_code, device_code]
+  surfaces: [mcp]
+  note: Advertised by the authorization server and by the MCP protected-resource metadata, but NOT declared in the OpenAPI securityDefinitions.
+  sources:
+  - well-known/flume-health-oauth-authorization-server.json
+  - well-known/flume-health-oauth-protected-resource.json
+- scope: name
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: given_name
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: family_name
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: nickname
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: email_verified
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: picture
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: created_at
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: identities
+  description: Standard OIDC claim scope (linked identity providers).
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: phone
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+- scope: address
+  description: Standard OIDC claim scope.
+  kind: identity
+  sources: [well-known/flume-health-oauth-authorization-server.json]
+
+authorization_beyond_scopes:
+- mechanism: account scoping
+  detail: The X-Flume-Account-ID request header selects the health-plan account; 122 of 153 operations require it. Wrong or unpermitted account yields 403.
+- mechanism: Context Discovery sessions
+  detail: >-
+    Access to a customer's data estate for tooling is granted as a time-boxed, approver-gated session
+    (23 operations under /api/v1/context/discovery/). Grant types include subscription_access for AI CLI tools.
+    Sessions can be approved, denied, extended, cancelled and revoked, and launches are written to an audit log.
+    This — not OAuth scope — is where Flume expresses fine-grained agent authorization.
+- mechanism: query-engine grants
+  detail: /api/v1/users/{id}/query-engine-grant and /query-engine-revoke gate a user's access to the query engine.
+
+evidence:
+- url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+  http_status: 200
+- url: https://console.flumehealth.com/.well-known/oauth-protected-resource
+  http_status: 200
+- url: https://console.flumehealth.com/api/docs/docs.json
+  http_status: 200
+checked: '2026-08-16'

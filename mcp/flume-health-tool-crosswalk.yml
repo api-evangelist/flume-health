@@ -1,0 +1,326 @@
+generated: '2026-08-16'
+method: derived
+source: openapi/flume-health-console-api-openapi.yml + https://console.flumehealth.com/.well-known/oauth-protected-resource
+note: 'Flume Health ships BOTH a 153-operation REST contract and a remote MCP endpoint, so a crosswalk is in scope. But
+  the MCP tool list is OAuth-gated: POST tools/list to https://console.flumehealth.com/api/v1/context/mcp returns HTTP 401
+  with an RFC 9728 Bearer challenge, and Flume publishes no tool catalog, no MCP docs page, and no llms.txt. There is therefore
+  NOTHING to bind REST operations to. crosswalk[] is deliberately empty rather than guessed - inventing tool names to fill
+  it would manufacture an agent surface Flume has not published. What IS knowable and recorded below: the MCP endpoint lives
+  inside the /api/v1/context/ namespace of the same API, whose REST siblings (Context Discovery, Context Graph, Context
+  Knowledge) are the 54 operations most likely to back its tools. That is a lead for an authenticated re-run, not a mapping.'
+surfaces:
+  openapi:
+    url: openapi/flume-health-console-api-openapi.yml
+    host: console.flumehealth.com
+    format: swagger-2.0
+    gated: false
+    operations: 153
+    spec_url: https://console.flumehealth.com/api/docs/docs.json
+  graphql: null
+  mcp:
+    url: https://console.flumehealth.com/api/v1/context/mcp
+    gated: true
+    gate: oauth2 - HTTP 401 with WWW-Authenticate Bearer resource_metadata
+    tools_known: 0
+crosswalk: []
+mcp_only: []
+rest_only_summary:
+  context_namespace_operations: 54
+  non_context_operations: 99
+  non_context_by_tag:
+    Account Contracts: 4
+    Accounts: 8
+    AutomapJobs: 5
+    Connections: 4
+    Endpoint Maps: 2
+    Endpoints: 29
+    Flags: 5
+    Jobs v2: 5
+    Objects: 10
+    Reports: 1
+    Shards: 3
+    SourceFile: 7
+    Telemetry: 1
+    Transactions: 4
+    Users: 8
+    WorkerSizes: 3
+rest_only:
+- operationId: listDiscoveryApprovers
+  method: GET
+  path: /api/v1/context/discovery/approvers
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: createDiscoveryApprover
+  method: POST
+  path: /api/v1/context/discovery/approvers
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getDiscoveryApprover
+  method: GET
+  path: /api/v1/context/discovery/approvers/{id}
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: revokeDiscoveryApprover
+  method: POST
+  path: /api/v1/context/discovery/approvers/{id}:revoke
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: listDiscoveryConnections
+  method: GET
+  path: /api/v1/context/discovery/connections
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: createDiscoveryConnection
+  method: POST
+  path: /api/v1/context/discovery/connections
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getDiscoveryConnection
+  method: GET
+  path: /api/v1/context/discovery/connections/{id}
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: deleteDiscoveryConnection
+  method: DELETE
+  path: /api/v1/context/discovery/connections/{id}
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: updateDiscoveryConnection
+  method: PATCH
+  path: /api/v1/context/discovery/connections/{id}
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: testDiscoveryConnection
+  method: POST
+  path: /api/v1/context/discovery/connections/{id}:test
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: listDiscoveryExtractions
+  method: GET
+  path: /api/v1/context/discovery/extractions
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: executeDiscoveryExtraction
+  method: POST
+  path: /api/v1/context/discovery/extractions
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getDiscoveryExtraction
+  method: GET
+  path: /api/v1/context/discovery/extractions/{id}
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: listDiscoverySessions
+  method: GET
+  path: /api/v1/context/discovery/sessions
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: createDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getDiscoverySession
+  method: GET
+  path: /api/v1/context/discovery/sessions/{id}
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: launchDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions/{id}/launches
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: approveDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions/{id}:approve
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: cancelDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions/{id}:cancel
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: denyDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions/{id}:deny
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: extendDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions/{id}:extend
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: revokeDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions/{id}:revoke
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: grantDiscoverySession
+  method: POST
+  path: /api/v1/context/discovery/sessions:grant
+  tag: Context Discovery
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getGraphStatus
+  method: GET
+  path: /api/v1/context/graph
+  tag: Context Graph
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: queryGraph
+  method: POST
+  path: /api/v1/context/graph:query
+  tag: Context Graph
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: searchGraph
+  method: GET
+  path: /api/v1/context/graph:search
+  tag: Context Graph
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: listKnowledge
+  method: GET
+  path: /api/v1/context/knowledge
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: createKnowledge
+  method: POST
+  path: /api/v1/context/knowledge
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: createKnowledgeArtifact
+  method: POST
+  path: /api/v1/context/knowledge/artifacts
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getKnowledgeArtifactContent
+  method: GET
+  path: /api/v1/context/knowledge/artifacts/{content_hash}/content
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getKnowledgeGraph
+  method: GET
+  path: /api/v1/context/knowledge/graph
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getKnowledgePrefix
+  method: GET
+  path: /api/v1/context/knowledge/prefix
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: listKnowledgeProposals
+  method: GET
+  path: /api/v1/context/knowledge/proposals
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getKnowledgeReviewQueue
+  method: GET
+  path: /api/v1/context/knowledge/review-items
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getKnowledgePromotionPreflight
+  method: GET
+  path: /api/v1/context/knowledge/review-items/{review_item_id}/promotion-preflight
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: approveKnowledgeReviewItem
+  method: POST
+  path: /api/v1/context/knowledge/review-items/{review_item_id}:approve
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: dismissKnowledgeReviewItem
+  method: POST
+  path: /api/v1/context/knowledge/review-items/{review_item_id}:dismiss
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: mergeKnowledgeReviewItem
+  method: POST
+  path: /api/v1/context/knowledge/review-items/{review_item_id}:merge
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: rejectKnowledgeReviewItem
+  method: POST
+  path: /api/v1/context/knowledge/review-items/{review_item_id}:reject
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getTurnKnowledge
+  method: GET
+  path: /api/v1/context/knowledge/turns/{message_id}
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getKnowledge
+  method: GET
+  path: /api/v1/context/knowledge/{id}
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: deleteKnowledge
+  method: DELETE
+  path: /api/v1/context/knowledge/{id}
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: updateKnowledge
+  method: PATCH
+  path: /api/v1/context/knowledge/{id}
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getAttachCandidates
+  method: GET
+  path: /api/v1/context/knowledge/{id}/attach-candidates
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: listKnowledgeFeedback
+  method: GET
+  path: /api/v1/context/knowledge/{id}/feedback
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getFullEntity
+  method: GET
+  path: /api/v1/context/knowledge/{id}/full
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: getGraphPeekNode
+  method: GET
+  path: /api/v1/context/knowledge/{id}/peek
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: attachKnowledge
+  method: POST
+  path: /api/v1/context/knowledge/{id}:attach
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: detachKnowledge
+  method: POST
+  path: /api/v1/context/knowledge/{id}:detach
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: eraseKnowledge
+  method: POST
+  path: /api/v1/context/knowledge/{id}:erase
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: feedbackKnowledge
+  method: POST
+  path: /api/v1/context/knowledge/{id}:feedback
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: linkKnowledgeArtifact
+  method: POST
+  path: /api/v1/context/knowledge/{id}:link-artifact
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: supersedeKnowledge
+  method: POST
+  path: /api/v1/context/knowledge/{id}:supersede
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+- operationId: bulkWriteKnowledge
+  method: POST
+  path: /api/v1/context/knowledge:bulk
+  tag: Context Knowledge
+  reason: no known MCP tool - live tool list is OAuth-gated
+coverage:
+  openapi_operations: 153
+  mcp_tools_known: 0
+  mapped: 0
+  mcp_only: 0
+  rest_only: 153
+  confidence: unknown - MCP schema not readable anonymously
+next_step: Re-run tools/list with an authenticated Flume Console bearer token to recover tool names and inputSchemas, then
+  bind to the Context Discovery / Context Graph / Context Knowledge operationIds listed in rest_only.

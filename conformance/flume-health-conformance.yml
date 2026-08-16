@@ -1,0 +1,183 @@
+generated: '2026-08-16'
+method: searched
+source: >-
+  https://www.flumehealth.com/security + https://auth.flumehealth.com/.well-known/oauth-authorization-server +
+  https://console.flumehealth.com/.well-known/oauth-protected-resource + openapi/flume-health-console-api-openapi.yml
+note: >-
+  Cross-cutting standards conformance for Flume Health, asserted only where there is either a live probed artifact
+  or a first-party published claim. Flume is a healthcare data platform for payers, so the FHIR / X12 / HIPAA
+  transaction standards are the ones a reader will expect — they are recorded as NOT conformed, because the public
+  Console API contract exposes none of them, and saying so is the finding.
+
+standards:
+- id: oauth2
+  name: OAuth 2.0 (RFC 6749)
+  conforms: true
+  evidence:
+    url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+    http_status: 200
+    detail: >-
+      Authorization server on Flume's own domain publishing authorization_endpoint, token_endpoint,
+      revocation_endpoint, and 13 grant types including authorization_code, client_credentials, refresh_token,
+      device_code and token-exchange.
+
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata (RFC 8414)
+  conforms: true
+  evidence:
+    url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+    http_status: 200
+
+- id: oidc
+  name: OpenID Connect Discovery 1.0
+  conforms: true
+  evidence:
+    url: https://auth.flumehealth.com/.well-known/openid-configuration
+    http_status: 200
+    detail: >-
+      issuer, jwks_uri, userinfo_endpoint, end_session_endpoint, id_token signing algs (RS256/PS256/HS256),
+      16 claims_supported. Byte-identical to the RFC 8414 document.
+
+- id: rfc7636
+  name: PKCE (RFC 7636)
+  conforms: true
+  evidence:
+    url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+    http_status: 200
+    detail: code_challenge_methods_supported [S256, plain]
+
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration (RFC 7591)
+  conforms: true
+  evidence:
+    url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+    http_status: 200
+    detail: registration_endpoint https://auth.flumehealth.com/oidc/register
+
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata (RFC 9728)
+  conforms: true
+  evidence:
+    url: https://console.flumehealth.com/.well-known/oauth-protected-resource
+    http_status: 200
+    detail: >-
+      The MCP endpoint returns HTTP 401 with WWW-Authenticate Bearer resource_metadata pointing at this document —
+      the full RFC 9728 discovery handshake, correctly implemented. This is the mechanism that let the MCP server be
+      discovered at all.
+
+- id: rfc9449
+  name: OAuth 2.0 DPoP (RFC 9449)
+  conforms: true
+  evidence:
+    url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
+    http_status: 200
+    detail: dpop_signing_alg_values_supported [ES256]
+
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence:
+    url: https://console.flumehealth.com/api/v1/context/mcp
+    http_status: 401
+    detail: >-
+      Live remote MCP endpoint; responds to JSON-RPC POST with the RFC 9728 OAuth challenge. Protocol version and
+      tool surface are not readable anonymously.
+
+- id: openapi
+  name: OpenAPI / Swagger
+  conforms: true
+  version: swagger-2.0
+  evidence:
+    url: https://console.flumehealth.com/api/docs/docs.json
+    http_status: 200
+    detail: >-
+      644 KB machine-readable contract, 108 paths / 153 operations / 270 definitions, rendered publicly with Redoc
+      at https://console.flumehealth.com/api/docs. Swagger 2.0, not OpenAPI 3.x — a currency gap worth noting.
+
+- id: pagination
+  name: Cursor pagination
+  conforms: true
+  evidence:
+    url: openapi/flume-health-console-api-openapi.yml
+    detail: pageToken / pageSize request params and a nextPageToken response field on every list envelope.
+
+- id: aip-136
+  name: Google AIP-136 custom methods (resource:verb)
+  conforms: true
+  evidence:
+    url: openapi/flume-health-console-api-openapi.yml
+    detail: 'Consistent colon-verb custom methods across the Context surface: :approve, :deny, :revoke, :extend, :attach, :supersede, :bulk, :search, :query, :grant.'
+
+- id: rfc9457
+  name: Problem Details for HTTP APIs (RFC 9457 / RFC 7807)
+  conforms: false
+  evidence:
+    url: openapi/flume-health-console-api-openapi.yml
+    detail: >-
+      All 4xx/5xx responses use a vendor envelope (responses.ErrorResponse — code/message/details) served as
+      application/json. No application/problem+json anywhere in the contract.
+
+- id: idempotency
+  name: Idempotent write keys
+  conforms: false
+  evidence:
+    url: openapi/flume-health-console-api-openapi.yml
+    detail: No Idempotency-Key header or equivalent on any of the 153 operations.
+
+- id: rfc8594
+  name: Sunset header (RFC 8594)
+  conforms: false
+  evidence:
+    url: openapi/flume-health-console-api-openapi.yml
+    detail: No Sunset or Deprecation response headers declared; zero operations marked deprecated.
+
+- id: fhir
+  name: HL7 FHIR
+  conforms: false
+  evidence:
+    url: https://console.flumehealth.com/api/docs/docs.json
+    http_status: 200
+    detail: >-
+      No FHIR resources, no /metadata CapabilityStatement, no fhir+json media type. Flume moves health-plan data
+      through its own canonical Flume Data Model, not through FHIR, on its public API.
+
+- id: x12-edi
+  name: ASC X12N EDI (834 / 837 / 835)
+  conforms: false
+  evidence:
+    url: https://docs.flumehealth.com/endpoints
+    http_status: 200
+    detail: >-
+      Flume's Endpoints move eligibility and claims data over SFTP, cloud storage, databases, Snowflake and APIs and
+      the docs describe datatypes generically; no X12 transaction sets are named or exposed in the public contract.
+
+compliance_programs:
+- id: soc2-type-ii
+  name: SOC 2 Type II
+  claimed: true
+  evidence:
+    url: https://www.flumehealth.com/security
+    http_status: 200
+    detail: Named on Flume's public security page. No report portal, no auditor named, no attestation date published.
+- id: hitrust-csf
+  name: HITRUST CSF
+  claimed: true
+  evidence:
+    url: https://www.flumehealth.com/security
+    http_status: 200
+    detail: Named on Flume's public security page. Certification level and date not published.
+- id: hipaa
+  name: HIPAA
+  claimed: partial
+  evidence:
+    url: https://www.flumehealth.com/security
+    http_status: 200
+    detail: >-
+      The page states "HIPAA-aligned controls" — it does not claim HIPAA certification (none exists), and it does
+      not publish a BAA or a covered-entity/business-associate posture.
+
+gaps:
+- No security.txt (RFC 9116) on any Flume-controlled host.
+- No published vulnerability disclosure policy or bug bounty.
+- No trust portal — certifications are named in marketing copy only, with no evidence artifact behind them.
+- Contract is Swagger 2.0; no OpenAPI 3.x, no AsyncAPI, no event/webhook surface.
