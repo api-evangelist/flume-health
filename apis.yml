@@ -12,7 +12,7 @@ image: https://flumehealth.com/og-image.png
 url: https://raw.githubusercontent.com/api-evangelist/flume-health/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-specificationVersion: '0.21'
+specificationVersion: '0.23'
 created: '2026-08-16'
 modified: '2026-08-16'
 tags:
