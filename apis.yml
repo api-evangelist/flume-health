@@ -16,6 +16,21 @@ specificationVersion: '0.23'
 created: '2026-08-16'
 modified: '2026-08-16'
 tags:
+- Healthcare
+- Health Plans
+- Payers
+- Healthcare Data
+- Data Integration
+- iPaaS
+- Eligibility
+- Claims
+- Knowledge Graph
+- MCP
+- agent-native
+- Authentication
+- Data Engineering
+- Interoperability
+tags_raw:
 - healthcare
 - health-plans
 - payers
@@ -41,6 +56,15 @@ apis:
   humanURL: https://console.flumehealth.com/api/docs
   baseURL: https://console.flumehealth.com/
   tags:
+  - Healthcare
+  - Health Plans
+  - Data Integration
+  - iPaaS
+  - Eligibility
+  - Claims
+  - Knowledge Graph
+  - Authentication
+  tags_raw:
   - healthcare
   - health-plans
   - data-integration
@@ -78,6 +102,11 @@ apis:
   humanURL: https://www.flumehealth.com/developers
   baseURL: https://console.flumehealth.com/api/v1/context/mcp
   tags:
+  - MCP
+  - agent-native
+  - Knowledge Graph
+  - Healthcare
+  tags_raw:
   - mcp
   - agent-native
   - knowledge-graph
