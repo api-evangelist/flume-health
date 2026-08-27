@@ -46,59 +46,13 @@ tags_raw:
 - data-engineering
 - interoperability
 apis:
-- name: Flume Console API
-  description: The REST API for Relay by Flume Health. Manages Accounts, Account Contracts, Connections, Endpoints and their
-    per-protocol secrets and tests (API, cloud storage, database, SFTP, Snowflake, Flume Lakehouse), Endpoint Maps, Shards,
-    Transactions, Source Files, Business Objects and Instances, Users, Flags, Worker Sizes, Reports, Telemetry, and v2 trade/automap
-    jobs — plus the Context Discovery, Context Graph, and Context Knowledge surfaces. Swagger 2.0, 153 operations across
-    108 paths, OAuth 2.0 / OIDC bearer auth, account scoping via the X-Flume-Account-ID header, and pageToken/pageSize cursor
-    pagination.
-  humanURL: https://console.flumehealth.com/api/docs
-  baseURL: https://console.flumehealth.com/
-  tags:
-  - Healthcare
-  - Health Plans
-  - Data Integration
-  - iPaaS
-  - Eligibility
-  - Claims
-  - Knowledge Graph
-  - Authentication
-  tags_raw:
-  - healthcare
-  - health-plans
-  - data-integration
-  - ipaas
-  - eligibility
-  - claims
-  - knowledge-graph
-  - oauth2
-  properties:
-  - type: OpenAPI
-    url: openapi/flume-health-console-api-openapi.yml
-  - type: APIReference
-    url: https://console.flumehealth.com/api/docs
-  - type: Documentation
-    url: https://docs.flumehealth.com/
-  - type: Authentication
-    url: authentication/flume-health-authentication.yml
-  - type: OAuthScopes
-    url: scopes/flume-health-scopes.yml
-  - type: Conventions
-    url: conventions/flume-health-conventions.yml
-  - type: ErrorCatalog
-    url: errors/flume-health-problem-types.yml
-  - type: DataModel
-    url: data-model/flume-health-data-model.yml
-  - type: Overlay
-    url: overlays/flume-health-console-api-overlay.yaml
-  - type: RateLimits
-    url: rate-limits/flume-health-rate-limits.yml
 - name: Flume Context MCP Server
-  description: A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp. It is protected
-    by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401 with a WWW-Authenticate Bearer challenge
-    and a resource_metadata pointer to unauthenticated callers, so the live tool list requires an authenticated introspection.
-    Discovered by probe; Flume publishes no MCP documentation page.
+  description: >-
+    A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp. It is
+    protected by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401 with a
+    WWW-Authenticate Bearer challenge and a resource_metadata pointer to unauthenticated callers, so the
+    live tool list requires an authenticated introspection. Discovered by probe; Flume publishes no MCP
+    documentation page.
   humanURL: https://www.flumehealth.com/developers
   baseURL: https://console.flumehealth.com/api/v1/context/mcp
   tags:
@@ -122,6 +76,500 @@ apis:
     url: scopes/flume-health-scopes.yml
   - type: Authentication
     url: authentication/flume-health-authentication.yml
+- aid: flume-health:flume-health-account-contracts-api
+  name: Flume Health Account Contracts API
+  description: The Account Contracts API from Flume Health — 2 operation(s) for account contracts.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Account Contracts
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-account-contracts-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-accounts-api
+  name: Flume Health Accounts API
+  description: The Accounts API from Flume Health — 4 operation(s) for accounts.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-accounts-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-automapjobs-api
+  name: Flume Health Automap Jobs API
+  description: The AutomapJobs API from Flume Health — 3 operation(s) for automapjobs.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - AutomapJobs
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-automapjobs-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-connections-api
+  name: Flume Health Connections API
+  description: The Connections API from Flume Health — 2 operation(s) for connections.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Connections
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-connections-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-context-discovery-api
+  name: Flume Health Context Discovery API
+  description: The Context Discovery API from Flume Health — 17 operation(s) for context discovery.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Context Discovery
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-context-discovery-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-context-graph-api
+  name: Flume Health Context Graph API
+  description: The Context Graph API from Flume Health — 3 operation(s) for context graph.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Context Graph
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-context-graph-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-context-knowledge-api
+  name: Flume Health Context Knowledge API
+  description: The Context Knowledge API from Flume Health — 25 operation(s) for context knowledge.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Context Knowledge
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-context-knowledge-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-endpoint-maps-api
+  name: Flume Health Endpoint Maps API
+  description: The Endpoint Maps API from Flume Health — 2 operation(s) for endpoint maps.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Endpoint Maps
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-endpoint-maps-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-endpoints-api
+  name: Flume Health Endpoints API
+  description: The Endpoints API from Flume Health — 23 operation(s) for endpoints.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Endpoints
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-endpoints-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-flags-api
+  name: Flume Health Flags API
+  description: The Flags API from Flume Health — 2 operation(s) for flags.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Flags
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-flags-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-jobs-v2-api
+  name: Flume Health Jobs v2 API
+  description: The Jobs v2 API from Flume Health — 3 operation(s) for jobs v2.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Jobs v2
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-jobs-v2-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-objects-api
+  name: Flume Health Objects API
+  description: The Objects API from Flume Health — 5 operation(s) for objects.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Objects
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-objects-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-reports-api
+  name: Flume Health Reports API
+  description: The Reports API from Flume Health — 1 operation(s) for reports.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Reports
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-reports-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-shards-api
+  name: Flume Health Shards API
+  description: The Shards API from Flume Health — 2 operation(s) for shards.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Shards
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-shards-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-sourcefile-api
+  name: Flume Health Source File API
+  description: The SourceFile API from Flume Health — 4 operation(s) for sourcefile.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - SourceFile
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-sourcefile-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-telemetry-api
+  name: Flume Health Telemetry API
+  description: The Telemetry API from Flume Health — 1 operation(s) for telemetry.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Telemetry
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-telemetry-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-transactions-api
+  name: Flume Health Transactions API
+  description: The Transactions API from Flume Health — 2 operation(s) for transactions.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-transactions-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-users-api
+  name: Flume Health Users API
+  description: The Users API from Flume Health — 5 operation(s) for users.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-users-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-workersizes-api
+  name: Flume Health Worker Sizes API
+  description: The WorkerSizes API from Flume Health — 2 operation(s) for workersizes.
+  humanURL: https://console.flumehealth.com/api/docs
+  baseURL: https://console.flumehealth.com/
+  tags:
+  - WorkerSizes
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-workersizes-api-openapi.yml
+  - type: APIReference
+    url: https://console.flumehealth.com/api/docs
+  - type: Documentation
+    url: https://docs.flumehealth.com/
+  - type: Authentication
+    url: authentication/flume-health-authentication.yml
+  - type: OAuthScopes
+    url: scopes/flume-health-scopes.yml
+  - type: Conventions
+    url: conventions/flume-health-conventions.yml
+  - type: ErrorCatalog
+    url: errors/flume-health-problem-types.yml
+  - type: DataModel
+    url: data-model/flume-health-data-model.yml
+  - type: RateLimits
+    url: rate-limits/flume-health-rate-limits.yml
 common:
 - type: TrustCenter
   url: security/flume-health-trust-center.yml
