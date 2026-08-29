@@ -8,6 +8,18 @@ description: Flume Health is a New York based healthcare data platform for the p
   exposed to AI clients through an OAuth-protected Model Context Protocol endpoint. The public Flume Console API is a 153-operation
   Swagger 2.0 contract served from console.flumehealth.com, authenticated with OpenID Connect / OAuth 2.0 at auth.flumehealth.com.
   Flume sold its third-party administrator operations to Vitori Health in 2023 to focus on the software platform.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://flumehealth.com/og-image.png
 url: https://raw.githubusercontent.com/api-evangelist/flume-health/refs/heads/main/apis.yml
 x-type: company
