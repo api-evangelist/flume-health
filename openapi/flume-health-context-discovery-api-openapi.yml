@@ -1,0 +1,2073 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Context Discovery API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Context Discovery
+paths:
+  /api/v1/context/discovery/approvers:
+    get:
+      description: List PAM approvers. Requires can_grant_approvers permission.
+      tags:
+      - Context Discovery
+      summary: List Discovery Approvers
+      operationId: listDiscoveryApprovers
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Filter by email
+        name: email
+        in: query
+        schema:
+          type: string
+      - description: 'Filter by active status (default: true)'
+        name: active
+        in: query
+        schema:
+          type: boolean
+      - description: Page token for pagination
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of results per page
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ApproverListResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Create a new PAM approver. Requires can_grant_approvers permission.
+      tags:
+      - Context Discovery
+      summary: Create Discovery Approver
+      operationId: createDiscoveryApprover
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ApproverReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.ApproverCreateRequest'
+        description: Approver to create
+        required: true
+  /api/v1/context/discovery/approvers/{id}:
+    get:
+      description: Get a specific PAM approver
+      tags:
+      - Context Discovery
+      summary: Get Discovery Approver
+      operationId: getDiscoveryApprover
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Approver ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ApproverReadModel'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/context/discovery/approvers/{id}:revoke:
+    post:
+      description: Revoke a PAM approver's access. Requires can_grant_approvers permission.
+      tags:
+      - Context Discovery
+      summary: Revoke Discovery Approver
+      operationId: revokeDiscoveryApprover
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Approver ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ApproverReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.ApproverRevokeRequest'
+        description: Revocation reason
+  /api/v1/context/discovery/connections:
+    get:
+      description: 'List connections available for context discovery operations.
+
+        Soft-deleted connections (`deletedAt != null`) are excluded by
+
+        default; pass `includeDeleted=true` to see them in the response
+
+        (useful for audit/recovery flows).'
+      tags:
+      - Context Discovery
+      summary: List Discovery Connections
+      operationId: listDiscoveryConnections
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Filter by connection type
+        name: connectionType
+        in: query
+        schema:
+          type: string
+      - description: Filter by enabled status
+        name: enabled
+        in: query
+        schema:
+          type: boolean
+      - description: Include soft-deleted connections (default false)
+        name: includeDeleted
+        in: query
+        schema:
+          type: boolean
+      - description: Page token for pagination
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of results per page
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ConnectionListResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Create a new connection for context discovery
+      tags:
+      - Context Discovery
+      summary: Create Discovery Connection
+      operationId: createDiscoveryConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ConnectionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.ConnectionWriteModel'
+        description: Connection configuration
+        required: true
+  /api/v1/context/discovery/connections/{id}:
+    get:
+      description: Get a specific connection for context discovery
+      tags:
+      - Context Discovery
+      summary: Get Discovery Connection
+      operationId: getDiscoveryConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Connection ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ConnectionReadModel'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    delete:
+      description: Delete a discovery connection
+      tags:
+      - Context Discovery
+      summary: Delete Discovery Connection
+      operationId: deleteDiscoveryConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Connection ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Update a connection for context discovery
+      tags:
+      - Context Discovery
+      summary: Update Discovery Connection
+      operationId: updateDiscoveryConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Connection ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ConnectionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.ConnectionPatchModel'
+        description: Connection updates
+        required: true
+  /api/v1/context/discovery/connections/{id}:test:
+    post:
+      description: Test connectivity to a discovery connection
+      tags:
+      - Context Discovery
+      summary: Test Discovery Connection
+      operationId: testDiscoveryConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Connection ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ConnectionTestResult'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/context/discovery/extractions:
+    get:
+      description: List data extraction operations for discovery
+      tags:
+      - Context Discovery
+      summary: List Extractions
+      operationId: listDiscoveryExtractions
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Filter by session ID
+        name: sessionId
+        in: query
+        schema:
+          type: string
+      - description: Filter by requester (me, all, or email)
+        name: requester
+        in: query
+        schema:
+          type: string
+      - description: Filter by status
+        name: status
+        in: query
+        schema:
+          type: string
+      - description: Page token for pagination
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of results per page
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ExtractionListResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Execute a data extraction (SQL query) against a connection
+      tags:
+      - Context Discovery
+      summary: Execute Extraction
+      operationId: executeDiscoveryExtraction
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ExtractionResultModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Session expired or not approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '422':
+          description: SQL validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.ExtractionCreateRequest'
+        description: Extraction parameters
+        required: true
+  /api/v1/context/discovery/extractions/{id}:
+    get:
+      description: Get a specific extraction with results
+      tags:
+      - Context Discovery
+      summary: Get Extraction
+      operationId: getDiscoveryExtraction
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Extraction ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.ExtractionResultModel'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/context/discovery/sessions:
+    get:
+      description: List discovery access sessions (PAM requests)
+      tags:
+      - Context Discovery
+      summary: List Discovery Sessions
+      operationId: listDiscoverySessions
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Filter by status (pending, approved, denied, expired, revoked)
+        name: status
+        in: query
+        schema:
+          type: string
+      - description: Filter by requester (me, all)
+        name: requester
+        in: query
+        schema:
+          type: string
+      - description: Filter by grant type (data_access, approver_access)
+        name: grantType
+        in: query
+        schema:
+          type: string
+      - description: Page token for pagination
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of results per page
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionListResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Request a new discovery access session (PAM request)
+      tags:
+      - Context Discovery
+      summary: Request Discovery Session
+      operationId: createDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionCreateRequest'
+        description: Session request
+        required: true
+  /api/v1/context/discovery/sessions/{id}:
+    get:
+      description: Get a specific discovery access session
+      tags:
+      - Context Discovery
+      summary: Get Discovery Session
+      operationId: getDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/context/discovery/sessions/{id}/launches:
+    post:
+      description: Record a single AI CLI tool launch under a subscription_access session. The session must exist, belong to the caller, be a subscription_access grant, be approved, and not be expired or revoked. The launch is written to the audit log (event=isolated_session_launch); the response is a resource-create shape so the backing store can move to a table later without changing the contract.
+      tags:
+      - Context Discovery
+      summary: Record Subscription Session Launch
+      operationId: launchDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionLaunchResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionLaunchRequest'
+        description: Launch record
+        required: true
+  /api/v1/context/discovery/sessions/{id}:approve:
+    post:
+      description: Approve a pending discovery access request
+      tags:
+      - Context Discovery
+      summary: Approve Discovery Session
+      operationId: approveDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionApproveRequest'
+        description: Approval comment
+  /api/v1/context/discovery/sessions/{id}:cancel:
+    post:
+      description: Cancel a pending discovery access request. Only the requester can cancel their own pending session.
+      tags:
+      - Context Discovery
+      summary: Cancel Discovery Session
+      operationId: cancelDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionCancelRequest'
+        description: Cancellation reason
+  /api/v1/context/discovery/sessions/{id}:deny:
+    post:
+      description: Deny a pending discovery access request
+      tags:
+      - Context Discovery
+      summary: Deny Discovery Session
+      operationId: denyDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionDenyRequest'
+        description: Denial reason
+        required: true
+  /api/v1/context/discovery/sessions/{id}:extend:
+    post:
+      description: Request to extend a session's expiration time. Requires approver approval.
+      tags:
+      - Context Discovery
+      summary: Extend Discovery Session
+      operationId: extendDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionExtendRequest'
+        description: Extension request
+        required: true
+  /api/v1/context/discovery/sessions/{id}:revoke:
+    post:
+      description: Revoke an active discovery access session
+      tags:
+      - Context Discovery
+      summary: Revoke Discovery Session
+      operationId: revokeDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Session ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionRevokeRequest'
+        description: Revocation reason
+  /api/v1/context/discovery/sessions:grant:
+    post:
+      description: Approver creates a pre-approved PAM session on behalf of another user. Skips the request → approve round-trip needed for onboarding / pre-provisioning. Caller must be a registered approver (root, SystemAdmin, or account-level approver). Self-grant is rejected for non-root callers.
+      tags:
+      - Context Discovery
+      summary: Grant Discovery Session (approver-only)
+      operationId: grantDiscoverySession
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.SessionReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionGrantRequest'
+        description: Grant request
+        required: true
+components:
+  schemas:
+    discovery.ExtractionStatus:
+      type: string
+      enum:
+      - pending
+      - running
+      - success
+      - failed
+      - blocked
+      - timeout
+      x-enum-varnames:
+      - ExtractionStatusPending
+      - ExtractionStatusRunning
+      - ExtractionStatusSuccess
+      - ExtractionStatusFailed
+      - ExtractionStatusBlocked
+      - ExtractionStatusTimeout
+    discovery.SessionCancelRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.ApproverCreateRequest:
+      type: object
+      required:
+      - email
+      properties:
+        accountId:
+          description: 'Optional: scope to specific account. If nil, approver has no account restriction.'
+          type: integer
+        canGrantApprovers:
+          description: 'Default: false'
+          type: boolean
+        email:
+          type: string
+        reason:
+          type: string
+    discovery.ConnectionType:
+      type: string
+      enum:
+      - database
+      - lakehouse
+      x-enum-varnames:
+      - ConnectionTypeDatabase
+      - ConnectionTypeLakehouse
+    discovery.SessionLaunchRequest:
+      description: Record of a single AI CLI tool launch under a subscription_access session.
+      type: object
+      properties:
+        cliVersion:
+          description: Version string of the CLI binary. Required; capped at 64 characters.
+          type: string
+          example: 0.1.42
+        cwd:
+          description: Working directory the tool was launched from. Optional; capped at 1024 characters.
+          type: string
+          example: /Users/dev/project
+        tool:
+          description: AI CLI tool being launched. Must be exactly "claude" or "codex".
+          type: string
+          enum:
+          - claude
+          - codex
+          example: claude
+    discovery.ConnectionTestResult:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+        latencyMs:
+          type: integer
+        success:
+          type: boolean
+    discovery.ExtractionResultModel:
+      type: object
+      properties:
+        bytesReturned:
+          type: integer
+        columns:
+          type: array
+          items:
+            type: string
+        connectionId:
+          type: integer
+        createdAt:
+          type: string
+        errorMessage:
+          type: string
+        executionMs:
+          type: integer
+        exfiltrationScore:
+          type: number
+        extractionType:
+          $ref: '#/components/schemas/discovery.ExtractionType'
+        id:
+          type: string
+        params:
+          type: object
+          additionalProperties: {}
+        requesterEmail:
+          type: string
+        resultLocation:
+          type: string
+        rowCount:
+          type: integer
+        rows:
+          type: array
+          items:
+            type: array
+            items: {}
+        sessionId:
+          type: string
+        sql:
+          type: string
+        status:
+          $ref: '#/components/schemas/discovery.ExtractionStatus'
+    discovery.ApproverRevokeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.SessionExtendRequest:
+      type: object
+      required:
+      - expireTime
+      - reason
+      properties:
+        expireTime:
+          description: New expiration time (must be after current expires_at)
+          type: string
+        reason:
+          description: Reason for requesting extension
+          type: string
+    discovery.SessionStatus:
+      type: string
+      enum:
+      - pending
+      - approved
+      - denied
+      - expired
+      - revoked
+      - cancelled
+      - extension_pending
+      x-enum-varnames:
+      - SessionStatusPending
+      - SessionStatusApproved
+      - SessionStatusDenied
+      - SessionStatusExpired
+      - SessionStatusRevoked
+      - SessionStatusCancelled
+      - SessionStatusExtensionPending
+    discovery.ExtractionListResponse:
+      type: object
+      properties:
+        extractions:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.ExtractionReadModel'
+        nextPageToken:
+          type: string
+    discovery.SessionGrantReadModel:
+      type: object
+      properties:
+        connectionId:
+          type: integer
+        connectionName:
+          type: string
+    discovery.ExtractionCreateRequest:
+      type: object
+      required:
+      - connectionId
+      - params
+      - sessionId
+      properties:
+        connectionId:
+          description: Must be in session's grants
+          type: integer
+        extractionType:
+          description: 'Default: sql_query'
+          allOf:
+          - $ref: '#/components/schemas/discovery.ExtractionType'
+        maxRows:
+          description: Override connection default
+          type: integer
+        params:
+          type: object
+          additionalProperties: {}
+        sessionId:
+          type: string
+    discovery.ApproverListResponse:
+      type: object
+      properties:
+        approvers:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.ApproverReadModel'
+        nextPageToken:
+          type: string
+    discovery.SessionDenyRequest:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+    discovery.SessionLaunchResponse:
+      description: A recorded AI CLI tool launch under a subscription_access session.
+      type: object
+      properties:
+        cliVersion:
+          description: Version of the CLI binary.
+          type: string
+          example: 0.1.42
+        cwd:
+          description: Working directory the tool was launched from.
+          type: string
+          example: /Users/dev/project
+        id:
+          description: Server-generated unique identifier for this launch record (UUID).
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        sessionId:
+          description: The subscription_access session this launch was recorded under.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        startTime:
+          description: When the launch was recorded (RFC3339).
+          type: string
+          example: '2024-12-31T23:59:59Z'
+        tool:
+          description: AI CLI tool that was launched.
+          type: string
+          enum:
+          - claude
+          - codex
+          example: claude
+    discovery.ApproverReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        accountName:
+          type: string
+        active:
+          type: boolean
+        canGrantApprovers:
+          type: boolean
+        createdAt:
+          type: string
+        email:
+          type: string
+        grantReason:
+          type: string
+        grantedBy:
+          type: string
+        id:
+          type: integer
+        revokeReason:
+          type: string
+        revokedAt:
+          type: string
+        revokedBy:
+          type: string
+        updatedAt:
+          type: string
+    discovery.ConnectionPatchModel:
+      type: object
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties
+          type: boolean
+        connectionConfig:
+          type: object
+          additionalProperties: {}
+        defaultRowLimit:
+          type: integer
+        description:
+          type: string
+        enabled:
+          type: boolean
+        maxResultBytes:
+          description: Per-connection byte limit
+          type: integer
+        name:
+          type: string
+        secretValue:
+          description: Updates Secret Manager
+          type: string
+        timeoutSeconds:
+          type: integer
+    discovery.GrantType:
+      type: string
+      enum:
+      - data_access
+      - approver_access
+      - subscription_access
+      x-enum-varnames:
+      - GrantTypeDataAccess
+      - GrantTypeApproverAccess
+      - GrantTypeSubscriptionAccess
+    discovery.ConnectionWriteModel:
+      type: object
+      required:
+      - connectionConfig
+      - connectionType
+      - name
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties
+          type: boolean
+        connectionConfig:
+          type: object
+          additionalProperties: {}
+        connectionType:
+          $ref: '#/components/schemas/discovery.ConnectionType'
+        defaultRowLimit:
+          type: integer
+        description:
+          type: string
+        maxResultBytes:
+          description: Per-connection byte limit
+          type: integer
+        name:
+          type: string
+        secretValue:
+          description: Written to Secret Manager, not stored
+          type: string
+        timeoutSeconds:
+          type: integer
+    discovery.ExtractionReadModel:
+      type: object
+      properties:
+        bytesReturned:
+          type: integer
+        connectionId:
+          type: integer
+        createdAt:
+          type: string
+        errorMessage:
+          type: string
+        executionMs:
+          type: integer
+        exfiltrationScore:
+          type: number
+        extractionType:
+          $ref: '#/components/schemas/discovery.ExtractionType'
+        id:
+          type: string
+        params:
+          type: object
+          additionalProperties: {}
+        requesterEmail:
+          type: string
+        resultLocation:
+          type: string
+        rowCount:
+          type: integer
+        sessionId:
+          type: string
+        sql:
+          type: string
+        status:
+          $ref: '#/components/schemas/discovery.ExtractionStatus'
+    discovery.SessionGrantRequest:
+      description: Approver creates a pre-approved PAM session for another user.
+      type: object
+      required:
+      - expireTime
+      - reason
+      - requesterEmail
+      properties:
+        connectionIds:
+          description: 'IDs of connections to grant access to. Either this (one or more) or
+
+            grantAllConnections=true is required; empty + false is rejected.
+
+            `validate:"required,min=1"` is intentionally NOT used here because the
+
+            wildcard alternative makes connectionIds non-required at the validation
+
+            layer; the manager enforces the "one or the other" rule with a clearer
+
+            error message.'
+          type: array
+          items:
+            type: integer
+          example:
+          - 1
+          - 2
+          - 3
+        expireTime:
+          description: 'When this session should expire (RFC3339 format). Must be in the
+
+            future — past timestamps are rejected with a validation error.'
+          type: string
+          example: '2099-12-31T23:59:59Z'
+        grantAllConnections:
+          description: 'Wildcard scope: when true, the granted session covers every enabled
+
+            connection in the recipient''s account at query time. For trusted
+
+            users where explicit enumeration is brittle as the estate evolves.
+
+            Pass either this OR connectionIds, not both.'
+          type: boolean
+          example: false
+        reason:
+          description: 'Business justification for the grant. Audit trail for the
+
+            approver''s decision to provision access without an explicit
+
+            request from the recipient.'
+          type: string
+          example: Pre-provisioning demo access for a sandbox account
+        requesterEmail:
+          description: 'Email of the user the session is being created for. NOT validated
+
+            against the user table at grant time — the recipient may be invited
+
+            later. If the email is never provisioned, the session simply won''t
+
+            be usable when they try (userscope middleware returns 404 on
+
+            unknown emails). The approver assumes the trust responsibility for
+
+            the email being correct.'
+          type: string
+          example: newuser@example.com
+    discovery.SessionListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.SessionReadModel'
+    discovery.SessionRevokeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.ConnectionReadModel:
+      type: object
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties for dev/staging
+          type: boolean
+        connectionConfig:
+          type: object
+          additionalProperties: {}
+        connectionType:
+          $ref: '#/components/schemas/discovery.ConnectionType'
+        createdAt:
+          type: string
+        defaultRowLimit:
+          type: integer
+        deletedAt:
+          description: Set when soft-deleted; secret has been destroyed and connection is rejected by all execution paths
+          type: string
+        description:
+          type: string
+        enabled:
+          type: boolean
+        id:
+          type: integer
+        maxResultBytes:
+          description: Per-connection byte limit (nil = use default)
+          type: integer
+        name:
+          type: string
+        supportsSQL:
+          type: boolean
+        timeoutSeconds:
+          type: integer
+        updatedAt:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    discovery.ConnectionListResponse:
+      type: object
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.ConnectionReadModel'
+        nextPageToken:
+          type: string
+    discovery.SessionApproveRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+    discovery.SessionCreateRequest:
+      description: Request to create a PAM session for database access or approver delegation.
+      type: object
+      required:
+      - expireTime
+      - reason
+      properties:
+        canGrantApproverAccess:
+          description: 'For approver_access grants: if true, recipient can grant approver access to others.
+
+            Only root approvers can set this to true.'
+          type: boolean
+          example: false
+        connectionIds:
+          description: 'IDs of connections to grant access to. For data_access grants, either
+
+            this (one or more) or grantAllConnections=true is required.'
+          type: array
+          items:
+            type: integer
+          example:
+          - 1
+          - 2
+          - 3
+        expireTime:
+          description: When this session should expire (RFC3339 format). Must be in the future.
+          type: string
+          example: '2024-12-31T23:59:59Z'
+        grantAllConnections:
+          description: 'Wildcard scope (data_access only): when true, the session covers every
+
+            enabled connection in the requester''s account at query time. Useful for
+
+            trusted users (CTO, account admins) where enumeration is brittle as the
+
+            data estate evolves — connections added after approval are automatically
+
+            covered. Pass either this OR connectionIds, not both; the wildcard
+
+            supersedes any explicit list.'
+          type: boolean
+          example: false
+        grantType:
+          description: 'Type of access: "data_access" (query databases), "approver_access"
+
+            (approve other sessions), or "subscription_access" (self-attested,
+
+            time-boxed grant to run AI CLI tools off the LLM gateway — no connection
+
+            scope, no recipient, born approved, capped at 24h). Default: data_access'
+          enum:
+          - data_access
+          - approver_access
+          - subscription_access
+          allOf:
+          - $ref: '#/components/schemas/discovery.GrantType'
+          example: data_access
+        reason:
+          description: Business justification for requesting access
+          type: string
+          example: Need to investigate claim processing issue
+        recipientEmail:
+          description: 'For approver_access grants: email of user to grant approver rights to'
+          type: string
+          example: newapprover@example.com
+    discovery.SessionReadModel:
+      description: PAM session granting time-limited access to database connections.
+      type: object
+      properties:
+        approvalComment:
+          description: Optional comment from the approver
+          type: string
+        approvedAt:
+          description: When this session was approved
+          type: string
+        approverEmail:
+          description: Email of the approver who approved/denied this request
+          type: string
+          example: admin@example.com
+        canGrantApproverAccess:
+          description: 'If true and grantType is "approver_access", this approver can grant approver access to others.
+
+            Only the root approver can set this to true.'
+          type: boolean
+          example: false
+        createdAt:
+          description: When this session request was created
+          type: string
+        denialReason:
+          description: Reason given if the session was denied
+          type: string
+        expireTime:
+          description: 'User-requested expiration time (RFC3339 format). Set by requester in SessionCreateRequest.
+
+            On approval, this value is typically copied to ExpiresAt (which is the enforced expiration).'
+          type: string
+          example: '2024-12-31T23:59:59Z'
+        expiresAt:
+          description: 'Actual enforced expiration time. Set on approval (typically = ExpireTime, but approver may adjust).
+
+            This is the authoritative expiration used for session validity checks.'
+          type: string
+        grantAllConnections:
+          description: 'Wildcard scope: when true, this data_access session covers every enabled
+
+            connection in its account at query time (resolved live, so connections
+
+            added after approval are automatically covered). Applicable only
+
+            when grantType=data_access.'
+          type: boolean
+          example: false
+        grantType:
+          description: 'Type of access granted: "data_access" (execute queries), "approver_access"
+
+            (approve sessions), or "subscription_access" (self-attested, off-gateway
+
+            AI CLI grant with no connection scope).'
+          enum:
+          - data_access
+          - approver_access
+          - subscription_access
+          allOf:
+          - $ref: '#/components/schemas/discovery.GrantType'
+          example: data_access
+        grants:
+          description: 'Connections this session grants access to. Omitted from the JSON
+
+            payload when GrantAllConnections is true (the slice is nil and
+
+            `omitempty` drops it) — clients should treat a missing `grants`
+
+            field as "no explicit grants" and rely on `grantAllConnections`
+
+            to know whether the wildcard scope applies.'
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.SessionGrantReadModel'
+        id:
+          description: Unique identifier for this session (UUID format)
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        reason:
+          description: Business justification for requesting access
+          type: string
+          example: Need to investigate claim processing issue
+        recipientEmail:
+          description: 'For approver_access grants: the email of the user receiving approver rights.
+
+            Distinguishes requester (granter) from recipient (grantee) in the delegation chain.'
+          type: string
+          example: newapprover@example.com
+        requesterEmail:
+          description: Email of the user who requested this session
+          type: string
+          example: user@example.com
+        revokedAt:
+          description: When this session was manually revoked (if applicable)
+          type: string
+        revokedBy:
+          description: Email of user who revoked the session
+          type: string
+        status:
+          description: 'Current status: pending, approved, denied, expired, revoked, cancelled, or extension_pending'
+          enum:
+          - pending
+          - approved
+          - denied
+          - expired
+          - revoked
+          - cancelled
+          - extension_pending
+          allOf:
+          - $ref: '#/components/schemas/discovery.SessionStatus'
+          example: approved
+        updatedAt:
+          description: When this session was last updated
+          type: string
+    discovery.ExtractionType:
+      type: string
+      enum:
+      - sql_query
+      x-enum-varnames:
+      - ExtractionTypeSQLQuery
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

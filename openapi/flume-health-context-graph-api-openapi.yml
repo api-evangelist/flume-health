@@ -1,0 +1,268 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Context Graph API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Context Graph
+paths:
+  /api/v1/context/graph:
+    get:
+      description: Returns the health and metadata of the knowledge graph for the authenticated account
+      tags:
+      - Context Graph
+      summary: Get graph status
+      operationId: getGraphStatus
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.StatusResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/graph:query:
+    post:
+      description: Runs a read-only Cypher query against the account's knowledge graph
+      tags:
+      - Context Graph
+      summary: Execute a Cypher query
+      operationId: queryGraph
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.QueryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '408':
+          description: Request Timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/graph.QueryRequest'
+        description: Cypher query
+        required: true
+  /api/v1/context/graph:search:
+    get:
+      description: Performs semantic or hybrid vector search against the account's graph
+      tags:
+      - Context Graph
+      summary: Search the knowledge graph
+      operationId: searchGraph
+      parameters:
+      - description: Search query text
+        name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: 'Search mode: semantic or hybrid'
+        name: mode
+        in: query
+        schema:
+          type: string
+          enum:
+          - semantic
+          - hybrid
+          default: semantic
+      - description: Max results to return
+        name: top_k
+        in: query
+        schema:
+          type: integer
+          default: 10
+      - description: Min similarity threshold (0-1)
+        name: min_similarity
+        in: query
+        schema:
+          type: number
+          default: 0
+      - description: Filter by vertex type (e.g. Table, Column)
+        name: label
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.SearchResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    graph.StatusResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.Meta'
+        edgeCount:
+          type: integer
+        lastLoaded:
+          type: string
+        nodeCount:
+          type: integer
+        status:
+          type: string
+    graph.QueryRequest:
+      type: object
+      required:
+      - cypher
+      properties:
+        cypher:
+          type: string
+    graph.QueryMeta:
+      type: object
+      properties:
+        rowCount:
+          type: integer
+        took:
+          type: string
+        truncated:
+          type: boolean
+    graph.QueryResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.QueryMeta'
+        columns:
+          type: array
+          items:
+            type: string
+        results:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+    graph.Meta:
+      type: object
+      properties:
+        took:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    knowledgestore.SearchResult:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties: {}
+        score:
+          type: number
+    graph.SearchResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.SearchMeta'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.SearchResult'
+    graph.SearchMeta:
+      type: object
+      properties:
+        mode:
+          type: string
+        resultCount:
+          type: integer
+        took:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

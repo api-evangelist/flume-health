@@ -1,0 +1,3163 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Endpoints API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Endpoints
+paths:
+  /api/v1/endpoints:
+    get:
+      description: Lists Endpoints.
+      tags:
+      - Endpoints
+      summary: List Endpoints
+      operationId: listEndpoints
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Endpoints to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: List of ids to filter for. If empty, no filtration occurs.
+        name: ids
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+      - description: List of endpoint states to filter for. If empty, no filtration occurs.
+        name: states
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            enum:
+            - Idle
+            - Running
+            - Error
+            - Stopped
+            type: string
+      - description: Connection ID to filter for
+        name: connectionId
+        in: query
+        schema:
+          type: integer
+      - description: View to return. If `alerts` is provided, endpoints that should be alerted on are returned
+        name: view
+        in: query
+        schema:
+          type: string
+      - description: Return Archived Endpoints
+        name: archived
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Creates an Endpoint.
+      tags:
+      - Endpoints
+      summary: Create Endpoint
+      operationId: createEndpoint
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpoint.WriteModel'
+        description: Endpoint Body
+        required: true
+  /api/v1/endpoints/datatypes:
+    get:
+      description: Gets the list of data types that can be used in an endpoint mapping.
+      tags:
+      - Endpoints
+      summary: Get Endpoint Datatypes
+      operationId: getEndpointDataTypes
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datatypes.DataTypes'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/datatypes/{datatype}:
+    get:
+      description: Gets the information for a specific datatype that can be used in an endpoint mapping.
+      tags:
+      - Endpoints
+      summary: Get Endpoint Datatype
+      operationId: getEndpointDataType
+      parameters:
+      - description: name of the datatype
+        name: datatype
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - Accumulators
+          - Authorizations
+          - Bytes
+          - Eligibility
+          - Groups
+          - MedicalClaimServiceLines
+          - Providers
+          - RxClaimServiceLines
+          - MedicalAndRxClaimLines
+          - Test
+          - TransactionMetadata
+          - Generic
+          - RecordLevelMetadata
+          - PlanNetworks
+          - ProviderNetworkDirectory
+          - HmClaimsExtended
+          - HmProvidersExtended
+          - Strings
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/datatypes.DataType'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/lambdas:
+    get:
+      description: Lists Lambdas for Endpoints.
+      tags:
+      - Endpoints
+      summary: List Endpoint Lambdas
+      operationId: listEndpointLambdas
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Lambdas to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.LambdaList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}:
+    get:
+      description: Gets an Endpoint.
+      tags:
+      - Endpoints
+      summary: Get Endpoint
+      operationId: getEndpoint
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: View to return. If `pipeline` is provided, shards and jobs are omitted for faster loading
+        name: view
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Updates an Endpoint.
+      tags:
+      - Endpoints
+      summary: Update Endpoint
+      operationId: updateEndpoint
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpoint.UpdateModel'
+        description: Endpoint Body
+        required: true
+  /api/v1/endpoints/{id}/datalake-ingest:
+    post:
+      description: Stream a CSV file body to be ingested into an Iceberg table via Trino. The request body is raw CSV (not JSON) — metadata is passed via headers.
+      tags:
+      - Endpoints
+      summary: Stream CSV Ingest to DataLake Endpoint
+      operationId: postIngestEndpoint
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Endpoint ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - description: Fully qualified Iceberg table name (e.g. lakekeeper.ref_data.my_table)
+        name: X-Table-Name
+        in: header
+        required: true
+        schema:
+          type: string
+      - description: Rows per INSERT batch (100-10000, default 5000)
+        name: X-Batch-Size
+        in: header
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Ingest results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/flitclient.IngestResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Endpoint not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              type: string
+        description: CSV content with header row
+        required: true
+  /api/v1/endpoints/{id}/datalake-query:
+    post:
+      description: Execute a SQL query against a DataLake endpoint and stream the NDJSON results
+      tags:
+      - Endpoints
+      summary: Query DataLake Endpoint
+      operationId: postQueryEndpoint
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Endpoint ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Endpoint not found
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpoint.QueryEndpointRequest'
+        description: Query request
+        required: true
+  /api/v1/endpoints/{id}/datalake-write:
+    post:
+      description: Execute a SQL write query against a DataLake endpoint
+      tags:
+      - Endpoints
+      summary: Execute Write Query on DataLake Endpoint
+      operationId: postQueryWriteEndpoint
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Endpoint ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Write results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/flitclient.WriteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Endpoint not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpoint.QueryEndpointRequest'
+        description: Write query request
+        required: true
+  /api/v1/endpoints/{id}/secrets/api:
+    get:
+      description: Gets Endpoint Api secret
+      tags:
+      - Endpoints
+      summary: Get Endpoint Api Secrets
+      operationId: getEndpointApiSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/cloudstorage:
+    get:
+      description: Gets endpoint cloud storage secrets
+      tags:
+      - Endpoints
+      summary: Get Endpoint Cloud Storage Secrets
+      operationId: getEndpointCloudStorageSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiCloudCredSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/cloudstorage/encryption:
+    get:
+      description: Gets endpoint cloud storage encryption secrets
+      tags:
+      - Endpoints
+      summary: Get Endpoint Cloud Storage EncryptionSecrets
+      operationId: getEndpointCloudStorageEncryptionSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiEncryptionSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/database:
+    get:
+      description: Gets Endpoint Database secret
+      tags:
+      - Endpoints
+      summary: Get Endpoint Database Secrets
+      operationId: getEndpointDatabaseSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/flumelakehouse:
+    get:
+      description: Gets Endpoint FlumeLakehouse Secrets (catalogConfigs JSON credential)
+      tags:
+      - Endpoints
+      summary: Get Endpoint FlumeLakehouse Secrets
+      operationId: getEndpointFlumeLakehouseSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiFlumeLakehouseSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/sftp:
+    get:
+      description: Gets endpoint sftp secret
+      tags:
+      - Endpoints
+      summary: Get Endpoint SFTP Secret
+      operationId: getEndpointSftpSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/sftp/encryption:
+    get:
+      description: Gets endpoint sftp encryption secret
+      tags:
+      - Endpoints
+      summary: Get Endpoint SFTP Encryption Secret
+      operationId: getEndpointSftpEncryptionSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiEncryptionSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/secrets/snowflake:
+    get:
+      description: Gets Endpoint Snowflake Secrets
+      tags:
+      - Endpoints
+      summary: Get Endpoint Snowflake Secrets
+      operationId: getEndpointSnowflakeSecret
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/tests/cloudstorage:
+    get:
+      description: Inspects the cloud storage connection to the server described by the endpoint's Cloud Storage credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Test Existing Cloud Storage Connection
+      operationId: getTestCloudStorageConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Tests the cloud storage connection to the server described by the Cloud Storage credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Test New Cloud Storage Connection
+      operationId: postTestCloudStorageConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloudstorage.WriteModel'
+        description: Cloud Storage Body
+        required: true
+  /api/v1/endpoints/{id}/tests/database:
+    get:
+      description: Inspects the database connection to the server described by the endpoint's Database credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Test Existing Database Connection
+      operationId: getTestDatabaseConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Tests the database connection to the server described by the Database credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Test New Database Connection
+      operationId: postTestDatabaseConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/database.WriteModel'
+        description: Database Credentials Body
+        required: true
+  /api/v1/endpoints/{id}/tests/map:
+    post:
+      description: Runs a test of the endpoint mapping against canned or provided data
+      tags:
+      - Endpoints
+      summary: Test Endpoint map
+      operationId: testEndpointMap
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                sql:
+                  type: string
+                  description: Sql Map
+                file:
+                  type: string
+                  description: Input File
+                  format: binary
+                mode:
+                  type: string
+                  enum:
+                  - fields
+                  - map
+                  description: Mode
+              required:
+              - sql
+              - mode
+  /api/v1/endpoints/{id}/tests/sftp:
+    get:
+      description: Inspects the connection to the server described by the endpoint's SFTP credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Get Endpoint SFTP Connection
+      operationId: getEndpointSftpConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Inspects the connection to the server described by the given endpoint's SFTP credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Test Endpoint SFTP Connection
+      operationId: testEndpointSftpConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpoint.WriteModel'
+        description: Endpoint Body
+        required: true
+  /api/v1/endpoints/{id}/tests/snowflake:
+    get:
+      description: Inspects the connection to the server described by the endpoint's Snowflake credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Get Endpoint Snowflake Connection
+      operationId: getEndpointSnowflakeConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Inspects the connection to the server described by the credentials. If it is traversable, it exists and a 200 is returned.
+      tags:
+      - Endpoints
+      summary: Test Endpoint Snowflake Connection
+      operationId: testEndpointSnowflakeConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/snowflake.WriteModel'
+        description: Snowflake Credentials Body
+        required: true
+  /api/v1/endpoints/{id}/{fieldType}/resources:
+    post:
+      description: Updates file resources for an Endpoint.
+      tags:
+      - Endpoints
+      summary: Update Endpoint Resources
+      operationId: updateEndpointResources
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: field type of the endpoint
+        name: fieldType
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - File
+          - ControlFile
+          - API
+          - Database
+          - FlumeLakehouse
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: string
+                  description: resource files for an endpoint (can be one or multiple files)
+                  format: binary
+                labels:
+                  type: string
+                  description: Labels for each file. Labels must be in same order as files. Data file label must contain '_data' in the name, spec labels must contain '_spec', and narrative files must contain '_narrative'
+              required:
+              - files
+              - labels
+  /api/v1/endpoints/{id}/{fieldType}/resources/{key}:
+    delete:
+      description: Delete Endpoint Resource by Key
+      tags:
+      - Endpoints
+      summary: Delete Endpoint Resource by Key
+      operationId: deleteEndpointResource
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: field type of the endpoint
+        name: fieldType
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - File
+          - ControlFile
+          - API
+          - Database
+          - FlumeLakehouse
+      - description: resource  key to be deleted
+        name: key
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/secret.ApiSecret'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+components:
+  schemas:
+    endpoint.MapType:
+      type: string
+      enum:
+      - SQL
+      - Python
+      - DuckDB
+      x-enum-varnames:
+      - MapTypeSql
+      - MapTypePython
+      - MapTypeDuckDB
+    endpoint.DataType:
+      type: string
+      enum:
+      - Accumulators
+      - Authorizations
+      - Bytes
+      - Eligibility
+      - Groups
+      - MedicalClaimServiceLines
+      - Providers
+      - RxClaimServiceLines
+      - MedicalAndRxClaimLines
+      - Test
+      - TransactionMetadata
+      - Generic
+      - RecordLevelMetadata
+      - PlanNetworks
+      - ProviderNetworkDirectory
+      - HmClaimsExtended
+      - HmProvidersExtended
+      - Strings
+      x-enum-varnames:
+      - DataTypeAccumulators
+      - DataTypeAuthorizations
+      - DataTypeBytes
+      - DataTypeEligibility
+      - DataTypeGroups
+      - DataTypeMedicalClaimServiceLines
+      - DataTypeProviders
+      - DataTypeRxClaimServiceLines
+      - DataTypeMedicalAndRxClaimLines
+      - DataTypeTest
+      - DataTypeTransactionMetadata
+      - DataTypeGeneric
+      - DataTypeRecordLevelMetadata
+      - DataTypePlanNetworks
+      - DataTypeProviderNetworkDirectory
+      - DataTypeHmClaimsExtended
+      - DataTypeHmProvidersExtended
+      - DataTypeStrings
+    database.Engine:
+      type: string
+      enum:
+      - PostgreSQL
+      - MicrosoftSQLServer2019
+      - MicrosoftSQLServer2022
+      - Oracle
+      x-enum-varnames:
+      - EnginePostgreSQL
+      - EngineMicrosoftSQLServer2019
+      - EngineMicrosoftSQLServer2022
+      - EngineOracle
+    sorting.Method:
+      type: string
+      enum:
+      - Default
+      - FileName
+      - LastModified
+      x-enum-varnames:
+      - MethodDefault
+      - MethodFileName
+      - MethodLastModified
+    endpoint.WorkerSize:
+      type: string
+      enum:
+      - small
+      - medium
+      - large
+      - xlarge
+      - max
+      x-enum-varnames:
+      - WorkerSizeSmall
+      - WorkerSizeMedium
+      - WorkerSizeLarge
+      - WorkerSizeXLarge
+      - WorkerSizeMax
+    database.DatabaseMap:
+      type: object
+      properties:
+        map:
+          type: string
+        name:
+          type: string
+        ordinal:
+          type: integer
+    endpoint.FileUpdate:
+      type: object
+      properties:
+        duckDb:
+          allOf:
+          - $ref: '#/components/schemas/duckdb.Config'
+        fields:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/endpoint.Field'
+        filterPattern:
+          type:
+          - string
+          - 'null'
+        filterType:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.FileFilterType'
+        headerRow:
+          type:
+          - integer
+          - 'null'
+        headerless:
+          type:
+          - boolean
+          - 'null'
+        map:
+          type:
+          - string
+          - 'null'
+        mapType:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.MapType'
+        nameTemplate:
+          type:
+          - string
+          - 'null'
+        recordStartRow:
+          type:
+          - integer
+          - 'null'
+        skipLinesBottom:
+          type:
+          - boolean
+          - 'null'
+        skipLinesTop:
+          type:
+          - boolean
+          - 'null'
+        trailerRowCount:
+          type:
+          - integer
+          - 'null'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.FileType'
+    flumelakehouse.WriteModel:
+      type: object
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
+        credentials:
+          $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
+    endpoint.EndpointType:
+      type: string
+      enum:
+      - Destination
+      - Source
+      x-enum-varnames:
+      - EndpointTypeDestination
+      - EndpointTypeSource
+    secret.ApiFlumeLakehouseSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
+    secret.ApiEncryptionSecret:
+      type: object
+      properties:
+        passphrase:
+          $ref: '#/components/schemas/secret.ApiSecret'
+        privateKey:
+          $ref: '#/components/schemas/secret.ApiSecret'
+    flumelakehousecredentials.FlumeLakehouseCredentials:
+      type: object
+      properties:
+        catalogConfigs:
+          type: array
+          items:
+            $ref: '#/components/schemas/flumelakehousecredentials.CatalogConfig'
+    endpoint.State:
+      type: string
+      enum:
+      - Idle
+      - Running
+      - Error
+      - Stopped
+      x-enum-varnames:
+      - StateIdle
+      - StateRunning
+      - StateError
+      - StateStopped
+    endpoint.LambdaResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    database.WriteModel:
+      type: object
+      properties:
+        database:
+          type: string
+        engine:
+          $ref: '#/components/schemas/database.Engine'
+        host:
+          type: string
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/database.DatabaseMap'
+        orderBy:
+          type: string
+        pageSize:
+          type: integer
+        port:
+          type: integer
+        protocol:
+          type: string
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        username:
+          type: string
+    datatypes.Field:
+      type: object
+      properties:
+        column:
+          type: string
+        deprecated:
+          type: boolean
+        fieldType:
+          $ref: '#/components/schemas/datatypes.FieldType'
+        name:
+          type: string
+    flumelakehouse.ReadModel:
+      type: object
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
+        secretName:
+          type: string
+    duckdb.File:
+      type: object
+      required:
+      - tableName
+      properties:
+        fileNamingConvention:
+          type: string
+        tableName:
+          type: string
+    flumelakehouse.UpdateModel:
+      type: object
+      properties:
+        credentialType:
+          allOf:
+          - $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
+        credentials:
+          allOf:
+          - $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
+        maps:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
+    endpoint.Protocol:
+      type: string
+      enum:
+      - SFTP
+      - Snowflake
+      - API
+      - FlumeTransactions
+      - FlumeRecordMetadata
+      - Database
+      - CloudStorage
+      - FlumeLakehouse
+      x-enum-varnames:
+      - ProtocolSftp
+      - ProtocolSnowflake
+      - ProtocolApi
+      - ProtocolFlumeTransactions
+      - ProtocolFlumeRecordMetadata
+      - ProtocolDatabase
+      - ProtocolCloudStorage
+      - ProtocolFlumeLakehouse
+    cloudstorage.WriteModel:
+      type: object
+      properties:
+        bucketName:
+          type: string
+        bucketPath:
+          type: string
+        credentialType:
+          $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
+        credentials:
+          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.WriteModel'
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+    endpoint.RecentTransactions:
+      type: object
+      properties:
+        last:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastFinished:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastFinishedOp:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastSuccessful:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastSuccessfulNonExtract:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastVisible:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+    cloudstorage.UpdateModel:
+      type: object
+      properties:
+        bucketName:
+          type:
+          - string
+          - 'null'
+        bucketPath:
+          type:
+          - string
+          - 'null'
+        credentialType:
+          allOf:
+          - $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
+        credentials:
+          allOf:
+          - $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+        deleteAfterPickup:
+          type:
+          - boolean
+          - 'null'
+        encryption:
+          allOf:
+          - $ref: '#/components/schemas/encryption.UpdateModel'
+        sortDescending:
+          type:
+          - boolean
+          - 'null'
+        sortingMethod:
+          allOf:
+          - $ref: '#/components/schemas/sorting.Method'
+    sftp.UpdateModel:
+      type: object
+      properties:
+        deleteAfterPickup:
+          type:
+          - boolean
+          - 'null'
+        encryption:
+          $ref: '#/components/schemas/encryption.UpdateModel'
+        host:
+          type:
+          - string
+          - 'null'
+        hostKeyAlgorithm:
+          type:
+          - string
+          - 'null'
+        keyExchange:
+          type:
+          - string
+          - 'null'
+        path:
+          type:
+          - string
+          - 'null'
+        port:
+          type:
+          - integer
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+        serverCipher:
+          type:
+          - string
+          - 'null'
+        serverPublicKey:
+          type:
+          - string
+          - 'null'
+        sortDescending:
+          type:
+          - boolean
+          - 'null'
+        sortingMethod:
+          allOf:
+          - $ref: '#/components/schemas/sorting.Method'
+        username:
+          type:
+          - string
+          - 'null'
+    sftp.ReadModel:
+      type: object
+      properties:
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.ReadModel'
+        host:
+          type: string
+        hostKeyAlgorithm:
+          type: string
+        keyExchange:
+          type: string
+        path:
+          type: string
+        port:
+          type: integer
+        secretName:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        serverCipher:
+          type: string
+        serverPublicKey:
+          type: string
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+        username:
+          type: string
+    duckdb.Config:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/duckdb.File'
+    snowflake.UpdateModel:
+      type: object
+      properties:
+        account:
+          type:
+          - string
+          - 'null'
+        database:
+          type:
+          - string
+          - 'null'
+        defaultSchema:
+          type:
+          - string
+          - 'null'
+        fields:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/snowflake.Field'
+        host:
+          type:
+          - string
+          - 'null'
+        port:
+          description: not in frontend
+          type:
+          - integer
+          - 'null'
+        role:
+          type:
+          - string
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+        stage:
+          type:
+          - string
+          - 'null'
+        table:
+          type:
+          - string
+          - 'null'
+        username:
+          type:
+          - string
+          - 'null'
+        warehouse:
+          type:
+          - string
+          - 'null'
+    endpoint.Operation:
+      type: string
+      enum:
+      - Map
+      - Transfer
+      x-enum-varnames:
+      - OperationMap
+      - OperationTransfer
+    endpoint.FileFilterType:
+      type: string
+      enum:
+      - StartsWith
+      - EndsWith
+      - Contains
+      - Regex
+      x-enum-varnames:
+      - FileFilterTypeStartsWith
+      - FileFilterTypeEndsWith
+      - FileFilterTypeContains
+      - FileFilterTypeRegex
+    cloudstoragecredentials.CloudStorageCredentials:
+      type: object
+      additionalProperties:
+        type: string
+    flumelakehousecredentials.CatalogConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          description: postgresql, sqlserver, iceberg
+          type: string
+    api.ReadModel:
+      type: object
+      properties:
+        map:
+          type: string
+        secretName:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+    endpoint.LambdaList:
+      type: object
+      properties:
+        lambdas:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.LambdaResponse'
+        nextPageToken:
+          type: string
+    endpoint.TransactionSummary:
+      type: object
+      properties:
+        endTime:
+          type: string
+        id:
+          type: integer
+        maxMemoryMb:
+          type: integer
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+    endpoint.WriteModel:
+      type: object
+      required:
+      - connectionId
+      - dataType
+      - name
+      - operation
+      - type
+      properties:
+        aiEnabled:
+          type: boolean
+        api:
+          $ref: '#/components/schemas/api.WriteModel'
+        cloudStorage:
+          $ref: '#/components/schemas/cloudstorage.WriteModel'
+        connectionId:
+          type: integer
+        controlFile:
+          $ref: '#/components/schemas/endpoint.File'
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+        database:
+          $ref: '#/components/schemas/database.WriteModel'
+        description:
+          type: string
+        file:
+          $ref: '#/components/schemas/endpoint.File'
+        fileSchedule:
+          type: string
+        flumeLakehouse:
+          $ref: '#/components/schemas/flumelakehouse.WriteModel'
+        hasControlFile:
+          type: boolean
+        incrementalRecords:
+          type: boolean
+        lookbackModifiedBy:
+          $ref: '#/components/schemas/endpoint.LookbackModifiedByUser'
+        lookbackUnit:
+          $ref: '#/components/schemas/endpoint.LoopbackUnit'
+        lookbackValue:
+          type: integer
+        name:
+          type: string
+        operation:
+          $ref: '#/components/schemas/endpoint.Operation'
+        protocol:
+          $ref: '#/components/schemas/endpoint.Protocol'
+        recordDestinationId:
+          description: if Protocol is FlumeRecordMetadata, the destination ID whose metadata to use
+          type: integer
+        schedule:
+          type: string
+        sftp:
+          $ref: '#/components/schemas/sftp.WriteModel'
+        shardKeyRegex:
+          type: string
+        sharded:
+          type: boolean
+        snowflake:
+          $ref: '#/components/schemas/snowflake.WriteModel'
+        supplementalDataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.DataType'
+        type:
+          $ref: '#/components/schemas/endpoint.EndpointType'
+        workerMemoryGb:
+          type: integer
+          minimum: 1
+        workerSize:
+          $ref: '#/components/schemas/endpoint.WorkerSize'
+    endpoint.File:
+      type: object
+      properties:
+        duckDb:
+          $ref: '#/components/schemas/duckdb.Config'
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.Field'
+        filterPattern:
+          type: string
+        filterType:
+          $ref: '#/components/schemas/endpoint.FileFilterType'
+        headerRow:
+          type: integer
+        headerless:
+          type: boolean
+        map:
+          type: string
+          example: SELECT * FROM data;
+        mapType:
+          $ref: '#/components/schemas/endpoint.MapType'
+        nameTemplate:
+          type: string
+        recordStartRow:
+          type: integer
+        resources:
+          type: object
+          additionalProperties:
+            type: string
+        skipLinesBottom:
+          type: boolean
+        skipLinesTop:
+          type: boolean
+        trailerRowCount:
+          type: integer
+        type:
+          $ref: '#/components/schemas/endpoint.FileType'
+    snowflake.Field:
+      type: object
+      required:
+      - name
+      - type
+      properties:
+        name:
+          type: string
+        primaryKey:
+          type: boolean
+        type:
+          type: string
+    secret.ApiSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    snowflake.ReadModel:
+      type: object
+      properties:
+        account:
+          type: string
+        database:
+          type: string
+        defaultSchema:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/snowflake.Field'
+        host:
+          type: string
+        port:
+          description: not in frontend
+          type: integer
+        role:
+          type: string
+        secretName:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        stage:
+          type: string
+        table:
+          type: string
+        username:
+          type: string
+        warehouse:
+          type: string
+    encryption.Method:
+      type: string
+      enum:
+      - None
+      - PGP
+      x-enum-varnames:
+      - MethodNone
+      - MethodPGP
+    encryption.WriteModel:
+      type: object
+      properties:
+        method:
+          $ref: '#/components/schemas/encryption.Method'
+        passphrase:
+          description: Used for Source Endpoint Decryption
+          type: string
+        privateKey:
+          description: Used for Source Endpoint Decryption
+          type: string
+        publicKey:
+          description: Used for Destination Endpoint Decryption
+          type: string
+    datatypes.DataTypes:
+      type: object
+      properties:
+        dataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/datatypes.DataType'
+    database.UpdateModel:
+      type: object
+      properties:
+        database:
+          type:
+          - string
+          - 'null'
+        engine:
+          allOf:
+          - $ref: '#/components/schemas/database.Engine'
+        host:
+          type:
+          - string
+          - 'null'
+        maps:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/database.DatabaseMap'
+        orderBy:
+          type:
+          - string
+          - 'null'
+        pageSize:
+          type:
+          - integer
+          - 'null'
+        port:
+          type:
+          - integer
+          - 'null'
+        protocol:
+          type:
+          - string
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+        username:
+          type:
+          - string
+          - 'null'
+    endpoint.ReadModel:
+      type: object
+      required:
+      - dataType
+      - name
+      - operation
+      - type
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        api:
+          $ref: '#/components/schemas/api.ReadModel'
+        archived:
+          type: boolean
+        cloudStorage:
+          $ref: '#/components/schemas/cloudstorage.ReadModel'
+        connection:
+          $ref: '#/components/schemas/endpoint.ConnectionName'
+        controlFile:
+          $ref: '#/components/schemas/endpoint.File'
+        created:
+          type: string
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+        database:
+          $ref: '#/components/schemas/database.ReadModel'
+        description:
+          type: string
+        file:
+          $ref: '#/components/schemas/endpoint.File'
+        fileSchedule:
+          type: string
+        flumeLakehouse:
+          $ref: '#/components/schemas/flumelakehouse.ReadModel'
+        hasControlFile:
+          type: boolean
+        id:
+          type: integer
+        incrementalRecords:
+          type: boolean
+        lastTransaction:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lookbackModifiedBy:
+          $ref: '#/components/schemas/endpoint.LookbackModifiedByUser'
+        lookbackUnit:
+          $ref: '#/components/schemas/endpoint.LoopbackUnit'
+        lookbackValue:
+          type: integer
+        missingExpectedSourceFile:
+          type: boolean
+        name:
+          type: string
+        nextTransaction:
+          type: string
+        operation:
+          $ref: '#/components/schemas/endpoint.Operation'
+        protocol:
+          $ref: '#/components/schemas/endpoint.Protocol'
+        recentTransactions:
+          $ref: '#/components/schemas/endpoint.RecentTransactions'
+        recordDestinationId:
+          description: if Protocol is FlumeRecordMetadata, the destination ID whose metadata to use
+          type: integer
+        schedule:
+          type: string
+        sftp:
+          $ref: '#/components/schemas/sftp.ReadModel'
+        shardKeyRegex:
+          type: string
+        sharded:
+          type: boolean
+        snowflake:
+          $ref: '#/components/schemas/snowflake.ReadModel'
+        state:
+          $ref: '#/components/schemas/endpoint.State'
+        supplementalDataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.DataType'
+        type:
+          $ref: '#/components/schemas/endpoint.EndpointType'
+        updated:
+          type: string
+        workerMemoryGb:
+          type: integer
+          minimum: 1
+        workerSize:
+          $ref: '#/components/schemas/endpoint.WorkerSize'
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    sftp.WriteModel:
+      type: object
+      properties:
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.WriteModel'
+        host:
+          type: string
+        hostKeyAlgorithm:
+          type: string
+        keyExchange:
+          type: string
+        path:
+          type: string
+        port:
+          type: integer
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        serverCipher:
+          type: string
+        serverPublicKey:
+          type: string
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+        username:
+          type: string
+    cloudstorage.ReadModel:
+      type: object
+      properties:
+        bucketName:
+          type: string
+        bucketPath:
+          type: string
+        credentialType:
+          $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.ReadModel'
+        secretName:
+          type: string
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+    flumelakehousecredentials.CredentialType:
+      type: string
+      enum:
+      - AwsStatic
+      - AwsWebIdentity
+      - GcpServiceAccount
+      - AzureSharedKey
+      - AzureSharedAccessSignature
+      - AzureConnectionString
+      x-enum-varnames:
+      - CredentialTypeAwsStatic
+      - CredentialTypeAwsWebIdentity
+      - CredentialTypeGcpServiceAccount
+      - CredentialTypeAzureSharedKey
+      - CredentialTypeAzureSharedAccessSignature
+      - CredentialTypeAzureConnectionString
+    endpoint.LoopbackUnit:
+      type: string
+      enum:
+      - minutes
+      - hours
+      x-enum-varnames:
+      - LoopbackUnitMinutes
+      - LoopbackUnitHours
+    endpoint.ListResponse:
+      type: object
+      properties:
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.ReadModel'
+        nextPageToken:
+          type: string
+    secret.ApiCloudCredSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+    encryption.UpdateModel:
+      type: object
+      properties:
+        method:
+          allOf:
+          - $ref: '#/components/schemas/encryption.Method'
+        passphrase:
+          type:
+          - string
+          - 'null'
+        privateKey:
+          type:
+          - string
+          - 'null'
+        publicKey:
+          type:
+          - string
+          - 'null'
+    secret.SecretType:
+      type: string
+      enum:
+      - Password
+      - PrivateKey
+      x-enum-varnames:
+      - SecretTypePassword
+      - SecretTypePrivateKey
+    datatypes.FieldType:
+      type: object
+      properties:
+        name:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+    datatypes.DataType:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/datatypes.Field'
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/endpoint.DataType'
+    endpoint.ConnectionName:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    flitclient.IngestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        rowsInserted:
+          type: integer
+        success:
+          type: boolean
+    api.UpdateModel:
+      type: object
+      properties:
+        map:
+          type:
+          - string
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+    flumelakehouse.FlumeLakehouseMap:
+      type: object
+      properties:
+        map:
+          type: string
+        name:
+          type: string
+        ordinal:
+          type: integer
+    database.ReadModel:
+      type: object
+      properties:
+        database:
+          type: string
+        engine:
+          $ref: '#/components/schemas/database.Engine'
+        host:
+          type: string
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/database.DatabaseMap'
+        orderBy:
+          type: string
+        pageSize:
+          type: integer
+        port:
+          type: integer
+        protocol:
+          type: string
+        secretName:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        username:
+          type: string
+    endpoint.LookbackModifiedByUser:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        email:
+          type: string
+        id:
+          type: integer
+    endpoint.QueryEndpointRequest:
+      type: object
+      properties:
+        sql:
+          type: string
+    encryption.ReadModel:
+      type: object
+      properties:
+        method:
+          $ref: '#/components/schemas/encryption.Method'
+        passphraseSecretName:
+          description: Used for Source Endpoint Decryption
+          type: string
+        privateKeySecretName:
+          description: Used for Source Endpoint Decryption
+          type: string
+        publicKey:
+          description: Used for Destination Endpoint Decryption
+          type: string
+    cloudstoragecredentials.CredentialType:
+      type: string
+      enum:
+      - AwsStatic
+      - AwsWebIdentity
+      - GcpServiceAccount
+      - AzureSharedKey
+      - AzureSharedAccessSignature
+      - AzureConnectionString
+      x-enum-varnames:
+      - CredentialTypeAwsStatic
+      - CredentialTypeAwsWebIdentity
+      - CredentialTypeGcpServiceAccount
+      - CredentialTypeAzureSharedKey
+      - CredentialTypeAzureSharedAccessSignature
+      - CredentialTypeAzureConnectionString
+    api.WriteModel:
+      type: object
+      properties:
+        map:
+          type: string
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+    endpoint.UpdateModel:
+      type: object
+      properties:
+        aiEnabled:
+          type:
+          - boolean
+          - 'null'
+        api:
+          allOf:
+          - $ref: '#/components/schemas/api.UpdateModel'
+        archived:
+          type:
+          - boolean
+          - 'null'
+          default: false
+        cloudStorage:
+          allOf:
+          - $ref: '#/components/schemas/cloudstorage.UpdateModel'
+        connectionId:
+          type:
+          - integer
+          - 'null'
+        controlFile:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.FileUpdate'
+        dataType:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.DataType'
+        database:
+          allOf:
+          - $ref: '#/components/schemas/database.UpdateModel'
+        description:
+          type:
+          - string
+          - 'null'
+        file:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.FileUpdate'
+        fileSchedule:
+          type:
+          - string
+          - 'null'
+        flumeLakehouse:
+          allOf:
+          - $ref: '#/components/schemas/flumelakehouse.UpdateModel'
+        hasControlFile:
+          type:
+          - boolean
+          - 'null'
+        incrementalRecords:
+          type:
+          - boolean
+          - 'null'
+        lookbackUnit:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.LoopbackUnit'
+        lookbackValue:
+          type:
+          - integer
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        operation:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.Operation'
+        protocol:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.Protocol'
+        recordDestinationId:
+          description: if Protocol is FlumeRecordMetadata, the destination ID whose metadata to use
+          type:
+          - integer
+          - 'null'
+        schedule:
+          type:
+          - string
+          - 'null'
+        sftp:
+          allOf:
+          - $ref: '#/components/schemas/sftp.UpdateModel'
+        shardKeyRegex:
+          type:
+          - string
+          - 'null'
+        sharded:
+          type:
+          - boolean
+          - 'null'
+        snowflake:
+          allOf:
+          - $ref: '#/components/schemas/snowflake.UpdateModel'
+        supplementalDataTypes:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/endpoint.DataType'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.EndpointType'
+        workerMemoryGb:
+          type:
+          - integer
+          - 'null'
+        workerSize:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.WorkerSize'
+    endpoint.Field:
+      type: object
+      properties:
+        length:
+          type: integer
+        name:
+          type: string
+        start:
+          type: integer
+    snowflake.WriteModel:
+      type: object
+      properties:
+        account:
+          type: string
+        database:
+          type: string
+        defaultSchema:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/snowflake.Field'
+        host:
+          type: string
+        port:
+          description: not in frontend
+          type: integer
+        role:
+          type: string
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        stage:
+          type: string
+        table:
+          type: string
+        username:
+          type: string
+        warehouse:
+          type: string
+    flitclient.WriteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        rowsAffected:
+          type: integer
+        success:
+          type: boolean
+    endpoint.FileType:
+      type: string
+      enum:
+      - CSV
+      - PSV
+      - TSV
+      - FixedWidth
+      x-enum-varnames:
+      - FileTypeCsv
+      - FileTypePsv
+      - FileTypeTsv
+      - FileTypeFixedWidth
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

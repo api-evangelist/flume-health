@@ -1,0 +1,362 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Account Contracts API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Account Contracts
+paths:
+  /api/v1/accounts/{id}/contracts:
+    get:
+      description: List account contracts for a specific account
+      tags:
+      - Account Contracts
+      summary: List Account Contracts
+      operationId: listAccountContracts
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Account ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Page token for pagination
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Page size for pagination
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/accountcontract.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Create a new account contract for a specific account
+      tags:
+      - Account Contracts
+      summary: Create Account Contract
+      operationId: createAccountContract
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Account ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/accountcontract.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/accountcontract.WriteModel'
+        description: Account contract payload
+        required: true
+  /api/v1/accounts/{id}/contracts/{contractId}:
+    delete:
+      description: Delete an existing account contract
+      tags:
+      - Account Contracts
+      summary: Delete Account Contract
+      operationId: deleteAccountContract
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Account ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Contract ID
+        name: contractId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Update an existing account contract
+      tags:
+      - Account Contracts
+      summary: Update Account Contract
+      operationId: updateAccountContract
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Account ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Contract ID
+        name: contractId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/accountcontract.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/accountcontract.UpdateModel'
+        description: Account contract update payload
+        required: true
+components:
+  schemas:
+    accountcontract.WriteModel:
+      type: object
+      required:
+      - contractSince
+      - contractUntil
+      - totalAllocatedRows
+      properties:
+        adminNotes:
+          type: string
+        contractSince:
+          type: string
+        contractUntil:
+          type: string
+        revenue:
+          type: number
+        totalAllocatedRows:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    accountcontract.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        adminNotes:
+          type: string
+        contractSince:
+          type: string
+        contractUntil:
+          type: string
+        id:
+          type: integer
+        revenue:
+          type: number
+        totalAllocatedRows:
+          type: integer
+    accountcontract.UpdateModel:
+      type: object
+      properties:
+        adminNotes:
+          type:
+          - string
+          - 'null'
+        contractSince:
+          type:
+          - string
+          - 'null'
+        contractUntil:
+          type:
+          - string
+          - 'null'
+        revenue:
+          type:
+          - number
+          - 'null'
+        totalAllocatedRows:
+          type:
+          - integer
+          - 'null'
+    accountcontract.ListResponse:
+      type: object
+      properties:
+        accountContracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/accountcontract.ReadModel'
+        nextPageToken:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

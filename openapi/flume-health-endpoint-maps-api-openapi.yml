@@ -1,0 +1,280 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Endpoint Maps API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Endpoint Maps
+paths:
+  /api/v1/endpoints/{id}/maps/{fieldType}:
+    get:
+      description: List Endpoint Maps for a Field Type on an Endpoint
+      tags:
+      - Endpoint Maps
+      summary: List Endpoint Map Versions
+      operationId: listEndpointMapVersions
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Field Type
+        name: fieldType
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - File
+          - ControlFile
+          - API
+          - Database
+          - FlumeLakehouse
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Endpoint Maps to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpointmap.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v1/endpoints/{id}/maps/{fieldType}/{ordinal}:
+    get:
+      description: Get Endpoint Map Version for a Field Type on an Endpoint
+      tags:
+      - Endpoint Maps
+      summary: Get Endpoint Map Version
+      operationId: getEndpointMapVersion
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the endpoint
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Field Type
+        name: fieldType
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - File
+          - ControlFile
+          - API
+          - Database
+          - FlumeLakehouse
+      - description: Endpoint Map Ordinal - API, File, and ControlFile only have Ordinal 1, Database can have multiple
+        name: ordinal
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpointmap.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+components:
+  schemas:
+    endpointmap.FieldType:
+      type: string
+      enum:
+      - File
+      - ControlFile
+      - API
+      - Database
+      - FlumeLakehouse
+      x-enum-varnames:
+      - FieldTypeFile
+      - FieldTypeControlFile
+      - FieldTypeApi
+      - FieldTypeDatabase
+      - FieldTypeFlumeLakehouse
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    endpointmap.ListResponse:
+      type: object
+      properties:
+        endpointMaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.ReadModel'
+        nextPageToken:
+          type: string
+    endpointmap.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        fieldType:
+          $ref: '#/components/schemas/endpointmap.FieldType'
+        id:
+          type: integer
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.MapVersion'
+        name:
+          type: string
+        ordinal:
+          type: integer
+    endpointmap.MapVersion:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        id:
+          type: integer
+        map:
+          type: string
+        version:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    user.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        active:
+          type: boolean
+        aiEnabled:
+          type: boolean
+        created:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        isAccessGranter:
+          type: boolean
+        lastName:
+          type: string
+        queryEngineAccessExpiresAt:
+          type: string
+        queryEngineAccessReason:
+          type: string
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+        updated:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

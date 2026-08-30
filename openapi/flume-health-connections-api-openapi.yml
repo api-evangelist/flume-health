@@ -1,0 +1,342 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Connections API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Connections
+paths:
+  /api/v1/connections:
+    get:
+      description: List Connections
+      tags:
+      - Connections
+      summary: List Connections
+      operationId: listConnections
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: List of ids to filter for. If empty, no filtration occurs.
+        name: ids
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+      - description: List of endpoint IDs to filter for. If empty, no filtration occurs.
+        name: endpointIds
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+      - description: Field by which to sort results. Defaults to name asc. Options:created,name
+        name: orderBy
+        in: query
+        schema:
+          type: string
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Connections to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connection.ListResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Create Connection
+      tags:
+      - Connections
+      summary: Create Connection
+      operationId: createConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connection.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/connection.WriteModel'
+        description: Connection body
+        required: true
+  /api/v1/connections/{id}:
+    get:
+      description: Get Connection
+      tags:
+      - Connections
+      summary: Get Connection
+      operationId: getConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Connection ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connection.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Update Connection
+      tags:
+      - Connections
+      summary: Update Connection
+      operationId: updateConnection
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the connection
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connection.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/connection.PatchModel'
+        description: Connection body
+        required: true
+components:
+  schemas:
+    connection.WriteModel:
+      type: object
+      required:
+      - name
+      properties:
+        customColumns:
+          type: array
+          items:
+            type: string
+        logo:
+          type: string
+        name:
+          type: string
+    connection.ReadModel:
+      type: object
+      required:
+      - name
+      properties:
+        created:
+          type: string
+        customColumns:
+          type: array
+          items:
+            type: string
+        id:
+          type: integer
+        logo:
+          type: string
+        name:
+          type: string
+    connection.PatchModel:
+      type: object
+      properties:
+        customColumns:
+          type: array
+          items:
+            type: string
+        logo:
+          type: string
+        name:
+          type: string
+    connection.ListResponse:
+      type: object
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/connection.ReadModel'
+        nextPageToken:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

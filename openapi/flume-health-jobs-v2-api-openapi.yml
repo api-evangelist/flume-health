@@ -1,0 +1,571 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Jobs v2 API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Jobs v2
+paths:
+  /api/v2/trades/jobs:
+    get:
+      description: Lists Jobs v2.
+      tags:
+      - Jobs v2
+      summary: List Jobs v2
+      operationId: listJobs
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Jobs to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: Field by which to sort results. Defaults to createdDate
+        name: orderBy
+        in: query
+        schema:
+          type: string
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+      - description: List of statuses to filter for. If empty, no filtration occurs.
+        name: status
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - description: List of endpoint IDs (source or destination) to filter for. If empty, no filtration occurs.
+        name: endpointId
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+      - description: Connection ID to filter against source or destination endpoint. If empty, no filtration occurs.
+        name: connectionId
+        in: query
+        schema:
+          type: integer
+      - description: View to return. If `lastRun` is provided, the last job run with and end timestamp is embedded
+        name: view
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Creates a Job v2.
+      tags:
+      - Jobs v2
+      summary: Create Job v2
+      operationId: createJob
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/job.WriteModel'
+        description: Job Body
+        required: true
+  /api/v2/trades/jobs/{id}:
+    get:
+      description: Gets a Job v2.
+      tags:
+      - Jobs v2
+      summary: Get Job v2
+      operationId: getJob
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the job
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Updates a Job v2.
+      tags:
+      - Jobs v2
+      summary: Update Job v2
+      operationId: updateJob
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the job
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/job.UpdateModel'
+        description: Job Body
+        required: true
+  /api/v2/trades/jobs/{id}/tests/map:
+    post:
+      description: Runs a test of the Job's source+destination endpoint mappings against provided data
+      tags:
+      - Jobs v2
+      summary: Test Job map
+      operationId: testJobMap
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the job
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/zip:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/job.TestRequest'
+        description: Test Files Payload
+        required: true
+components:
+  schemas:
+    endpoint.DataType:
+      type: string
+      enum:
+      - Accumulators
+      - Authorizations
+      - Bytes
+      - Eligibility
+      - Groups
+      - MedicalClaimServiceLines
+      - Providers
+      - RxClaimServiceLines
+      - MedicalAndRxClaimLines
+      - Test
+      - TransactionMetadata
+      - Generic
+      - RecordLevelMetadata
+      - PlanNetworks
+      - ProviderNetworkDirectory
+      - HmClaimsExtended
+      - HmProvidersExtended
+      - Strings
+      x-enum-varnames:
+      - DataTypeAccumulators
+      - DataTypeAuthorizations
+      - DataTypeBytes
+      - DataTypeEligibility
+      - DataTypeGroups
+      - DataTypeMedicalClaimServiceLines
+      - DataTypeProviders
+      - DataTypeRxClaimServiceLines
+      - DataTypeMedicalAndRxClaimLines
+      - DataTypeTest
+      - DataTypeTransactionMetadata
+      - DataTypeGeneric
+      - DataTypeRecordLevelMetadata
+      - DataTypePlanNetworks
+      - DataTypeProviderNetworkDirectory
+      - DataTypeHmClaimsExtended
+      - DataTypeHmProvidersExtended
+      - DataTypeStrings
+    job.TestRequest:
+      type: object
+      required:
+      - files
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.TestFile'
+    job.ListResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.ReadModel'
+        nextPageToken:
+          type: string
+    job.ReadModel:
+      type: object
+      required:
+      - name
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        aiWorkflowSubmitted:
+          type: boolean
+        created:
+          type: string
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+        destinationEndpoint:
+          $ref: '#/components/schemas/job.EndpointSummary'
+        id:
+          type: integer
+        ignoreObjectInstances:
+          type: boolean
+        name:
+          type: string
+        sourceEndpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.EndpointSummary'
+        status:
+          $ref: '#/components/schemas/job.Status'
+        supplementalDataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.DataType'
+        updated:
+          type: string
+    endpoint.Operation:
+      type: string
+      enum:
+      - Map
+      - Transfer
+      x-enum-varnames:
+      - OperationMap
+      - OperationTransfer
+    job.WriteModel:
+      type: object
+      required:
+      - name
+      properties:
+        aiEnabled:
+          type: boolean
+          default: false
+        aiWorkflowSubmitted:
+          type: boolean
+          default: false
+        destinationEndpointId:
+          type: integer
+        ignoreObjectInstances:
+          type: boolean
+        name:
+          type: string
+        sourceEndpointIds:
+          type: array
+          items:
+            type: integer
+        status:
+          $ref: '#/components/schemas/job.Status'
+    job.Status:
+      type: string
+      enum:
+      - Test
+      - Production
+      - Published
+      - Draft
+      - Archived
+      - Paused
+      x-enum-varnames:
+      - StatusTest
+      - StatusProduction
+      - StatusPublished
+      - StatusDraft
+      - StatusArchived
+      - StatusPaused
+    endpoint.State:
+      type: string
+      enum:
+      - Idle
+      - Running
+      - Error
+      - Stopped
+      x-enum-varnames:
+      - StateIdle
+      - StateRunning
+      - StateError
+      - StateStopped
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    job.UpdateModel:
+      type: object
+      properties:
+        aiEnabled:
+          type:
+          - boolean
+          - 'null'
+          default: false
+        aiWorkflowSubmitted:
+          type:
+          - boolean
+          - 'null'
+        destinationEndpointId:
+          type:
+          - integer
+          - 'null'
+        ignoreObjectInstances:
+          type: boolean
+        name:
+          type:
+          - string
+          - 'null'
+        sourceEndpointIds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+        status:
+          allOf:
+          - $ref: '#/components/schemas/job.Status'
+    job.EndpointSummary:
+      type: object
+      properties:
+        aiEnabled:
+          type: boolean
+        connectionId:
+          type: integer
+        id:
+          type: integer
+        name:
+          type: string
+        operation:
+          $ref: '#/components/schemas/endpoint.Operation'
+        state:
+          $ref: '#/components/schemas/endpoint.State'
+    job.TestFile:
+      type: object
+      required:
+      - endpointId
+      properties:
+        endpointId:
+          type: integer
+        file:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

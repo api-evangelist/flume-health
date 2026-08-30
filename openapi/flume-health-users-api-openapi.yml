@@ -1,0 +1,602 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Users API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Users
+paths:
+  /api/v1/users:
+    get:
+      description: List users scoped to the account of the executing user
+      tags:
+      - Users
+      summary: List users
+      operationId: listUsers
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Page token for pagination
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Page size for pagination
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.ListModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Creates a new user bound to the account to which the executing user is scoped
+      tags:
+      - Users
+      summary: Create a user
+      operationId: createUser
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.WriteModel'
+        description: User payload
+        required: true
+  /api/v1/users/me:
+    get:
+      description: Get Current User
+      tags:
+      - Users
+      summary: Get Current User
+      operationId: getCurrentUser
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.SelfUser'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Patch current user
+      tags:
+      - Users
+      summary: Patch Current User
+      operationId: patchCurrentUser
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.SelfUser'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.SelfUserPatchModel'
+        description: User payload
+        required: true
+  /api/v1/users/{id}:
+    get:
+      description: Gets one user by id
+      tags:
+      - Users
+      summary: Get a user
+      operationId: getUser
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: User ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    put:
+      description: Updates a user by id, bound to the account to which the executing user is scoped
+      tags:
+      - Users
+      summary: Update a user
+      operationId: updateUser
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: User ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.WriteModel'
+        description: User payload
+        required: true
+  /api/v1/users/{id}/query-engine-grant:
+    post:
+      description: Grants query engine access to a user for a specified duration. Only accessible by SystemAdmin or users with is_access_granter=true.
+      tags:
+      - Users
+      summary: Grant query engine access
+      operationId: grantQueryEngineAccess
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: User ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.QueryEngineGrantResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.QueryEngineGrantRequest'
+        description: Grant payload
+        required: true
+  /api/v1/users/{id}/query-engine-revoke:
+    delete:
+      description: Revokes query engine access from a user. Only accessible by SystemAdmin or users with is_access_granter=true.
+      tags:
+      - Users
+      summary: Revoke query engine access
+      operationId: revokeQueryEngineAccess
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: User ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.QueryEngineGrantResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+components:
+  schemas:
+    user.QueryEngineGrantResponse:
+      type: object
+      properties:
+        expiresAt:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        userId:
+          type: integer
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    user.QueryEngineGrantRequest:
+      type: object
+      required:
+      - duration_hours
+      - reason
+      properties:
+        duration_hours:
+          type: integer
+          maximum: 24
+          minimum: 1
+        reason:
+          type: string
+    user.ListModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/user.ReadModel'
+    user.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        active:
+          type: boolean
+        aiEnabled:
+          type: boolean
+        created:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        isAccessGranter:
+          type: boolean
+        lastName:
+          type: string
+        queryEngineAccessExpiresAt:
+          type: string
+        queryEngineAccessReason:
+          type: string
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+        updated:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    user.SelfUser:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        isAccessGranter:
+          type: boolean
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+    user.SelfUserPatchModel:
+      type: object
+      properties:
+        receiveEmailAlerts:
+          type: boolean
+    user.WriteModel:
+      type: object
+      required:
+      - active
+      - email
+      - firstName
+      - lastName
+      - role
+      properties:
+        active:
+          description: pointer so we can distinguish between false and not set
+          type: boolean
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          $ref: '#/components/schemas/user.Role'
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

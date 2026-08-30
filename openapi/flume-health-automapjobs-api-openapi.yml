@@ -1,0 +1,563 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Automap Jobs API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: AutomapJobs
+paths:
+  /api/v2/trades/jobs/{jobId}/automapjobs:
+    get:
+      description: List AutomapJobs
+      tags:
+      - AutomapJobs
+      summary: List AutomapJobs
+      operationId: listAutomapJobs
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Automapjobs to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: ID of job
+        name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/automapjob.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Create AutomapJob
+      tags:
+      - AutomapJobs
+      summary: Create AutomapJob
+      operationId: createAutomapJob
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: ID of job
+        name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/automapjob.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+  /api/v2/trades/jobs/{jobId}/automapjobs/{automapversion}:
+    get:
+      description: Get AutomapJobs by ID
+      tags:
+      - AutomapJobs
+      summary: Get AutomapJobs by ID
+      operationId: getAutomapJobsById
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: ID of job
+        name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: version number of automap job
+        name: automapversion
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/automapjob.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Update AutomapJob
+      tags:
+      - AutomapJobs
+      summary: Update AutomapJob
+      operationId: updateAutomapJob
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: ID of job
+        name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: version number of automap job
+        name: automapversion
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/automapjob.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/automapjob.UpdateModel'
+        description: Automap Job Body
+        required: true
+  /api/v2/trades/jobs/{jobId}/automapjobs/{automapversion}/outputs:
+    get:
+      description: Get AutomapJobs Output
+      tags:
+      - AutomapJobs
+      summary: Get AutomapJob Output
+      operationId: getAutomapJobOutputs
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: ID of job
+        name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: version number of automap job
+        name: automapversion
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+components:
+  schemas:
+    automapjob.FieldMappingUpdate:
+      type: object
+      properties:
+        confidenceLevel:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.ConfidenceLevel'
+        destination:
+          type:
+          - string
+          - 'null'
+        explanation:
+          type:
+          - string
+          - 'null'
+        feedback:
+          type:
+          - string
+          - 'null'
+        fieldStatus:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.FieldStatus'
+        source:
+          type:
+          - string
+          - 'null'
+    automapjob.FieldMapping:
+      type: object
+      required:
+      - confidenceLevel
+      - destination
+      - source
+      properties:
+        confidenceLevel:
+          $ref: '#/components/schemas/automapjob.ConfidenceLevel'
+        destination:
+          type: string
+        explanation:
+          type: string
+        feedback:
+          type: string
+        fieldStatus:
+          $ref: '#/components/schemas/automapjob.FieldStatus'
+        source:
+          type: string
+    automapjob.ConfidenceLevel:
+      type: string
+      enum:
+      - Low
+      - Medium
+      - High
+      x-enum-varnames:
+      - ConfidenceLevelLow
+      - ConfidenceLevelMedium
+      - ConfidenceLevelHigh
+    automapjob.FieldStatus:
+      type: string
+      enum:
+      - Accepted
+      - Rejected
+      x-enum-varnames:
+      - FieldStatusAccepted
+      - FieldStatusRejected
+    automapjob.Status:
+      type: string
+      enum:
+      - Queued
+      - Processing
+      - Failed
+      - Cancelled
+      - Success
+      x-enum-varnames:
+      - StatusQueued
+      - StatusProcessing
+      - StatusFailed
+      - StatusCancelled
+      - StatusSuccess
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    automapjob.MapsUpdate:
+      type: object
+      properties:
+        destination:
+          type:
+          - string
+          - 'null'
+        source:
+          type:
+          - string
+          - 'null'
+    automapjob.ListResponse:
+      type: object
+      properties:
+        automapJobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/automapjob.ReadModel'
+        nextPageToken:
+          type: string
+    automapjob.UpdateModel:
+      type: object
+      properties:
+        endTime:
+          type:
+          - string
+          - 'null'
+        error:
+          type:
+          - string
+          - 'null'
+        explanation:
+          type:
+          - string
+          - 'null'
+        feedback:
+          type:
+          - string
+          - 'null'
+        fieldMappings:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/automapjob.FieldMappingUpdate'
+        maps:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.MapsUpdate'
+        outputs:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.OutputsUpdate'
+        startTime:
+          type:
+          - string
+          - 'null'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.Status'
+    automapjob.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        endTime:
+          type: string
+        error:
+          type: string
+        explanation:
+          type: string
+        feedback:
+          type: string
+        fieldMappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/automapjob.FieldMapping'
+        jobId:
+          type: integer
+        maps:
+          $ref: '#/components/schemas/automapjob.Maps'
+        outputs:
+          $ref: '#/components/schemas/automapjob.Outputs'
+        startTime:
+          type: string
+        status:
+          $ref: '#/components/schemas/automapjob.Status'
+        version:
+          type: integer
+    automapjob.OutputsUpdate:
+      type: object
+      properties:
+        destination:
+          type:
+          - string
+          - 'null'
+        source:
+          type:
+          - string
+          - 'null'
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    user.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        active:
+          type: boolean
+        aiEnabled:
+          type: boolean
+        created:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        isAccessGranter:
+          type: boolean
+        lastName:
+          type: string
+        queryEngineAccessExpiresAt:
+          type: string
+        queryEngineAccessReason:
+          type: string
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+        updated:
+          type: string
+    automapjob.Maps:
+      type: object
+      properties:
+        destination:
+          type: string
+        source:
+          type: string
+    automapjob.Outputs:
+      type: object
+      properties:
+        destination:
+          type: string
+        source:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

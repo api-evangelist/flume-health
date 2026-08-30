@@ -1,0 +1,648 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Source File API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: SourceFile
+paths:
+  /api/v1/sourceFiles:
+    get:
+      description: Lists Source Files associated with the Source Endpoint of a Job
+      tags:
+      - SourceFile
+      summary: List Job Source Files
+      operationId: listSourceFiles
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: The endpointId to inspect source files for
+        name: endpointId
+        in: query
+        schema:
+          type: integer
+      - description: Filter sourceFiles by isProcessed Status
+        name: isProcessed
+        in: query
+        schema:
+          type: boolean
+      - description: Filter sourceFiles by isStaged Status
+        name: isStaged
+        in: query
+        schema:
+          type: boolean
+      - description: Filter sourceFiles by fileDisappeared Status
+        name: fileDisappeared
+        in: query
+        schema:
+          type: boolean
+      - description: Filter sourceFiles by shardBatchKey
+        name: shardBatchKey
+        in: query
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of SourceFiles to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: Field by which to sort results
+        name: orderBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - discoveredAt
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sourcefile.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Create a SourceFile
+      tags:
+      - SourceFile
+      summary: Create SourceFile
+      operationId: createSourceFile
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sourcefile.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sourcefile.WriteModel'
+        description: SourceFile body
+        required: true
+  /api/v1/sourceFiles/{id}:
+    get:
+      description: Gets one source file by id
+      tags:
+      - SourceFile
+      summary: Get a source file
+      operationId: getSourceFile
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Source File ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sourcefile.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Updates a SourceFile
+      tags:
+      - SourceFile
+      summary: Update SourceFile
+      operationId: updateSourceFile
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the source file
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sourcefile.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sourcefile.PatchModel'
+        description: SourceFile body
+        required: true
+  /api/v1/sourceFiles:bulk:
+    post:
+      description: Create SourceFiles in bulk and returns those which were created
+      tags:
+      - SourceFile
+      summary: Create SourceFile (Bulk)
+      operationId: createSourceFileBulk
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sourcefile.BulkWriteModel'
+        description: bulk SourceFile body
+        required: true
+    patch:
+      description: Update multiple SourceFiles in a single request
+      tags:
+      - SourceFile
+      summary: Bulk Update SourceFiles
+      operationId: updateSourceFilesBulk
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/sourcefile.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sourcefile.BulkPatchModel'
+        description: SourceFiles to update
+        required: true
+  /api/v1/sourceFiles:search:
+    get:
+      description: Search for Source Files by filename
+      tags:
+      - SourceFile
+      summary: Search Source Files
+      operationId: searchSourceFiles
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Search query for filename
+        name: q
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: The endpointId to inspect source files for
+        name: endpointId
+        in: query
+        schema:
+          type: integer
+      - description: Filter sourceFiles by isProcessed Status
+        name: isProcessed
+        in: query
+        schema:
+          type: boolean
+      - description: Filter sourceFiles by isStaged Status
+        name: isStaged
+        in: query
+        schema:
+          type: boolean
+      - description: Filter sourceFiles by fileDisappeared Status
+        name: fileDisappeared
+        in: query
+        schema:
+          type: boolean
+      - description: Filter sourceFiles by shardBatchKey
+        name: shardBatchKey
+        in: query
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of SourceFiles to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: Field by which to sort results
+        name: orderBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - discoveredAt
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sourcefile.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+components:
+  schemas:
+    sourcefile.BulkPatchModel:
+      type: object
+      required:
+      - endpointId
+      - ids
+      properties:
+        endpointId:
+          type: integer
+        ids:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
+    sourcefile.BulkWriteModel:
+      type: object
+      properties:
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/sourcefile.WriteModel'
+    sourcefile.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/sourcefile.ReadModel'
+    sourcefile.WriteModel:
+      type: object
+      required:
+      - endpointId
+      - fileName
+      - lastModified
+      - sizeBytes
+      properties:
+        archiveFileName:
+          type: string
+        archiveType:
+          $ref: '#/components/schemas/sourcefile.ArchiveType'
+        blobKey:
+          type: string
+        controlFile:
+          $ref: '#/components/schemas/sourcefile.ControlFile'
+        discoveredAt:
+          type: string
+        discoveredRank:
+          type: integer
+        duckDbBatchKey:
+          type: string
+        duckDbTable:
+          type: string
+        endpointId:
+          type: integer
+        fileName:
+          type: string
+        isArchive:
+          type: boolean
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
+        lastModified:
+          type: string
+        shardBatchKey:
+          type: string
+        sizeBytes:
+          type: integer
+    sourcefile.ArchiveType:
+      type: string
+      enum:
+      - Zip
+      - Gzip
+      - Bzip2
+      - Tar
+      - TarGzip
+      - TarBzip2
+      - 7zip
+      x-enum-varnames:
+      - ArchiveTypeZip
+      - ArchiveTypeGzip
+      - ArchiveTypeBzip2
+      - ArchiveTypeTar
+      - ArchiveTypeTarGzip
+      - ArchiveTypeTarBzip2
+      - ArchiveType7zip
+    sourcefile.PatchModel:
+      type: object
+      properties:
+        controlFile:
+          $ref: '#/components/schemas/sourcefile.ControlFile'
+        fileDisappeared:
+          type: boolean
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
+        shardBatchKey:
+          type: string
+        sizeBytes:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    sourcefile.ControlFile:
+      type: object
+      properties:
+        blobKey:
+          type: string
+        fileName:
+          type: string
+        lastModified:
+          type: string
+        sizeBytes:
+          type: integer
+    sourcefile.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        archiveFileName:
+          type: string
+        archiveType:
+          $ref: '#/components/schemas/sourcefile.ArchiveType'
+        blobKey:
+          type: string
+        controlFile:
+          $ref: '#/components/schemas/sourcefile.ControlFile'
+        discoveredAt:
+          type: string
+        discoveredRank:
+          type: integer
+        duckDbBatchKey:
+          type: string
+        duckDbTable:
+          type: string
+        endpointId:
+          type: integer
+        fileDisappeared:
+          type: boolean
+        fileName:
+          type: string
+        id:
+          type: integer
+        isArchive:
+          type: boolean
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
+        lastModified:
+          type: string
+        shardBatchKey:
+          type: string
+        sizeBytes:
+          type: integer
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

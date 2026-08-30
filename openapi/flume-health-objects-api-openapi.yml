@@ -1,0 +1,840 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Objects API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Objects
+paths:
+  /api/v1/objects:
+    get:
+      description: Lists Objects.
+      tags:
+      - Objects
+      summary: List Objects
+      operationId: listObjects
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: List of Object IDs to return
+        name: ids
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Objects to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: Field by which to sort results {name, createdDate}. Defaults to createdDate
+        name: orderBy
+        in: query
+        schema:
+          type: string
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/object.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Creates an Object.
+      tags:
+      - Objects
+      summary: Create Object
+      operationId: createObject
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/object.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/object.WriteModel'
+        description: Object Body
+        required: true
+  /api/v1/objects/{id}:
+    get:
+      description: Gets an Object.
+      tags:
+      - Objects
+      summary: Get Object
+      operationId: getObject
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/object.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    delete:
+      description: Deletes an Object.
+      tags:
+      - Objects
+      summary: Delete Object
+      operationId: deleteObject
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Updates an Object.
+      tags:
+      - Objects
+      summary: Update Object
+      operationId: updateObject
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/object.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/object.UpdateModel'
+        description: Object Body
+        required: true
+  /api/v1/objects/{objId}/instances:
+    get:
+      description: Lists Instances.
+      tags:
+      - Objects
+      summary: List Instances
+      operationId: listInstances
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: objId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Filter by connectionId
+        name: connectionId
+        in: query
+        schema:
+          type: string
+      - description: Filter by jobId
+        name: jobId
+        in: query
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Instances to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: Field by which to sort results {name, createdDate, canonicalValue}. Defaults to createdDate
+        name: orderBy
+        in: query
+        schema:
+          type: string
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectinstance.ListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Creates an Instance.
+      tags:
+      - Objects
+      summary: Create Instance
+      operationId: createInstance
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: objId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectinstance.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectinstance.WriteModel'
+        description: Instance Body
+        required: true
+  /api/v1/objects/{objId}/instances/{id}:
+    get:
+      description: Gets an Instance.
+      tags:
+      - Objects
+      summary: Get Instance
+      operationId: getInstance
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: objId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: id of the instance
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectinstance.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Updates an Instance.
+      tags:
+      - Objects
+      summary: Update Instance
+      operationId: updateInstance
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: objId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: id of the instance
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectinstance.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectinstance.UpdateModel'
+        description: Instance Body
+        required: true
+  /api/v1/objects/{objId}/instances:bulk:
+    post:
+      description: Creates Bulk Instances
+      tags:
+      - Objects
+      summary: Create Bulk Instances
+      operationId: createBulkInstances
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of the object
+        name: objId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectinstance.BulkWriteModel'
+        description: Instance Bodies
+        required: true
+components:
+  schemas:
+    objectinstance.ObjectSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    objectinstance.ReadModel:
+      type: object
+      required:
+      - canonicalValue
+      - connectionIds
+      - jobIds
+      - name
+      properties:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        id:
+          type: integer
+        jobIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        name:
+          type: string
+        object:
+          $ref: '#/components/schemas/objectinstance.ObjectSummary'
+    endpoint.DataType:
+      type: string
+      enum:
+      - Accumulators
+      - Authorizations
+      - Bytes
+      - Eligibility
+      - Groups
+      - MedicalClaimServiceLines
+      - Providers
+      - RxClaimServiceLines
+      - MedicalAndRxClaimLines
+      - Test
+      - TransactionMetadata
+      - Generic
+      - RecordLevelMetadata
+      - PlanNetworks
+      - ProviderNetworkDirectory
+      - HmClaimsExtended
+      - HmProvidersExtended
+      - Strings
+      x-enum-varnames:
+      - DataTypeAccumulators
+      - DataTypeAuthorizations
+      - DataTypeBytes
+      - DataTypeEligibility
+      - DataTypeGroups
+      - DataTypeMedicalClaimServiceLines
+      - DataTypeProviders
+      - DataTypeRxClaimServiceLines
+      - DataTypeMedicalAndRxClaimLines
+      - DataTypeTest
+      - DataTypeTransactionMetadata
+      - DataTypeGeneric
+      - DataTypeRecordLevelMetadata
+      - DataTypePlanNetworks
+      - DataTypeProviderNetworkDirectory
+      - DataTypeHmClaimsExtended
+      - DataTypeHmProvidersExtended
+      - DataTypeStrings
+    objectinstance.CustomValue:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    objectinstance.BulkWriteModel:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.WriteModel'
+    object.UpdateModel:
+      type: object
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
+        name:
+          type: string
+    object.CanonicalColumn:
+      type: object
+      required:
+      - column
+      - dataType
+      properties:
+        column:
+          type: string
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+    objectinstance.CustomValuesByConnection:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/objectinstance.CustomValue'
+    objectinstance.WriteModel:
+      type: object
+      required:
+      - canonicalValue
+      - connectionIds
+      - jobIds
+      - name
+      properties:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        jobIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        name:
+          type: string
+    objectinstance.UpdateModel:
+      type: object
+      properties:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        jobIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        name:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    object.ReadModel:
+      type: object
+      required:
+      - canonicalColumns
+      - name
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
+        id:
+          type: integer
+        name:
+          type: string
+        numInstances:
+          type: integer
+    object.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.ReadModel'
+    objectinstance.ListResponse:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.ReadModel'
+        nextPageToken:
+          type: string
+    object.WriteModel:
+      type: object
+      required:
+      - canonicalColumns
+      - name
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
+        name:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

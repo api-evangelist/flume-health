@@ -1,0 +1,2704 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Context Knowledge API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Context Knowledge
+paths:
+  /api/v1/context/knowledge:
+    get:
+      description: 'Lists curated knowledge for the authenticated account, ordered by fqn and filterable by scope, kind, status, and fqn-prefix. The agent reads knowledge via graph-search/graph-query (K1); this is the CURATOR/manage surface. A read, so — like get — it is not gated by the knowledge_write_manage flag: a write-off rollback still serves it. One curator-scoped rule applies: a NON-curator never sees status=proposed rows (unapproved content is what the review-queue and proposal-list gates protect, and an inventory must not route around them); a non-curator filtering for proposed gets an empty list, not an error. The result is BOUNDED (limit defaults to 200, ceiling 1000) and the envelope carries no cursor, so an account past the ceiling is truncated — the truncation is logged server-side, and wire pagination is the fix rather than a larger bound.'
+      tags:
+      - Context Knowledge
+      summary: List knowledge
+      operationId: listKnowledge
+      parameters:
+      - description: Filter by scope type (flume_core, account, project, user, session)
+        name: scope
+        in: query
+        schema:
+          type: string
+      - description: Filter by kind. Matched exactly and NOT validated against a closed set — kind is open-with-declaration (G8), so an account's declared kind:ontology values are legal filter values.
+        name: kind
+        in: query
+        schema:
+          type: string
+      - description: Filter by lifecycle status (proposed, active, superseded, archived, rejected, tombstoned)
+        name: status
+        in: query
+        schema:
+          type: string
+      - description: Filter by fqn prefix (opaque, store-minted knowledge/{id}; C16)
+        name: fqn_prefix
+        in: query
+        schema:
+          type: string
+      - description: Max entities to return (default 200, ceiling 1000)
+        name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.KnowledgeListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: 'Creates a knowledge entity. account_id comes from request context, fqn is store-minted (C16), and curator_role from auth — none may be supplied in the body. TWO paths share this route by a body-value dispatch on status (AIP: not a bespoke verb): the default status=active is the CURATOR-gated create, while status=proposed is the save-this proposal (FL-29879) — NOT curator-gated, any authenticated author may propose. A proposal lands status=proposed plus one review_items row and is never retrieval-eligible until a curator approves it via the row-scoped review-items/{review_item_id}:approve. The propose-only evidence fields (proposed_target, sensitivity, verification_interval) are accepted ONLY with status=proposed; the source evidence link rides in source_refs, which already documents exactly that purpose.'
+      tags:
+      - Context Knowledge
+      summary: Create a knowledge entity
+      operationId: createKnowledge
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
+        description: Knowledge to create
+        required: true
+  /api/v1/context/knowledge/artifacts:
+    post:
+      description: Persists a content-addressed :Artifact (code/document/image). Identity is the content_hash (derived from the payload; a supplied hash is verified). Byte-identical content dedups to one row (FR-33). Raw PHI bytes are never injected — only the sanitized extracted_text is embedded/injected. A binary artifact's `bytes` are retained (FL-30227), stored against the content_hash outside the graph and served only through GET /api/v1/context/knowledge/artifacts/{content_hash}/content, which is role- and sensitivity-gated. Identity, size, media_type, extracted_text, and sensitivity/scope persist on the artifact itself.
+      tags:
+      - Context Knowledge
+      summary: Create a content-addressed artifact
+      operationId: createKnowledgeArtifact
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.CreateArtifactResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.CreateArtifactRequest'
+        description: Artifact to create
+        required: true
+  /api/v1/context/knowledge/artifacts/{content_hash}/content:
+    get:
+      description: Streams the raw bytes of a stored binary artifact, addressed by content_hash. Requires Editor or above; a phi_bearing or unclassified artifact additionally requires a curator (SystemAdmin). Returns 404 when no payload is stored — including for artifacts created before payload persistence existed, whose bytes were discarded and cannot be recovered except by re-creating the artifact from the same content. Raw bytes are never injected or embedded; only the sanitized extracted_text is.
+      tags:
+      - Context Knowledge
+      summary: Download a binary artifact's payload
+      operationId: getKnowledgeArtifactContent
+      parameters:
+      - description: Artifact content hash (sha256-…)
+        name: content_hash
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The artifact payload
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad Request
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/graph:
+    get:
+      description: 'Returns the read-only knowledge graph (nodes + edges) for the graph view (FR-25). Read-only: mutation happens on the manage surface. Not yet implemented (501).'
+      tags:
+      - Context Knowledge
+      summary: Get the read-only knowledge graph
+      operationId: getKnowledgeGraph
+      parameters:
+      - description: Filter by scope type
+        name: scope
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.KnowledgeGraphResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/prefix:
+    get:
+      description: 'Returns the near-static {ontology} schema-card and the debounced/versioned {index} block with their current versions, for the gateway proxy flow to attach to the cached system-prefix (FR-34). These blocks are read-side only: they do NOT pass the per-turn relevance gate or count against the per-turn budget. Gated by knowledge_read_inject; with the flag off the endpoint returns 503 (read-off rollback).'
+      tags:
+      - Context Knowledge
+      summary: Get the stable knowledge prefix blocks
+      operationId: getKnowledgePrefix
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.KnowledgePrefixResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/proposals:
+    get:
+      description: Lists status=proposed knowledge items awaiting curator review (FR-7, FR-27). Account-isolated and CURATOR-GATED (a non-curator gets 403, even though the route-level policy admits editors) — the list carries unapproved proposal content. Each entry is hydrated from the LIVE :Knowledge node, so a curator's edits before approval are what the queue shows; the reason comes from the review row. A read, so — like get — it is not gated by the knowledge_write_manage flag.
+      tags:
+      - Context Knowledge
+      summary: List knowledge proposals
+      operationId: listKnowledgeProposals
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.ProposalListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/review-items:
+    get:
+      description: 'Returns the account''s curator review queue (proposed_knowledge, bulk_seed_ambiguity and feedback_flag rows) for the review-queue UI (Story 5.2, pulled into v1), optionally filtered by status. Account-isolated and CURATOR-GATED (a non-curator gets 403, even though the route-level policy admits editors). A read, so — like get — it is not gated by the knowledge_write_manage flag: a write-off rollback still serves the queue.'
+      tags:
+      - Context Knowledge
+      summary: Get the curator review queue
+      operationId: getKnowledgeReviewQueue
+      parameters:
+      - description: Filter by review status (open, accepted, rejected, dismissed)
+        name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.ReviewQueueResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/review-items/{review_item_id}/promotion-preflight:
+    get:
+      description: 'Returns everything the propose->active promotion gate needs, in one read (FL-29879''s 2026-08-05 AC): the proposal''s §3.4 evidence, the FR-27 field NAMES it is missing, and a FRESH artifact-revision verdict. Both gate results are server-authoritative — missing_evidence because several FR-27 fields are not on ProposalPayload at all, and artifact_freshness because the revision flip skips proposed referrers, so the proposal''s own needs_review badge reads clean on exactly the case this catches. It writes nothing and is safe (and intended) to re-run on every promotion-dialog open: a verdict computed at mount would answer with the graph as it was at mount, and the failure this exists for is a revision landing while the proposal waited. CURATOR-gated. A row that is not a proposed_knowledge item has no promotion to preflight (400).'
+      tags:
+      - Context Knowledge
+      summary: Preflight a proposal's promotion
+      operationId: getKnowledgePromotionPreflight
+      parameters:
+      - description: Review item id (a bare UUIDv7 — review rows carry no collection prefix)
+        name: review_item_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.PromotionPreflightResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: the proposal was promoted or its row disposed in another tab
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/review-items/{review_item_id}:approve:
+    post:
+      description: 'Disposes a review row as accepted. On a proposed_knowledge row this is ONE call that does BOTH halves of the promotion: it promotes the entity proposed->active (emitting the `approved` event) and disposes the row open->accepted. They are one call because the two writes span different datasets with no shared transaction, so the sequencing has to be the server''s — a client issuing two calls would own a half-applied promotion it cannot repair. On a bulk_seed_ambiguity or feedback_flag row there is no entity to promote, so it is queue bookkeeping only. Promotion enforces the FR-27 evidence floor AND the artifact-freshness re-check, refusing with 400 invalid_input and a `field` naming what blocked it (`artifacts` for a revised or unconfirmable artifact, otherwise the missing evidence field). A refused promotion writes NOTHING. CURATOR-gated.'
+      tags:
+      - Context Knowledge
+      summary: Approve a review item
+      operationId: approveKnowledgeReviewItem
+      parameters:
+      - description: Review item id
+        name: review_item_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.ApproveReviewItemRequest'
+        description: Optional approver overrides (recall_policy, verification_interval). The queue UI approves with no body, in which case the proposal's own values stand.
+  /api/v1/context/knowledge/review-items/{review_item_id}:dismiss:
+    post:
+      description: 'Disposes a review row as dismissed — the curator judged it not actionable. PURE queue bookkeeping on every item type: no knowledge effect and no knowledge_audit_log event, because a queue transition is not itself a :Knowledge state change (§1.5 keeps the two logs distinct). This is the feedback_flag disposition; a triage prompt is not a proposal, so it is never "rejected". CURATOR-gated.'
+      tags:
+      - Context Knowledge
+      summary: Dismiss a review item
+      operationId: dismissKnowledgeReviewItem
+      parameters:
+      - description: Review item id
+        name: review_item_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/review-items/{review_item_id}:merge:
+    post:
+      description: 'Folds a proposed_knowledge row''s content into an EXISTING entity and disposes the row as accepted. There is deliberately no `merged` audit event — the sixteen-type set is closed, and a merge decomposes into exactly two recorded effects: an `edited` event on the target and an `approved` event on the review item. Only the target is client-supplied; the FIELDS folded are derived server-side from the proposal (from the LIVE node, so a curator''s pre-merge edits are what lands), because letting a client name them would make merge a general edit wearing a proposal''s disposition. Only a proposed_knowledge row can be merged. CURATOR-gated.'
+      tags:
+      - Context Knowledge
+      summary: Merge a proposal into an existing entity
+      operationId: mergeKnowledgeReviewItem
+      parameters:
+      - description: Review item id
+        name: review_item_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.MergeReviewItemRequest'
+        description: Merge target
+        required: true
+  /api/v1/context/knowledge/review-items/{review_item_id}:reject:
+    post:
+      description: Disposes a review row as rejected. On a proposed_knowledge row it also terminates the entity (proposed->rejected) and emits a `rejected` event carrying the reason when one is supplied; the body is optional, because a curator dispositioning without typing a reason sends none. Rejecting a knowledge entity that is not a proposal is a 409 — `rejected` is a proposal-lifecycle terminus, not a general retraction (that is DELETE/tombstone). CURATOR-gated.
+      tags:
+      - Context Knowledge
+      summary: Reject a review item
+      operationId: rejectKnowledgeReviewItem
+      parameters:
+      - description: Review item id
+        name: review_item_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.RejectReviewItemRequest'
+        description: Optional rejection reason
+  /api/v1/context/knowledge/turns/{message_id}:
+    get:
+      description: 'Returns the injected-knowledge panel + RecallTrace payload for a conversation turn (FR-24). A zero-injection turn returns gate_decision=none with no recall_trace. SOURCE AND ITS LIMITS: served from an in-process retention ring on the injection-audit writer, NOT from the durable injection_audit table (whose context-db receiver does not exist yet). It is therefore SINGLE-POD (the API runs several replicas; only the pod that served the turn holds the record), RESTART-LOSSY, and BOUNDED (old turns age out). A turn this pod did not serve, or that has aged out, returns the SAME zero-injection payload as a turn that genuinely injected nothing — the two are not distinguishable, and this endpoint never 404s or 500s for a missing turn. Treat it as a demo/debug surface; the durable trail is the audit table. ADDRESSING: the gateway mints a per-turn message id and returns it as the X-Flume-Message-Id response header on the LLM proxy call that served the turn (FL-30412) — read it there and address this route with it. A conversation id is also accepted, for clients that do not read that header yet, and resolves to that conversation''s MOST RECENT retained turn — correct for a dock rendering the live answer, wrong for one pinned to an older answer. PER-ITEM FIDELITY: title, kind and scope are re-read from the entity at request time, so they reflect the entity NOW rather than at turn time; badge.freshness, conflict and phi are computed during retrieval and are NOT carried by the audit record, so they are absent/false here rather than recomputed from a second, divergable opinion.'
+      tags:
+      - Context Knowledge
+      summary: Get injected knowledge for a turn
+      operationId: getTurnKnowledge
+      parameters:
+      - description: Message id segment of the turn — the opaque id only, not a slash-bearing resource name (chi path params cannot contain a slash). Take it from the X-Flume-Message-Id response header of the LLM proxy call that served the turn. A conversation id is also accepted and resolves to that conversation's most recent retained turn.
+        name: message_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.TurnKnowledgePayload'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}:
+    get:
+      description: 'Returns a single knowledge entity by its opaque fqn (knowledge/{id}). This curator read is intentionally NOT gated by the knowledge_write_manage flag: per the flag''s design, the write/manage surface is dark-launched and rolled back independently of reads (see writeEnabled), so a write-off rollback still serves reads of already-curated entities. The flag gates mutations only, not the whole surface.'
+      tags:
+      - Context Knowledge
+      summary: Get a knowledge entity
+      operationId: getKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    delete:
+      description: Soft-deletes a knowledge entity — maps to status=tombstoned + body redaction (audited), never a hard row delete.
+      tags:
+      - Context Knowledge
+      summary: Tombstone a knowledge entity
+      operationId: deleteKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    patch:
+      description: 'Field-updates a knowledge entity. C12: verify (last_verified_at + verified_by) AND publish (status + recall_policy) are BOTH PATCH field-stamps here — there is no :verify or :publish custom method; a body may carry both. A publish stamp may only set status=active.'
+      tags:
+      - Context Knowledge
+      summary: Update a knowledge entity
+      operationId: updateKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.PatchKnowledgeRequest'
+        description: Fields to update
+        required: true
+  /api/v1/context/knowledge/{id}/attach-candidates:
+    get:
+      description: Returns (as a normal 200) the candidate list the manage UI shows to resolve an ambiguous attach — the same candidates the write-path attach reports via 409 disambiguate_required — plus an optional same-kind/same-target conflict warning (FR-4). This read surface never itself returns 409. Not yet implemented (501).
+      tags:
+      - Context Knowledge
+      summary: List attach disambiguation candidates
+      operationId: getAttachCandidates
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Attach-target text to disambiguate
+        name: q
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.AttachCandidatesResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}/feedback:
+    get:
+      description: Returns the ✓/✗ feedback events recorded against a knowledge entity so curators can triage feedback_flag review items (D6a). Feedback never mutates trust fields (FR-15). Not yet implemented (501).
+      tags:
+      - Context Knowledge
+      summary: List feedback events for a knowledge entity
+      operationId: listKnowledgeFeedback
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.FeedbackEventListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}/full:
+    get:
+      description: 'Returns the full view — everything the manage UI (FL-29876) renders (§3.2 KnowledgeEntityPayload): attachments, provenance, lifecycle, artifacts, conflict edges, and badges. account_id is server-populated. Not yet implemented (501).'
+      tags:
+      - Context Knowledge
+      summary: Get the full knowledge entity view
+      operationId: getFullEntity
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.KnowledgeEntityPayload'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}/peek:
+    get:
+      description: 'Returns the read-only single-node peek shown in the GraphPeekDrawer (FR-25): a body excerpt, badge, scope, flags, and attachment summaries. Not yet implemented (501).'
+      tags:
+      - Context Knowledge
+      summary: Peek a single knowledge node
+      operationId: getGraphPeekNode
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.GraphPeekNode'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}:attach:
+    post:
+      description: 'Interactive attach (FL-29867). Resolves target_text and enforces hard-required human-in-the-loop disambiguation (FR-4): 0 candidates offers :BusinessTerm creation (create_target_term to confirm), 1 auto-attaches, 2+ returns 409 disambiguate_required with candidates. A same-kind/same-target active returns 200 with a conflict_warning (not an error); resend with proceed=true to attach and record :CONFLICTS_WITH. An explicit target_fqns[] attaches directly (post-disambiguation retry).'
+      tags:
+      - Context Knowledge
+      summary: Attach knowledge to a target
+      operationId: attachKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledgemanager.AttachResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: no candidate — offer business-term creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: disambiguate_required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.DisambiguationResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledgemanager.AttachInput'
+        description: Attach target
+        required: true
+  /api/v1/context/knowledge/{id}:detach:
+    post:
+      description: 'Removes a :APPLIES_TO edge. NOT YET IMPLEMENTED (501): live edge removal is blocked on a context-db relationship-only edge-delete endpoint (FL-30075). The wire shape lands with #8 (arch §2.1); the route returns 501 until the endpoint ships.'
+      tags:
+      - Context Knowledge
+      summary: Detach knowledge from a target
+      operationId: detachKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '501':
+          description: blocked on FL-30075
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}:erase:
+    post:
+      description: 'Right-to-erasure: removes the node and its body (and the chunk-index rows and vectors), retaining only a redacted tombstone audit event. Distinct from delete/tombstone.'
+      tags:
+      - Context Knowledge
+      summary: Erase a knowledge entity
+      operationId: eraseKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/knowledge/{id}:feedback:
+    post:
+      description: Records a vote (up/down) plus an optional note (max 4KB) from the injected panel. A down vote also lands a review_items row for curator triage (D6a). Never mutates trust fields (FR-15). This is an end-user reaction surface (not curator-gated), so it is not gated by the knowledge_write_manage flag — but an automated (M2M) identity is rejected with 403, because a flag is a curation-plane write.
+      tags:
+      - Context Knowledge
+      summary: Record feedback on knowledge
+      operationId: feedbackKnowledge
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.FeedbackRequest'
+        description: Feedback vote
+        required: true
+  /api/v1/context/knowledge/{id}:link-artifact:
+    post:
+      description: Attaches a content-addressed artifact to a knowledge entity via a typed reference edge (COMPUTED_BY for code, CITES/EVIDENCED_BY for document, ILLUSTRATED_BY for image, DERIVED_FROM for provenance). The edge type must match the artifact kind.
+      tags:
+      - Context Knowledge
+      summary: Link an artifact to a knowledge entity
+      operationId: linkKnowledgeArtifact
+      parameters:
+      - description: Knowledge id (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.LinkArtifactRequest'
+        description: Artifact link
+        required: true
+  /api/v1/context/knowledge/{id}:supersede:
+    post:
+      description: Creates a new version, links :SUPERSEDES, and flips the prior version's temporal bounds. A genuine non-CRUD action (multi-node + side effects), so a colon custom method, not a field PATCH.
+      tags:
+      - Context Knowledge
+      summary: Supersede a knowledge entity
+      operationId: supersedeKnowledge
+      parameters:
+      - description: Knowledge id of the entity being superseded (opaque; the full fqn is knowledge/{id}, C16)
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledge.SupersedeRequest'
+        description: The superseding entity
+        required: true
+  /api/v1/context/knowledge:bulk:
+    post:
+      description: 'Bulk/seed/migration write. Never a per-item live stop (§2.1b): an item with an explicit target_fqn creates a knowledge node and attaches it to that target, which must already exist as an estate or business-concept node; an item carrying only target_text is written to review_items (a bulk_seed_ambiguity row — pointer+hash, never the raw body) and the batch proceeds, because this path runs no target resolver; input-shape failures and rejected targets are returned per item. No item may supply fqn, id, or account_id — identity is store-minted and the account comes from the request context. The manifest must carry between 1 and 500 items. Curator-gated; requires the knowledge_write_manage flag. With dry_run the same admission rules run (shape checks and the target check, which is a read) without writing anything, so a preview never reports written for an item the real run would reject on its input — it cannot predict a store-level failure, which only the real write can hit. Each `deferred` entry is a PREVIEW of the row that would be created: item_type, status, reason, account_id and proposed_payload are exact, while review_item_id, source_event_id and created_at are minted at persist time. On a preview the two ids are OMITTED from the response; created_at is the one field that still carries a zero value ("0001-01-01T00:00:00Z") and must be treated as absent rather than parsed as a date.'
+      tags:
+      - Context Knowledge
+      summary: Bulk write knowledge
+      operationId: bulkWriteKnowledge
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledgemanager.BulkResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/knowledgemanager.BulkWriteInput'
+        description: Bulk manifest
+        required: true
+components:
+  schemas:
+    knowledge.KnowledgePrefixResponse:
+      type: object
+      properties:
+        index:
+          $ref: '#/components/schemas/knowledge.KnowledgePrefixBlock'
+        ontology:
+          $ref: '#/components/schemas/knowledge.KnowledgePrefixBlock'
+    knowledge.GraphNodeBadges:
+      type: object
+      properties:
+        conflict:
+          type: boolean
+        freshness:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
+          example: fresh
+        phi:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+    knowledgemanager.KnowledgeWriteErrorCode:
+      type: string
+      enum:
+      - invalid_input
+      - disambiguation_required
+      - conflict
+      - scope_forbidden
+      - not_found
+      - internal
+      x-enum-varnames:
+      - KnowledgeWriteInvalidInput
+      - KnowledgeWriteDisambiguationRequired
+      - KnowledgeWriteConflict
+      - KnowledgeWriteScopeForbidden
+      - KnowledgeWriteNotFound
+      - KnowledgeWriteInternal
+    knowledgestore.ReviewItemStatus:
+      type: string
+      enum:
+      - open
+      - accepted
+      - rejected
+      - dismissed
+      x-enum-varnames:
+      - ReviewOpen
+      - ReviewAccepted
+      - ReviewRejected
+      - ReviewDismissed
+    knowledge.KnowledgeGraphResponse:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.KnowledgeGraphEdge'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.KnowledgeGraphNode'
+    knowledge.EntityLifecycle:
+      type: object
+      properties:
+        last_validated_against_schema:
+          type: string
+        recall_policy:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+          example: auto
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+        supersedes_fqn:
+          type: string
+        valid_from:
+          type: string
+        valid_to:
+          type: string
+    knowledgestore.InheritanceMode:
+      type: string
+      enum:
+      - exact
+      - descendants
+      x-enum-varnames:
+      - InheritanceExact
+      - InheritanceDescendants
+    knowledgestore.KnowledgeEntity:
+      type: object
+      properties:
+        account_id:
+          type: string
+          example: '12345'
+        applicability:
+          type: string
+        authored_by:
+          type: string
+        body:
+          type: string
+          x-body-soft-cap-warning: true
+        confidence:
+          type: number
+        corroborated_by:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+        created_by:
+          type: string
+        curator_role:
+          type: string
+          example: system_admin
+        description:
+          type: string
+          example: Rows written before 2021-03 have a null paid_amt.
+        fqn:
+          type: string
+          example: knowledge/019f8899-d6c2-761f-9019-4ad5e8167402
+        kind:
+          type: string
+          example: pitfall
+        knowledge_scope_id:
+          type: string
+          example: '12345'
+        knowledge_scope_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+          example: account
+        last_validated_against_schema:
+          type: string
+        last_verified_at:
+          type: string
+        recall_policy:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+          example: auto
+        source_refs:
+          type: array
+          items:
+            type: string
+        source_type:
+          type: string
+          example: curator
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+        supersedes_fqn:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+          example: paid_amt is null before the 2021 migration
+        updated_at:
+          type: string
+        updated_by:
+          type: string
+        valid_from:
+          type: string
+        valid_to:
+          type: string
+        verification_interval:
+          type: string
+        verified_by:
+          type: string
+    knowledgemanager.BulkItem:
+      type: object
+      required:
+      - payload
+      properties:
+        inheritance:
+          $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+        payload:
+          $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
+        target_fqn:
+          type: string
+        target_text:
+          type: string
+    knowledge.KnowledgeGraphNode:
+      type: object
+      properties:
+        badges:
+          $ref: '#/components/schemas/knowledge.GraphNodeBadges'
+        fqn:
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        label:
+          type: string
+          example: Knowledge
+    knowledgestore.KnowledgeResultBadge:
+      type: object
+      properties:
+        freshness:
+          description: Freshness is the verification/recency band (see FreshnessBand).
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
+          example: fresh
+        source:
+          description: Source is the provenance gradient label (e.g. "curator", "scan", "inferred").
+          type: string
+          example: curator
+    knowledge.EntityProvenance:
+      type: object
+      properties:
+        authored_by:
+          type: string
+        confidence:
+          type: number
+        corroborated_by:
+          type: array
+          items:
+            type: string
+        created_by:
+          type: string
+        curator_role:
+          type: string
+          example: system_admin
+        last_verified_at:
+          type: string
+        source_refs:
+          type: array
+          items:
+            type: string
+        source_type:
+          type: string
+          example: curator
+        updated_by:
+          type: string
+        verification_interval:
+          type: string
+        verified_by:
+          type: string
+    knowledge.GraphPeekAttachment:
+      type: object
+      properties:
+        inheritance:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+          example: exact
+        target_fqn:
+          type: string
+        target_label:
+          type: string
+    knowledge.FeedbackVote:
+      type: string
+      enum:
+      - up
+      - down
+      x-enum-varnames:
+      - VoteUp
+      - VoteDown
+    knowledgemanager.CreateKnowledgeInput:
+      type: object
+      required:
+      - description
+      - kind
+      - knowledge_scope_type
+      - title
+      properties:
+        applicability:
+          type: string
+        authored_by:
+          type: string
+        body:
+          type: string
+        confidence:
+          type: number
+        description:
+          type: string
+        kind:
+          type: string
+        knowledge_scope_id:
+          description: 'ScopeID is required for the project, user, and session scopes (each names a
+
+            specific subject) and MAY be empty for account (defaults to the request-context
+
+            account) and flume_core (global, no id). See Validate.'
+          type: string
+        knowledge_scope_type:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+        proposed_target:
+          description: 'ProposedTarget is the attachment target the proposer named, as TEXT. Required to
+
+            approve (FR-27 "resolved attachment target"). It is deliberately neither of the
+
+            two things it resembles: not an :APPLIES_TO edge (attach needs a RESOLVED fqn,
+
+            and a proposer has not resolved anything), and not Applicability (which is prose
+
+            about WHEN the knowledge applies, not WHAT it attaches to). Resolution is the
+
+            curator''s job on the manage surface before approval.'
+          type: string
+        recall_policy:
+          $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+        sensitivity:
+          description: 'Sensitivity is the proposer''s PHI classification (none | phi_adjacent |
+
+            phi_bearing). Required to approve (FR-27 "sensitivity classification"); an
+
+            unclassified entity is not injectable (PHI policy §4).'
+          type: string
+          example: none
+        source_refs:
+          type: array
+          items:
+            type: string
+        source_type:
+          type: string
+        status:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        valid_from:
+          type: string
+        valid_to:
+          type: string
+        verification_interval:
+          description: 'VerificationInterval is the re-verification cadence (an ISO-8601 duration string
+
+            such as "P90D" — see knowledgestore.Duration), required to approve (FR-27
+
+            "verification interval").
+
+
+            It is accepted at PROPOSE time, which is a deviation worth stating: it is an
+
+            approver-shaped decision, and the natural home would be the approve request. But
+
+            the review-queue''s approve is a bodyless POST by contract, so with no create-time
+
+            field a proposal could carry no interval by any route the SPA has, and every
+
+            promotion would block on missing evidence permanently. The approve route still
+
+            accepts an override, so the approver keeps the final say; this field is what
+
+            lets the proposal arrive with a defensible default already on it.'
+          type: string
+          example: P90D
+    knowledge.FeedbackRequest:
+      type: object
+      required:
+      - vote
+      properties:
+        conversation_id:
+          type: string
+        message_id:
+          type: string
+        note:
+          type: string
+        vote:
+          description: up | down
+          type: string
+          example: up
+    knowledge.GraphPeekNode:
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.GraphPeekAttachment'
+        badge:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeResultBadge'
+        body_excerpt:
+          type: string
+        conflict:
+          type: boolean
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        phi:
+          type: boolean
+        scope:
+          $ref: '#/components/schemas/knowledge.KnowledgeScope'
+        title:
+          type: string
+    knowledgemanager.BulkWriteInput:
+      type: object
+      required:
+      - manifest
+      properties:
+        dry_run:
+          type: boolean
+        manifest:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.BulkItem'
+    knowledge.SuppressionReason:
+      type: string
+      enum:
+      - budget
+      - expired
+      - out_of_scope
+      - lower_rank
+      - non_active
+      x-enum-varnames:
+      - SuppressBudget
+      - SuppressExpired
+      - SuppressOutOfScope
+      - SuppressLowerRank
+      - SuppressNonActive
+    knowledge.PromotionPreflightResponse:
+      type: object
+      properties:
+        artifact_freshness:
+          $ref: '#/components/schemas/knowledge.PromotionArtifactFreshness'
+        missing_evidence:
+          type: array
+          items:
+            type: string
+        proposal:
+          $ref: '#/components/schemas/knowledge.ProposalPayload'
+        review_item_id:
+          type: string
+    knowledge.ProposalListResponse:
+      type: object
+      properties:
+        proposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.ProposalPayload'
+    knowledgemanager.BulkItemError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/knowledgemanager.KnowledgeWriteError'
+        index:
+          type: integer
+    knowledge.CreateArtifactRequest:
+      type: object
+      required:
+      - kind
+      properties:
+        bytes:
+          description: 'Bytes is the raw binary payload for a document/image artifact. Go''s
+
+            encoding/json marshals a []byte as a base64 JSON string, so the wire
+
+            representation is base64; the swaggertype and format tags below record that
+
+            in the generated spec and client, which would otherwise model a []byte as an
+
+            array of integers.'
+          type: string
+          format: byte
+        content_hash:
+          type: string
+        extracted_text:
+          type: string
+        kind:
+          type: string
+          example: code
+        language:
+          type: string
+          example: trinosql
+        media_type:
+          type: string
+          example: application/sql
+        scope:
+          type: string
+          example: account
+        sensitivity:
+          type: string
+          example: phi_bearing
+        source:
+          type: string
+    knowledgestore.KnowledgeScopeType:
+      type: string
+      enum:
+      - flume_core
+      - account
+      - project
+      - user
+      - session
+      x-enum-varnames:
+      - ScopeTypeFlumeCore
+      - ScopeTypeAccount
+      - ScopeTypeProject
+      - ScopeTypeUser
+      - ScopeTypeSession
+    knowledge.KnowledgePrefixBlock:
+      type: object
+      properties:
+        content:
+          description: Content is the rendered block text ({ontology} or {index}).
+          type: string
+        version:
+          description: Version is the block's monotonic version (ontology_version / account_index_version).
+          type: integer
+    knowledge.EntityBadges:
+      type: object
+      properties:
+        conflict:
+          type: boolean
+        freshness:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
+          example: fresh
+        needs_review:
+          type: boolean
+        phi:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+    knowledge.Meta:
+      type: object
+      properties:
+        took:
+          type: string
+    knowledgestore.ArtifactKind:
+      type: string
+      enum:
+      - code
+      - document
+      - image
+      x-enum-varnames:
+      - ArtifactKindCode
+      - ArtifactKindDocument
+      - ArtifactKindImage
+    knowledgemanager.AttachInput:
+      type: object
+      required:
+      - inheritance
+      properties:
+        confidence:
+          description: 'Confidence is the optional [0,1] score for the attachment. Omit it to leave
+
+            confidence unset; a supplied value (including 0) is persisted distinctly from
+
+            unset, so "zero confidence" and "no confidence" do not collapse.'
+          type: number
+        create_target_term:
+          description: 'CreateTargetTerm is the zero-candidate confirm step: when a target text
+
+            resolves to no candidate, the curator may confirm creating a :BusinessTerm to
+
+            attach to. When set, the manager mints the term and attaches the source to it in
+
+            one call (the offer→confirm flow), emitting the business-term-fallback metric.'
+          allOf:
+          - $ref: '#/components/schemas/knowledgemanager.NewBusinessTerm'
+        inheritance:
+          $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+        proceed:
+          description: 'Proceed acknowledges a same-kind/same-target conflict warning: the first
+
+            interactive attach returns the warning and writes nothing; a follow-up with
+
+            Proceed=true writes the :APPLIES_TO edge AND records the :CONFLICTS_WITH edge
+
+            (FR-5). It has no effect when no conflict exists.
+
+
+            The two-call confirm is STATELESS, so Proceed is a blanket acknowledgment of
+
+            WHATEVER CONFLICTS EXIST AT PROCEED TIME, not of the specific conflicts a prior
+
+            call surfaced: a first call with Proceed=true skips the warning entirely, and a
+
+            conflict created between the warn and the proceed is written past without ever
+
+            having been shown. Accepted deliberately — FR-5''s mechanical invariants still
+
+            hold either way (every conflict is detected, recorded as :CONFLICTS_WITH with an
+
+            `attached` audit event, and echoed in the result), so nothing is absorbed
+
+            silently; only the ORDER of "shown" versus "written" differs. If multi-curator
+
+            concurrency arrives, replace this with acknowledged-fqn semantics (e.g.
+
+            proceed_past: [existing_fqns]) rather than widening the blanket flag.'
+          type: boolean
+        source_fqn:
+          type: string
+        target_fqns:
+          type: array
+          items:
+            type: string
+        target_text:
+          type: string
+    knowledge.FeedbackEventListResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.FeedbackEvent'
+    knowledge.EntityAttachment:
+      type: object
+      properties:
+        confidence:
+          type: number
+        inheritance:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+          example: exact
+        target_fqn:
+          type: string
+        target_label:
+          type: string
+    knowledgemanager.ConflictWarning:
+      type: object
+      properties:
+        existing_fqn:
+          type: string
+        kind:
+          type: string
+        target_fqn:
+          type: string
+    knowledgemanager.NewBusinessTerm:
+      type: object
+      required:
+      - name
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+    knowledge.RejectReviewItemRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: unverifiable against the estate
+    knowledge.ApproveReviewItemRequest:
+      type: object
+      properties:
+        recall_policy:
+          description: RecallPolicy overrides the auto-injection policy the entity goes live under.
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+          example: auto
+        verification_interval:
+          description: 'VerificationInterval overrides the re-verification cadence — an ISO-8601 duration
+
+            string such as "P90D", NOT a nanosecond count (see knowledgestore.Duration). It is
+
+            also the one FR-27 field an approver can supply for a proposal that carries none,
+
+            which is what keeps a promotion completable without a manage-surface round trip.'
+          type: string
+          example: P90D
+    knowledge.MergeReviewItemRequest:
+      type: object
+      required:
+      - target_fqn
+      properties:
+        target_fqn:
+          type: string
+          example: knowledge/019f8899-d6c2-761e-b01e-3fa71d083a7b
+    knowledge.CreateArtifactResponse:
+      type: object
+      properties:
+        content_hash:
+          type: string
+          example: sha256-9f2c1a
+    knowledge.PatchKnowledgeRequest:
+      type: object
+      properties:
+        applicability:
+          type: string
+        body:
+          type: string
+        description:
+          type: string
+        last_verified_at:
+          type: string
+        recall_policy:
+          $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+        status:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        verified_by:
+          type: string
+    knowledge.LinkArtifactRequest:
+      type: object
+      required:
+      - content_hash
+      - edge
+      properties:
+        content_hash:
+          type: string
+          example: sha256-9f2c1a
+        edge:
+          type: string
+          example: COMPUTED_BY
+    knowledgemanager.BulkResult:
+      type: object
+      properties:
+        deferred:
+          description: 'Deferred holds the bulk_seed_ambiguity rows raised by this run. On an executed run
+
+            these are the PERSISTED rows, fully identified. On a dry run they are PREVIEWS of
+
+            the rows that would be created: item_type, status, reason, account_id and
+
+            proposed_payload are exact, while review_item_id, source_event_id and created_at
+
+            are minted at persist time and so carry no value here. Nothing else returns a
+
+            ReviewItem with unset identity fields.
+
+
+            On the wire that means the two ids are OMITTED from a preview row (they carry
+
+            omitempty for exactly this path), matching the generated optional TS type. The one
+
+            residue is created_at: time.Time has no useful zero-omission, so a preview stamps
+
+            it "0001-01-01T00:00:00Z". A consumer must therefore treat created_at on a dry-run
+
+            row as absent rather than parse it — `new Date(row.created_at)` yields a year-1
+
+            date, which is worse than an absent one because nothing downstream flags it.
+
+            Removing that last one needs a preview-specific type or *time.Time; both change
+
+            the contract and are scoped out of this ticket.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.ReviewItem'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.BulkItemError'
+        written:
+          type: integer
+    knowledgestore.KnowledgeStatus:
+      type: string
+      enum:
+      - proposed
+      - active
+      - superseded
+      - archived
+      - rejected
+      - tombstoned
+      x-enum-varnames:
+      - StatusProposed
+      - StatusActive
+      - StatusSuperseded
+      - StatusArchived
+      - StatusRejected
+      - StatusTombstoned
+    knowledge.KnowledgeListResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/knowledge.Meta'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
+    knowledgestore.ReviewItem:
+      type: object
+      properties:
+        account_id:
+          type: string
+        assigned_to:
+          type: string
+        created_at:
+          type: string
+        item_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ReviewItemType'
+          example: bulk_seed_ambiguity
+        proposed_payload:
+          type: object
+        reason:
+          type: string
+        review_item_id:
+          type: string
+        source_event_id:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ReviewItemStatus'
+          example: open
+    knowledge.EntityArtifact:
+      type: object
+      properties:
+        content_hash:
+          type: string
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ArtifactKind'
+          example: code
+        language:
+          type: string
+        media_type:
+          type: string
+        sensitivity:
+          type: string
+          example: phi_bearing
+    knowledgemanager.AttachCandidate:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        parent:
+          type: string
+        snippet:
+          type: string
+    knowledge.ConflictWarningResp:
+      type: object
+      properties:
+        existing_fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        target_fqn:
+          type: string
+    knowledge.SupersedeRequest:
+      type: object
+      required:
+      - payload
+      properties:
+        payload:
+          $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
+    knowledge.PromotionFreshnessVerdict:
+      type: string
+      enum:
+      - fresh
+      - artifact_revised
+      - no_artifacts
+      - unknown
+      x-enum-varnames:
+      - FreshnessFresh
+      - FreshnessArtifactRevised
+      - FreshnessNoArtifacts
+      - FreshnessUnknown
+    knowledge.FeedbackEvent:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        fqn:
+          type: string
+        message_id:
+          type: string
+        note:
+          type: string
+        vote:
+          allOf:
+          - $ref: '#/components/schemas/knowledge.FeedbackVote'
+          example: up
+    knowledge.ProposalPayload:
+      type: object
+      properties:
+        body:
+          type: string
+        confidence:
+          type: number
+        evidence_link:
+          description: to the source tool output
+          type: string
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        proposed_target:
+          description: proposed attachment
+          type: string
+        reason:
+          type: string
+        recall_policy:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+          example: auto
+        scope_id:
+          type: string
+        scope_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+          example: account
+        sensitivity:
+          type: string
+        title:
+          type: string
+    knowledge.ReviewQueueResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.ReviewItemPayload'
+    knowledgestore.RecallPolicy:
+      type: string
+      enum:
+      - auto
+      - manual
+      - never
+      x-enum-varnames:
+      - RecallAuto
+      - RecallManual
+      - RecallNever
+    knowledge.AttachCandidate:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        parent:
+          type: string
+        snippet:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    knowledgemanager.KnowledgeWriteError:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/knowledgemanager.KnowledgeWriteErrorCode'
+        field:
+          type: string
+        message:
+          type: string
+    knowledge.ReviewItemPayload:
+      type: object
+      properties:
+        assigned_to:
+          type: string
+        created_at:
+          type: string
+        item_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ReviewItemType'
+          example: proposed_knowledge
+        proposed_payload:
+          type: object
+        reason:
+          type: string
+        review_item_id:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ReviewItemStatus'
+          example: open
+    knowledge.PromotionArtifactCheck:
+      type: object
+      properties:
+        content_hash:
+          type: string
+        current_content_hash:
+          description: 'CurrentContentHash names the head that replaced this version; absent when the
+
+            version IS the head. On a forked revision history it names ONE of several heads
+
+            (content-addressing lets a version have multiple successors, so there is no unique
+
+            "latest") — `revised` is the field that carries the verdict.'
+          type: string
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ArtifactKind'
+          example: code
+        revised:
+          type: boolean
+    knowledge.GateDecision:
+      type: string
+      enum:
+      - none
+      - light
+      - heavy
+      x-enum-varnames:
+      - GateNone
+      - GateLight
+      - GateHeavy
+    knowledge.KnowledgeGraphEdge:
+      type: object
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+        target:
+          type: string
+        type:
+          type: string
+          example: APPLIES_TO
+    knowledgestore.AppliesToEdge:
+      type: object
+      properties:
+        confidence:
+          description: 'Confidence is presence-aware: nil means "no confidence supplied" (the property
+
+            is omitted at persistence), while a non-nil pointer persists its value —
+
+            including a legal 0.0 — so "zero confidence" and "unset" round-trip distinctly
+
+            instead of collapsing to the same stored state.'
+          type: number
+        created_at:
+          type: string
+        created_by:
+          type: string
+        inheritance:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+          example: exact
+        source_fqn:
+          type: string
+        target_fqn:
+          type: string
+    knowledgestore.ReviewItemType:
+      type: string
+      enum:
+      - proposed_knowledge
+      - bulk_seed_ambiguity
+      - feedback_flag
+      x-enum-varnames:
+      - ReviewTypeProposedKnowledge
+      - ReviewTypeBulkSeedAmbiguity
+      - ReviewTypeFeedbackFlag
+    knowledge.SuppressedItem:
+      type: object
+      properties:
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: definition
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/knowledge.SuppressionReason'
+          example: budget
+        title:
+          type: string
+    knowledge.KnowledgeEntityPayload:
+      type: object
+      properties:
+        account_id:
+          type: string
+        applicability:
+          type: string
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.EntityArtifact'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.EntityAttachment'
+        badges:
+          $ref: '#/components/schemas/knowledge.EntityBadges'
+        body:
+          type: string
+        conflict_edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.ConflictEdgeRef'
+        description:
+          type: string
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        lifecycle:
+          $ref: '#/components/schemas/knowledge.EntityLifecycle'
+        provenance:
+          $ref: '#/components/schemas/knowledge.EntityProvenance'
+        scope_id:
+          type: string
+          example: acct-benchmark-a
+        scope_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+          example: account
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+    knowledge.PromotionArtifactFreshness:
+      type: object
+      properties:
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.PromotionArtifactCheck'
+        verdict:
+          allOf:
+          - $ref: '#/components/schemas/knowledge.PromotionFreshnessVerdict'
+          example: fresh
+    knowledge.DisambiguationResponse:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.AttachCandidate'
+        error:
+          type: string
+    knowledge.TurnKnowledgePayload:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        gate_decision:
+          allOf:
+          - $ref: '#/components/schemas/knowledge.GateDecision'
+          example: heavy
+        injected:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.InjectedItem'
+        message_id:
+          type: string
+        recall_trace:
+          description: RecallTrace is the at-a-glance banner list; ABSENT on a zero-injection turn.
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.RecallTraceItem'
+        suppressed:
+          description: 'C14 branch A — the suppressed set enumerated inline. Mutually exclusive with
+
+            SuppressedRef; a builder picks a branch by measurement.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.SuppressedItem'
+        suppressed_count:
+          description: the "+N considered, not injected" headline
+          type: integer
+        suppressed_detail_ref:
+          description: 'C14 branch B — a handle the dock fetches on expand when inlining the full
+
+            suppressed set is too heavy for the turn payload.'
+          type: string
+    knowledgemanager.AttachResult:
+      type: object
+      properties:
+        additional_conflicts:
+          description: 'AdditionalConflicts carries the second-and-later conflicts when multiple
+
+            explicit targets each hit a same-kind active (FR-5: every conflict is
+
+            surfaced, none silently absorbed). Additive so existing consumers of the
+
+            singular field keep working; empty when at most one conflict exists.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.ConflictWarning'
+        conflict_warning:
+          $ref: '#/components/schemas/knowledgemanager.ConflictWarning'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.AppliesToEdge'
+    knowledge.ConflictEdgeRef:
+      type: object
+      properties:
+        other_fqn:
+          type: string
+    knowledge.RecallTraceItem:
+      type: object
+      properties:
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        title:
+          type: string
+    knowledge.InjectedItem:
+      type: object
+      properties:
+        badge:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeResultBadge'
+        conflict:
+          description: 'Conflict and PHI are TRI-STATE: true, false, or null for "not established".
+
+
+            They were plain booleans, which meant every row this API served asserted a definite
+
+            negative — including for entities whose governance nothing had read. For `phi` that
+
+            is the unsafe direction of an unsafe field: a curator opening the dock to judge
+
+            whether something should have reached a model was told "no PHI" about an entity
+
+            nobody classified. The rule is that unknown stays unknown; the same reasoning
+
+            reviewmanager''s ToolCall.ResultEmpty documents for its own tri-state, and the same
+
+            distinction §3.1 already draws by OMITTING recall_trace rather than sending it empty.
+
+
+            omitempty, so unknown is ABSENCE rather than an explicit null. Two reasons, and the
+
+            first is decisive: swag renders a *bool as a plain `boolean`, so a null on the wire
+
+            would contradict the generated contract the SPA builds its types from (A5) — the
+
+            field would be typed `boolean` and arrive null. Absence is expressible in that
+
+            contract; null is not.
+
+
+            It is also unambiguous, which an earlier version of this comment got wrong: the
+
+            previous shape was a plain bool with no omitempty, so an older server ALWAYS sent
+
+            the key. An absent phi therefore cannot be version skew — it can only be this
+
+            server saying "not established".'
+          type: boolean
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        phi:
+          type: boolean
+        scope:
+          $ref: '#/components/schemas/knowledge.KnowledgeScope'
+        title:
+          type: string
+    knowledge.KnowledgeScope:
+      type: object
+      properties:
+        scope_id:
+          type: string
+          example: acct-benchmark-a
+        scope_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+          example: account
+    knowledge.AttachCandidatesResponse:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.AttachCandidate'
+        conflict_warning:
+          $ref: '#/components/schemas/knowledge.ConflictWarningResp'
+    knowledgestore.FreshnessBand:
+      type: string
+      enum:
+      - fresh
+      - aging
+      - stale
+      - expired
+      - needs_review
+      x-enum-varnames:
+      - FreshnessFresh
+      - FreshnessAging
+      - FreshnessStale
+      - FreshnessExpired
+      - FreshnessNeedsReview
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

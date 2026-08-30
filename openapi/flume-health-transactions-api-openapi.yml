@@ -1,0 +1,506 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+
+
+    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
+
+    '
+  title: Flume Console Transactions API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Transactions
+paths:
+  /api/v1/endpoints/{endpointId}/transactions:
+    get:
+      description: Lists Transactions for a given Endpoint
+      tags:
+      - Transactions
+      summary: List Transactions
+      operationId: listTransactions
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of parent endpoint (use '-' for all endpoints)
+        name: endpointId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: The page to request. Should be a previously-received nextPageToken
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      - description: Number of Transactions to return
+        name: pageSize
+        in: query
+        schema:
+          type: string
+      - description: Field by which to sort results. Defaults to StartTime
+        name: orderBy
+        in: query
+        schema:
+          type: string
+      - description: If true, sorts in descending order
+        name: orderDesc
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - description: List of states to filter for. If empty, no filtration occurs.
+        name: state
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - description: View to return. If `excludeNoOpScheduled` is provided, transactions that are both Scheduled and SucceededNoOp are excluded
+        name: view
+        in: query
+        schema:
+          type: string
+      - description: Only return transactions that started after this time
+        name: since
+        in: query
+        schema:
+          type: string
+      - description: List of shardBatchKeys to filter for. If empty, no filtration occurs.
+        name: shardBatchKeys
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transaction.ListReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: Creates a Transaction.
+      tags:
+      - Transactions
+      summary: Create Transaction
+      operationId: createTransaction
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of parent endpoint
+        name: endpointId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transaction.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transaction.WriteModel'
+        description: Transaction body
+        required: true
+  /api/v1/endpoints/{endpointId}/transactions/{id}:
+    get:
+      description: Gets a Transaction.
+      tags:
+      - Transactions
+      summary: Get Transaction
+      operationId: getTransaction
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of parent endpoint
+        name: endpointId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: id of target transaction
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transaction.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    patch:
+      description: Updates a Transaction.
+      tags:
+      - Transactions
+      summary: Update Transaction
+      operationId: updateTransaction
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: id of parent endpoint
+        name: endpointId
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: id of target transaction
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transaction.ReadModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transaction.WriteModel'
+        description: transaction body
+        required: true
+components:
+  schemas:
+    transaction.WriteModel:
+      type: object
+      required:
+      - state
+      - trigger
+      properties:
+        endTime:
+          type: string
+        groupIds:
+          type: array
+          items:
+            type: string
+        operation:
+          $ref: '#/components/schemas/transaction.Operation'
+        shardBatchKey:
+          type: string
+        shardId:
+          type: integer
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        steps:
+          $ref: '#/components/schemas/transaction.Steps'
+        trigger:
+          $ref: '#/components/schemas/transaction.Trigger'
+        workerId:
+          type: string
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
+    transaction.Step:
+      type: object
+      properties:
+        endTime:
+          type: string
+        error:
+          type: string
+        errorLogBlobKey:
+          type: string
+        file:
+          $ref: '#/components/schemas/transaction.FileDetail'
+        logBlobKey:
+          type: string
+        logs:
+          type: string
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        watermark:
+          type: string
+        watermarkBlobKey:
+          type: string
+    transaction.FileDetail:
+      type: object
+      properties:
+        archiveFileName:
+          type: string
+        compressedFilesFound:
+          type: array
+          items:
+            type: string
+        downloadDurationMillis:
+          type: integer
+        lastModifiedTime:
+          type: string
+        name:
+          type: string
+        recordsIn:
+          type: integer
+        recordsOut:
+          type: integer
+        retrievalTime:
+          type: string
+        sizeBytes:
+          type: integer
+        uploadDurationMillis:
+          type: integer
+    transaction.Steps:
+      type: object
+      properties:
+        extract:
+          $ref: '#/components/schemas/transaction.Step'
+        load:
+          $ref: '#/components/schemas/transaction.Step'
+        transform:
+          $ref: '#/components/schemas/transaction.Step'
+    transaction.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        durationMillis:
+          type: integer
+        endTime:
+          type: string
+        endpointId:
+          type: integer
+        groupIds:
+          type: array
+          items:
+            type: string
+        id:
+          type: integer
+        maxMemoryMB:
+          type: integer
+        operation:
+          $ref: '#/components/schemas/transaction.Operation'
+        shardBatchKey:
+          type: string
+        shardId:
+          type: integer
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        steps:
+          $ref: '#/components/schemas/transaction.Steps'
+        trigger:
+          $ref: '#/components/schemas/transaction.Trigger'
+        triggeredBy:
+          type: string
+        workerId:
+          type: string
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    transaction.Operation:
+      type: string
+      enum:
+      - SourceMap
+      - SourceTransfer
+      - SourceExtract
+      - SourceMapBatchLoad
+      - SourceMapBatchProcess
+      - DestinationMap
+      - DestinationTransfer
+      x-enum-varnames:
+      - OperationSourceMap
+      - OperationSourceTransfer
+      - OperationSourceExtract
+      - OperationSourceMapBatchLoad
+      - OperationSourceMapBatchProcess
+      - OperationDestinationMap
+      - OperationDestinationTransfer
+    transaction.ListReadModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/transaction.ReadModel'
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api
