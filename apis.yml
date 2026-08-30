@@ -28,20 +28,20 @@ specificationVersion: '0.23'
 created: '2026-08-16'
 modified: '2026-08-16'
 tags:
-- Healthcare
-- Health Plans
-- Payers
-- Healthcare Data
-- Data Integration
-- iPaaS
+- healthcare
+- health-plans
+- payers
+- healthcare-data
+- data-integration
+- ipaas
 - Eligibility
-- Claims
-- Knowledge Graph
+- claims
+- knowledge-graph
 - MCP
 - agent-native
 - Authentication
-- Data Engineering
-- Interoperability
+- data-engineering
+- interoperability
 tags_raw:
 - healthcare
 - health-plans
@@ -70,8 +70,8 @@ apis:
   tags:
   - MCP
   - agent-native
-  - Knowledge Graph
-  - Healthcare
+  - knowledge-graph
+  - healthcare
   tags_raw:
   - mcp
   - agent-native
@@ -120,6 +120,8 @@ apis:
   humanURL: https://console.flumehealth.com/api/docs
   baseURL: https://console.flumehealth.com/
   tags:
+  - Account
+  tags_raw:
   - Accounts
   properties:
   - type: OpenAPI
@@ -301,7 +303,8 @@ apis:
   description: The Endpoints API from Flume Health — 23 operation(s) for endpoints.
   humanURL: https://console.flumehealth.com/api/docs
   baseURL: https://console.flumehealth.com/
-  tags:
+  tags: []
+  tags_raw:
   - Endpoints
   properties:
   - type: OpenAPI
@@ -354,6 +357,8 @@ apis:
   humanURL: https://console.flumehealth.com/api/docs
   baseURL: https://console.flumehealth.com/
   tags:
+  - Jobs V2
+  tags_raw:
   - Jobs v2
   properties:
   - type: OpenAPI
@@ -510,6 +515,8 @@ apis:
   humanURL: https://console.flumehealth.com/api/docs
   baseURL: https://console.flumehealth.com/
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
@@ -536,6 +543,8 @@ apis:
   humanURL: https://console.flumehealth.com/api/docs
   baseURL: https://console.flumehealth.com/
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
