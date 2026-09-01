@@ -28,20 +28,20 @@ specificationVersion: '0.23'
 created: '2026-08-16'
 modified: '2026-08-16'
 tags:
-- healthcare
-- health-plans
-- payers
-- healthcare-data
-- data-integration
-- ipaas
+- Healthcare
+- Health Plans
+- Payers
+- Healthcare Data
+- Data Integration
+- iPaaS
 - Eligibility
-- claims
-- knowledge-graph
+- Claims
+- Knowledge Graph
 - MCP
 - agent-native
 - Authentication
-- data-engineering
-- interoperability
+- Data Engineering
+- Interoperability
 tags_raw:
 - healthcare
 - health-plans
@@ -70,8 +70,8 @@ apis:
   tags:
   - MCP
   - agent-native
-  - knowledge-graph
-  - healthcare
+  - Knowledge Graph
+  - Healthcare
   tags_raw:
   - mcp
   - agent-native
