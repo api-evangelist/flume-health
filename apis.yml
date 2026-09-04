@@ -20,6 +20,22 @@ deliveryModel:
   - pricing
   generated: '2026-08-28'
   method: derived
+accessModel:
+  pricing: unknown
+  onboarding: approval
+  trial: false
+  try_now: false
+  public: false
+  label: Requires approval
+  confidence: medium
+  source:
+  - plans
+  - authentication
+  - scopes
+  - rate-limits
+  - security
+  generated: '2026-09-03'
+  method: derived
 image: https://flumehealth.com/og-image.png
 url: https://raw.githubusercontent.com/api-evangelist/flume-health/refs/heads/main/apis.yml
 x-type: company
