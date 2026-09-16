@@ -1,13 +1,15 @@
 aid: flume-health
 name: Flume Health
-description: Flume Health is a New York based healthcare data platform for the payer ecosystem. Its Relay product is an
-  integration platform (iPaaS) that maps eligibility, claims, and other health plan data between source and destination
-  Endpoints — SFTP, cloud storage, databases, Snowflake, and APIs — through a canonical Flume Data Model, with Connections,
-  Shards, Transactions, and mapping jobs managed from the Flume Console. A newer Context layer adds a knowledge graph over
-  a customer's data estate, natural-language query, and domain agents for actuarial, claims, coding, and compliance work,
-  exposed to AI clients through an OAuth-protected Model Context Protocol endpoint. The public Flume Console API is a 153-operation
-  Swagger 2.0 contract served from console.flumehealth.com, authenticated with OpenID Connect / OAuth 2.0 at auth.flumehealth.com.
-  Flume sold its third-party administrator operations to Vitori Health in 2023 to focus on the software platform.
+description: Flume Health is a New York based healthcare data platform for the payer ecosystem. Its Relay
+  product is an integration platform (iPaaS) that maps eligibility, claims, and other health plan data
+  between source and destination Endpoints — SFTP, cloud storage, databases, Snowflake, and APIs — through
+  a canonical Flume Data Model, with Connections, Shards, Transactions, and mapping jobs managed from
+  the Flume Console. A newer Context layer adds a knowledge graph over a customer's data estate, natural-language
+  query, and domain agents for actuarial, claims, coding, and compliance work, exposed to AI clients through
+  an OAuth-protected Model Context Protocol endpoint. The public Flume Console API is a 153-operation
+  Swagger 2.0 contract served from console.flumehealth.com, authenticated with OpenID Connect / OAuth
+  2.0 at auth.flumehealth.com. Flume sold its third-party administrator operations to Vitori Health in
+  2023 to focus on the software platform.
 deliveryModel:
   model: saas
   open_source: false
@@ -42,7 +44,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.23'
 created: '2026-08-16'
-modified: '2026-08-16'
+modified: '2026-09-16'
 tags:
 - Healthcare
 - Health Plans
@@ -75,12 +77,11 @@ tags_raw:
 - interoperability
 apis:
 - name: Flume Context MCP Server
-  description: >-
-    A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp. It is
-    protected by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401 with a
-    WWW-Authenticate Bearer challenge and a resource_metadata pointer to unauthenticated callers, so the
-    live tool list requires an authenticated introspection. Discovered by probe; Flume publishes no MCP
-    documentation page.
+  description: A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp.
+    It is protected by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401
+    with a WWW-Authenticate Bearer challenge and a resource_metadata pointer to unauthenticated callers,
+    so the live tool list requires an authenticated introspection. Discovered by probe; Flume publishes
+    no MCP documentation page.
   humanURL: https://www.flumehealth.com/developers
   baseURL: https://console.flumehealth.com/api/v1/context/mcp
   tags:
@@ -634,7 +635,7 @@ common:
 - type: GitHubOrganization
   url: https://github.com/flumehealth
 - type: OpenAPI
-  url: openapi/flume-health-console-api-openapi.yml
+  url: openapi/_original/flume-health-console-api-openapi.yml
 - type: MCPServer
   url: mcp/flume-health-mcp.yml
 - type: ToolCrosswalk
@@ -676,7 +677,6 @@ maintainers:
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
-
 x-enrichment:
   date: '2026-08-16'
   status: enriched
