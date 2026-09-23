@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Account Contracts API
   contact: {}
   version: '1.0'
@@ -273,34 +271,6 @@ paths:
         required: true
 components:
   schemas:
-    accountcontract.WriteModel:
-      type: object
-      required:
-      - contractSince
-      - contractUntil
-      - totalAllocatedRows
-      properties:
-        adminNotes:
-          type: string
-        contractSince:
-          type: string
-        contractUntil:
-          type: string
-        revenue:
-          type: number
-        totalAllocatedRows:
-          type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     accountcontract.ReadModel:
       type: object
       properties:
@@ -318,6 +288,43 @@ components:
           type: number
         totalAllocatedRows:
           type: integer
+    accountcontract.WriteModel:
+      type: object
+      required:
+      - contractSince
+      - contractUntil
+      - totalAllocatedRows
+      properties:
+        adminNotes:
+          type: string
+        contractSince:
+          type: string
+        contractUntil:
+          type: string
+        revenue:
+          type: number
+        totalAllocatedRows:
+          type: integer
+    accountcontract.ListResponse:
+      type: object
+      properties:
+        accountContracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/accountcontract.ReadModel'
+        nextPageToken:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     accountcontract.UpdateModel:
       type: object
       properties:
@@ -341,15 +348,6 @@ components:
           type:
           - integer
           - 'null'
-    accountcontract.ListResponse:
-      type: object
-      properties:
-        accountContracts:
-          type: array
-          items:
-            $ref: '#/components/schemas/accountcontract.ReadModel'
-        nextPageToken:
-          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

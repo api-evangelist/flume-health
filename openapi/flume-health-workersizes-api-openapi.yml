@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Worker Sizes API
   contact: {}
   version: '1.0'
@@ -192,17 +190,15 @@ paths:
         required: true
 components:
   schemas:
-    workersize.ReadModel:
+    workersize.ListResponse:
       type: object
       properties:
-        cpuLimit:
-          type: integer
-        id:
-          type: integer
-        label:
-          $ref: '#/components/schemas/endpoint.WorkerSize'
-        memoryLimit:
-          type: integer
+        nextPageToken:
+          type: string
+        workerSizes:
+          type: array
+          items:
+            $ref: '#/components/schemas/workersize.ReadModel'
     endpoint.WorkerSize:
       type: string
       enum:
@@ -217,26 +213,6 @@ components:
       - WorkerSizeLarge
       - WorkerSizeXLarge
       - WorkerSizeMax
-    workersize.ListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        workerSizes:
-          type: array
-          items:
-            $ref: '#/components/schemas/workersize.ReadModel'
-    workersize.UpdateModel:
-      type: object
-      properties:
-        cpuLimit:
-          type:
-          - integer
-          - 'null'
-        memoryLimit:
-          type:
-          - integer
-          - 'null'
     responses.ErrorResponse:
       type: object
       properties:
@@ -248,6 +224,28 @@ components:
             type: string
         message:
           type: string
+    workersize.UpdateModel:
+      type: object
+      properties:
+        cpuLimit:
+          type:
+          - integer
+          - 'null'
+        memoryLimit:
+          type:
+          - integer
+          - 'null'
+    workersize.ReadModel:
+      type: object
+      properties:
+        cpuLimit:
+          type: integer
+        id:
+          type: integer
+        label:
+          $ref: '#/components/schemas/endpoint.WorkerSize'
+        memoryLimit:
+          type: integer
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

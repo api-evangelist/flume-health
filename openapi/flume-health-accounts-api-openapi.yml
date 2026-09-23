@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Accounts API
   contact: {}
   version: '1.0'
@@ -473,35 +471,32 @@ paths:
         - email
 components:
   schemas:
-    account.ListResponse:
+    account.UpdateModel:
       type: object
       properties:
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/account.ReadModel'
-        nextPageToken:
-          type: string
-    account.AccountConfigColors:
-      type: object
-      properties:
-        primary:
-          type: string
-        secondary:
-          type: string
-        tertiary:
-          type: string
-    secret.ApiCloudCredSecret:
-      type: object
-      properties:
+        blobConfig:
+          $ref: '#/components/schemas/account.BlobConfig'
+        isDisabled:
+          type: boolean
         name:
           type: string
-        value:
-          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
-    cloudstoragecredentials.CloudStorageCredentials:
+          minLength: 1
+        restrictMapAccess:
+          type: boolean
+    account.WriteModel:
       type: object
-      additionalProperties:
-        type: string
+      required:
+      - name
+      properties:
+        blobConfig:
+          $ref: '#/components/schemas/account.BlobConfig'
+        isDisabled:
+          type: boolean
+        name:
+          type: string
+          minLength: 1
+        restrictMapAccess:
+          type: boolean
     account.ReadModel:
       type: object
       properties:
@@ -518,33 +513,17 @@ components:
           type: string
         restrictMapAccess:
           type: boolean
-    cloudstoragecredentials.CredentialType:
-      type: string
-      enum:
-      - AwsStatic
-      - AwsWebIdentity
-      - GcpServiceAccount
-      - AzureSharedKey
-      - AzureSharedAccessSignature
-      - AzureConnectionString
-      x-enum-varnames:
-      - CredentialTypeAwsStatic
-      - CredentialTypeAwsWebIdentity
-      - CredentialTypeGcpServiceAccount
-      - CredentialTypeAzureSharedKey
-      - CredentialTypeAzureSharedAccessSignature
-      - CredentialTypeAzureConnectionString
-    responses.ErrorResponse:
+    cloudstoragecredentials.CloudStorageCredentials:
+      type: object
+      additionalProperties:
+        type: string
+    secret.ApiCloudCredSecret:
       type: object
       properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
+        name:
           type: string
+        value:
+          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
     account.UpdateAccountConfigModel:
       type: object
       properties:
@@ -554,18 +533,23 @@ components:
           type: string
         logo:
           type: string
-    account.ReadAccountConfigModel:
+    account.AccountConfigColors:
       type: object
       properties:
-        accountId:
-          type: integer
-        colors:
-          $ref: '#/components/schemas/account.AccountConfigColors'
-        displayName:
+        primary:
           type: string
-        favicon:
+        secondary:
           type: string
-        logo:
+        tertiary:
+          type: string
+    account.ListResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/account.ReadModel'
+        nextPageToken:
           type: string
     account.BlobConfig:
       type: object
@@ -582,32 +566,46 @@ components:
           - $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
         credentialsName:
           type: string
-    account.WriteModel:
+    cloudstoragecredentials.CredentialType:
+      type: string
+      enum:
+      - AwsStatic
+      - AwsWebIdentity
+      - GcpServiceAccount
+      - AzureSharedKey
+      - AzureSharedAccessSignature
+      - AzureConnectionString
+      x-enum-varnames:
+      - CredentialTypeAwsStatic
+      - CredentialTypeAwsWebIdentity
+      - CredentialTypeGcpServiceAccount
+      - CredentialTypeAzureSharedKey
+      - CredentialTypeAzureSharedAccessSignature
+      - CredentialTypeAzureConnectionString
+    account.ReadAccountConfigModel:
       type: object
-      required:
-      - name
       properties:
-        blobConfig:
-          $ref: '#/components/schemas/account.BlobConfig'
-        isDisabled:
-          type: boolean
-        name:
+        accountId:
+          type: integer
+        colors:
+          $ref: '#/components/schemas/account.AccountConfigColors'
+        displayName:
           type: string
-          minLength: 1
-        restrictMapAccess:
-          type: boolean
-    account.UpdateModel:
+        favicon:
+          type: string
+        logo:
+          type: string
+    responses.ErrorResponse:
       type: object
       properties:
-        blobConfig:
-          $ref: '#/components/schemas/account.BlobConfig'
-        isDisabled:
-          type: boolean
-        name:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
-          minLength: 1
-        restrictMapAccess:
-          type: boolean
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

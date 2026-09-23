@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Objects API
   contact: {}
   version: '1.0'
@@ -621,34 +619,23 @@ components:
           type: integer
         name:
           type: string
-    objectinstance.ReadModel:
+    object.CanonicalColumn:
       type: object
       required:
-      - canonicalValue
-      - connectionIds
-      - jobIds
-      - name
+      - column
+      - dataType
       properties:
-        canonicalValue:
+        column:
           type: string
-        connectionCustomValues:
-          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
-        connectionIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        id:
-          type: integer
-        jobIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        name:
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+    objectinstance.CustomValue:
+      type: object
+      properties:
+        key:
           type: string
-        object:
-          $ref: '#/components/schemas/objectinstance.ObjectSummary'
+        value:
+          type: string
     endpoint.DataType:
       type: string
       enum:
@@ -689,45 +676,22 @@ components:
       - DataTypeHmClaimsExtended
       - DataTypeHmProvidersExtended
       - DataTypeStrings
-    objectinstance.CustomValue:
+    object.ReadModel:
       type: object
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-    objectinstance.BulkWriteModel:
-      type: object
-      properties:
-        instances:
-          type: array
-          items:
-            $ref: '#/components/schemas/objectinstance.WriteModel'
-    object.UpdateModel:
-      type: object
+      required:
+      - canonicalColumns
+      - name
       properties:
         canonicalColumns:
           type: array
           items:
             $ref: '#/components/schemas/object.CanonicalColumn'
+        id:
+          type: integer
         name:
           type: string
-    object.CanonicalColumn:
-      type: object
-      required:
-      - column
-      - dataType
-      properties:
-        column:
-          type: string
-        dataType:
-          $ref: '#/components/schemas/endpoint.DataType'
-    objectinstance.CustomValuesByConnection:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/objectinstance.CustomValue'
+        numInstances:
+          type: integer
     objectinstance.WriteModel:
       type: object
       required:
@@ -752,6 +716,47 @@ components:
             type: integer
         name:
           type: string
+    objectinstance.BulkWriteModel:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.WriteModel'
+    objectinstance.ReadModel:
+      type: object
+      required:
+      - canonicalValue
+      - connectionIds
+      - jobIds
+      - name
+      properties:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        id:
+          type: integer
+        jobIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        name:
+          type: string
+        object:
+          $ref: '#/components/schemas/objectinstance.ObjectSummary'
+    objectinstance.CustomValuesByConnection:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/objectinstance.CustomValue'
     objectinstance.UpdateModel:
       type: object
       properties:
@@ -782,31 +787,6 @@ components:
             type: string
         message:
           type: string
-    object.ReadModel:
-      type: object
-      required:
-      - canonicalColumns
-      - name
-      properties:
-        canonicalColumns:
-          type: array
-          items:
-            $ref: '#/components/schemas/object.CanonicalColumn'
-        id:
-          type: integer
-        name:
-          type: string
-        numInstances:
-          type: integer
-    object.ListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        objects:
-          type: array
-          items:
-            $ref: '#/components/schemas/object.ReadModel'
     objectinstance.ListResponse:
       type: object
       properties:
@@ -821,6 +801,24 @@ components:
       required:
       - canonicalColumns
       - name
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
+        name:
+          type: string
+    object.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.ReadModel'
+    object.UpdateModel:
+      type: object
       properties:
         canonicalColumns:
           type: array

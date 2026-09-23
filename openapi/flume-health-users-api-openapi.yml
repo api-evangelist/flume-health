@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Users API
   contact: {}
   version: '1.0'
@@ -125,7 +123,6 @@ paths:
         required: true
   /api/v1/users/me:
     get:
-      description: Get Current User
       tags:
       - Users
       summary: Get Current User
@@ -462,17 +459,6 @@ paths:
         - email
 components:
   schemas:
-    user.QueryEngineGrantResponse:
-      type: object
-      properties:
-        expiresAt:
-          type: string
-        message:
-          type: string
-        reason:
-          type: string
-        userId:
-          type: integer
     user.Role:
       type: string
       enum:
@@ -497,15 +483,11 @@ components:
           minimum: 1
         reason:
           type: string
-    user.ListModel:
+    user.SelfUserPatchModel:
       type: object
       properties:
-        nextPageToken:
-          type: string
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/user.ReadModel'
+        receiveEmailAlerts:
+          type: boolean
     user.ReadModel:
       type: object
       properties:
@@ -537,17 +519,6 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     user.SelfUser:
       type: object
       properties:
@@ -563,11 +534,28 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/user.Role'
-    user.SelfUserPatchModel:
+    user.QueryEngineGrantResponse:
       type: object
       properties:
-        receiveEmailAlerts:
-          type: boolean
+        expiresAt:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        userId:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     user.WriteModel:
       type: object
       required:
@@ -590,6 +578,15 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/user.Role'
+    user.ListModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/user.ReadModel'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

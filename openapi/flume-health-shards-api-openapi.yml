@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Shards API
   contact: {}
   version: '1.0'
@@ -192,30 +190,19 @@ paths:
         - email
 components:
   schemas:
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
-    shard.BulkWriteModel:
+    shard.RecentTransactions:
       type: object
       properties:
-        shards:
-          type: array
-          items:
-            $ref: '#/components/schemas/shard.WriteModel'
-    shard.WriteModel:
-      type: object
-      required:
-      - key
-      properties:
-        key:
-          type: string
+        last:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastFinished:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastFinishedOp:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastSuccessful:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastVisible:
+          $ref: '#/components/schemas/shard.TransactionSummary'
     transaction.Step:
       type: object
       properties:
@@ -239,6 +226,55 @@ components:
           type: string
         watermarkBlobKey:
           type: string
+    shard.BulkWriteModel:
+      type: object
+      properties:
+        shards:
+          type: array
+          items:
+            $ref: '#/components/schemas/shard.WriteModel'
+    shard.TransactionSummary:
+      type: object
+      properties:
+        endTime:
+          type: string
+        id:
+          type: integer
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    transaction.Steps:
+      type: object
+      properties:
+        extract:
+          $ref: '#/components/schemas/transaction.Step'
+        load:
+          $ref: '#/components/schemas/transaction.Step'
+        transform:
+          $ref: '#/components/schemas/transaction.Step'
     transaction.FileDetail:
       type: object
       properties:
@@ -264,79 +300,6 @@ components:
           type: integer
         uploadDurationMillis:
           type: integer
-    shard.TransactionSummary:
-      type: object
-      properties:
-        endTime:
-          type: string
-        id:
-          type: integer
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-    transaction.Operation:
-      type: string
-      enum:
-      - SourceMap
-      - SourceTransfer
-      - SourceExtract
-      - SourceMapBatchLoad
-      - SourceMapBatchProcess
-      - DestinationMap
-      - DestinationTransfer
-      x-enum-varnames:
-      - OperationSourceMap
-      - OperationSourceTransfer
-      - OperationSourceExtract
-      - OperationSourceMapBatchLoad
-      - OperationSourceMapBatchProcess
-      - OperationDestinationMap
-      - OperationDestinationTransfer
-    transaction.Steps:
-      type: object
-      properties:
-        extract:
-          $ref: '#/components/schemas/transaction.Step'
-        load:
-          $ref: '#/components/schemas/transaction.Step'
-        transform:
-          $ref: '#/components/schemas/transaction.Step'
-    shard.RecentTransactions:
-      type: object
-      properties:
-        last:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastFinished:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastFinishedOp:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastSuccessful:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastVisible:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
     endpoint.State:
       type: string
       enum:
@@ -349,17 +312,6 @@ components:
       - StateRunning
       - StateError
       - StateStopped
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     shard.ReadModel:
       type: object
       required:
@@ -381,6 +333,35 @@ components:
           $ref: '#/components/schemas/shard.RecentTransactions'
         state:
           $ref: '#/components/schemas/endpoint.State'
+    transaction.Operation:
+      type: string
+      enum:
+      - SourceMap
+      - SourceTransfer
+      - SourceExtract
+      - SourceMapBatchLoad
+      - SourceMapBatchProcess
+      - DestinationMap
+      - DestinationTransfer
+      x-enum-varnames:
+      - OperationSourceMap
+      - OperationSourceTransfer
+      - OperationSourceExtract
+      - OperationSourceMapBatchLoad
+      - OperationSourceMapBatchProcess
+      - OperationDestinationMap
+      - OperationDestinationTransfer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     transaction.ReadModel:
       type: object
       properties:
@@ -418,6 +399,13 @@ components:
           type: string
         workerId:
           type: string
+    shard.WriteModel:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          type: string
     transaction.ListReadModel:
       type: object
       properties:
@@ -427,6 +415,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/transaction.ReadModel'
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

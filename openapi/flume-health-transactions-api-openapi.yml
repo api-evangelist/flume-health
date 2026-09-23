@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Transactions API
   contact: {}
   version: '1.0'
@@ -304,42 +302,6 @@ paths:
         required: true
 components:
   schemas:
-    transaction.WriteModel:
-      type: object
-      required:
-      - state
-      - trigger
-      properties:
-        endTime:
-          type: string
-        groupIds:
-          type: array
-          items:
-            type: string
-        operation:
-          $ref: '#/components/schemas/transaction.Operation'
-        shardBatchKey:
-          type: string
-        shardId:
-          type: integer
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        steps:
-          $ref: '#/components/schemas/transaction.Steps'
-        trigger:
-          $ref: '#/components/schemas/transaction.Trigger'
-        workerId:
-          type: string
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
     transaction.Step:
       type: object
       properties:
@@ -363,6 +325,37 @@ components:
           type: string
         watermarkBlobKey:
           type: string
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    transaction.Steps:
+      type: object
+      properties:
+        extract:
+          $ref: '#/components/schemas/transaction.Step'
+        load:
+          $ref: '#/components/schemas/transaction.Step'
+        transform:
+          $ref: '#/components/schemas/transaction.Step'
     transaction.FileDetail:
       type: object
       properties:
@@ -388,15 +381,45 @@ components:
           type: integer
         uploadDurationMillis:
           type: integer
-    transaction.Steps:
+    transaction.Operation:
+      type: string
+      enum:
+      - SourceMap
+      - SourceTransfer
+      - SourceExtract
+      - SourceMapBatchLoad
+      - SourceMapBatchProcess
+      - DestinationMap
+      - DestinationTransfer
+      x-enum-varnames:
+      - OperationSourceMap
+      - OperationSourceTransfer
+      - OperationSourceExtract
+      - OperationSourceMapBatchLoad
+      - OperationSourceMapBatchProcess
+      - OperationDestinationMap
+      - OperationDestinationTransfer
+    responses.ErrorResponse:
       type: object
       properties:
-        extract:
-          $ref: '#/components/schemas/transaction.Step'
-        load:
-          $ref: '#/components/schemas/transaction.Step'
-        transform:
-          $ref: '#/components/schemas/transaction.Step'
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
     transaction.ReadModel:
       type: object
       properties:
@@ -434,57 +457,6 @@ components:
           type: string
         workerId:
           type: string
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    transaction.Operation:
-      type: string
-      enum:
-      - SourceMap
-      - SourceTransfer
-      - SourceExtract
-      - SourceMapBatchLoad
-      - SourceMapBatchProcess
-      - DestinationMap
-      - DestinationTransfer
-      x-enum-varnames:
-      - OperationSourceMap
-      - OperationSourceTransfer
-      - OperationSourceExtract
-      - OperationSourceMapBatchLoad
-      - OperationSourceMapBatchProcess
-      - OperationDestinationMap
-      - OperationDestinationTransfer
     transaction.ListReadModel:
       type: object
       properties:
@@ -494,6 +466,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/transaction.ReadModel'
+    transaction.WriteModel:
+      type: object
+      required:
+      - state
+      - trigger
+      properties:
+        endTime:
+          type: string
+        groupIds:
+          type: array
+          items:
+            type: string
+        operation:
+          $ref: '#/components/schemas/transaction.Operation'
+        shardBatchKey:
+          type: string
+        shardId:
+          type: integer
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        steps:
+          $ref: '#/components/schemas/transaction.Steps'
+        trigger:
+          $ref: '#/components/schemas/transaction.Trigger'
+        workerId:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

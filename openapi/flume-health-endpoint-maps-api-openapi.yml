@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Endpoint Maps API
   contact: {}
   version: '1.0'
@@ -161,6 +159,31 @@ paths:
         - email
 components:
   schemas:
+    endpointmap.MapVersion:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        id:
+          type: integer
+        map:
+          type: string
+        version:
+          type: integer
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
     endpointmap.FieldType:
       type: string
       enum:
@@ -175,18 +198,6 @@ components:
       - FieldTypeApi
       - FieldTypeDatabase
       - FieldTypeFlumeLakehouse
-    user.Role:
-      type: string
-      enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
-      x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
     endpointmap.ListResponse:
       type: object
       properties:
@@ -195,47 +206,6 @@ components:
           items:
             $ref: '#/components/schemas/endpointmap.ReadModel'
         nextPageToken:
-          type: string
-    endpointmap.ReadModel:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        fieldType:
-          $ref: '#/components/schemas/endpointmap.FieldType'
-        id:
-          type: integer
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.MapVersion'
-        name:
-          type: string
-        ordinal:
-          type: integer
-    endpointmap.MapVersion:
-      type: object
-      properties:
-        createdAt:
-          type: string
-        createdBy:
-          $ref: '#/components/schemas/user.ReadModel'
-        id:
-          type: integer
-        map:
-          type: string
-        version:
-          type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
           type: string
     user.ReadModel:
       type: object
@@ -267,6 +237,34 @@ components:
         role:
           $ref: '#/components/schemas/user.Role'
         updated:
+          type: string
+    endpointmap.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        fieldType:
+          $ref: '#/components/schemas/endpointmap.FieldType'
+        id:
+          type: integer
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.MapVersion'
+        name:
+          type: string
+        ordinal:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
   securitySchemes:
     OAuth2Implicit:

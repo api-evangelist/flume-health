@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Context Graph API
   contact: {}
   version: '1.0'
@@ -165,6 +163,11 @@ paths:
       - BearerAuth: []
 components:
   schemas:
+    graph.Meta:
+      type: object
+      properties:
+        took:
+          type: string
     graph.StatusResponse:
       type: object
       properties:
@@ -185,45 +188,15 @@ components:
       properties:
         cypher:
           type: string
-    graph.QueryMeta:
-      type: object
-      properties:
-        rowCount:
-          type: integer
-        took:
-          type: string
-        truncated:
-          type: boolean
-    graph.QueryResponse:
+    graph.SearchResponse:
       type: object
       properties:
         _meta:
-          $ref: '#/components/schemas/graph.QueryMeta'
-        columns:
-          type: array
-          items:
-            type: string
+          $ref: '#/components/schemas/graph.SearchMeta'
         results:
           type: array
           items:
-            type: object
-            additionalProperties: {}
-    graph.Meta:
-      type: object
-      properties:
-        took:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
+            $ref: '#/components/schemas/knowledgestore.SearchResult'
     knowledgestore.SearchResult:
       type: object
       properties:
@@ -238,15 +211,15 @@ components:
           additionalProperties: {}
         score:
           type: number
-    graph.SearchResponse:
+    graph.QueryMeta:
       type: object
       properties:
-        _meta:
-          $ref: '#/components/schemas/graph.SearchMeta'
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgestore.SearchResult'
+        rowCount:
+          type: integer
+        took:
+          type: string
+        truncated:
+          type: boolean
     graph.SearchMeta:
       type: object
       properties:
@@ -256,6 +229,31 @@ components:
           type: integer
         took:
           type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    graph.QueryResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.QueryMeta'
+        columns:
+          type: array
+          items:
+            type: string
+        results:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

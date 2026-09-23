@@ -3,12 +3,10 @@ info:
   description: 'The API for Relay by Flume Health.
 
 
-    For more information about how Flume can power your health plan, please [contact us](mailto:sales@flumehealth.com).
+    For more information about how Flume can power your health plan, please contact us.
 
 
-    [Redoc](/api/docs/) | [Swagger - Try It](/api/swagger/)
-
-    '
+    Redoc | Swagger - Try It'
   title: Flume Console Connections API
   contact: {}
   version: '1.0'
@@ -23,7 +21,6 @@ tags:
 paths:
   /api/v1/connections:
     get:
-      description: List Connections
       tags:
       - Connections
       summary: List Connections
@@ -97,7 +94,6 @@ paths:
         - profile
         - email
     post:
-      description: Create Connection
       tags:
       - Connections
       summary: Create Connection
@@ -153,7 +149,6 @@ paths:
         required: true
   /api/v1/connections/{id}:
     get:
-      description: Get Connection
       tags:
       - Connections
       summary: Get Connection
@@ -207,7 +202,6 @@ paths:
         - profile
         - email
     patch:
-      description: Update Connection
       tags:
       - Connections
       summary: Update Connection
@@ -269,10 +263,8 @@ paths:
         required: true
 components:
   schemas:
-    connection.WriteModel:
+    connection.PatchModel:
       type: object
-      required:
-      - name
       properties:
         customColumns:
           type: array
@@ -299,8 +291,10 @@ components:
           type: string
         name:
           type: string
-    connection.PatchModel:
+    connection.WriteModel:
       type: object
+      required:
+      - name
       properties:
         customColumns:
           type: array
@@ -309,15 +303,6 @@ components:
         logo:
           type: string
         name:
-          type: string
-    connection.ListResponse:
-      type: object
-      properties:
-        connections:
-          type: array
-          items:
-            $ref: '#/components/schemas/connection.ReadModel'
-        nextPageToken:
           type: string
     responses.ErrorResponse:
       type: object
@@ -329,6 +314,15 @@ components:
           items:
             type: string
         message:
+          type: string
+    connection.ListResponse:
+      type: object
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/connection.ReadModel'
+        nextPageToken:
           type: string
   securitySchemes:
     OAuth2Implicit:
