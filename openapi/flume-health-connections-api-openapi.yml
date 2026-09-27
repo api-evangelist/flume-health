@@ -291,18 +291,14 @@ components:
           type: string
         name:
           type: string
-    connection.WriteModel:
+    connection.ListResponse:
       type: object
-      required:
-      - name
       properties:
-        customColumns:
+        connections:
           type: array
           items:
-            type: string
-        logo:
-          type: string
-        name:
+            $ref: '#/components/schemas/connection.ReadModel'
+        nextPageToken:
           type: string
     responses.ErrorResponse:
       type: object
@@ -315,14 +311,18 @@ components:
             type: string
         message:
           type: string
-    connection.ListResponse:
+    connection.WriteModel:
       type: object
+      required:
+      - name
       properties:
-        connections:
+        customColumns:
           type: array
           items:
-            $ref: '#/components/schemas/connection.ReadModel'
-        nextPageToken:
+            type: string
+        logo:
+          type: string
+        name:
           type: string
   securitySchemes:
     OAuth2Implicit:

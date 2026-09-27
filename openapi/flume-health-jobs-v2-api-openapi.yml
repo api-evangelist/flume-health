@@ -339,62 +339,39 @@ paths:
         required: true
 components:
   schemas:
-    job.Status:
-      type: string
-      enum:
-      - Test
-      - Production
-      - Published
-      - Draft
-      - Archived
-      - Paused
-      x-enum-varnames:
-      - StatusTest
-      - StatusProduction
-      - StatusPublished
-      - StatusDraft
-      - StatusArchived
-      - StatusPaused
-    job.TestRequest:
+    job.TestFile:
       type: object
       required:
-      - files
+      - endpointId
       properties:
-        files:
+        endpointId:
+          type: integer
+        file:
+          type: string
+    job.ListResponse:
+      type: object
+      properties:
+        jobs:
           type: array
           items:
-            $ref: '#/components/schemas/job.TestFile'
-    job.UpdateModel:
+            $ref: '#/components/schemas/job.ReadModel'
+        nextPageToken:
+          type: string
+    job.EndpointSummary:
       type: object
       properties:
         aiEnabled:
-          type:
-          - boolean
-          - 'null'
-          default: false
-        aiWorkflowSubmitted:
-          type:
-          - boolean
-          - 'null'
-        destinationEndpointId:
-          type:
-          - integer
-          - 'null'
-        ignoreObjectInstances:
           type: boolean
+        connectionId:
+          type: integer
+        id:
+          type: integer
         name:
-          type:
-          - string
-          - 'null'
-        sourceEndpointIds:
-          type:
-          - array
-          - 'null'
-          items:
-            type: integer
-        status:
-          allOf:
-          - $ref: '#/components/schemas/job.Status'
+          type: string
+        operation:
+          $ref: '#/components/schemas/endpoint.Operation'
+        state:
+          $ref: '#/components/schemas/endpoint.State'
     job.WriteModel:
       type: object
       required:
@@ -418,6 +395,65 @@ components:
             type: integer
         status:
           $ref: '#/components/schemas/job.Status'
+    job.Status:
+      type: string
+      enum:
+      - Test
+      - Production
+      - Published
+      - Draft
+      - Archived
+      - Paused
+      x-enum-varnames:
+      - StatusTest
+      - StatusProduction
+      - StatusPublished
+      - StatusDraft
+      - StatusArchived
+      - StatusPaused
+    job.ReadModel:
+      type: object
+      required:
+      - name
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        aiWorkflowSubmitted:
+          type: boolean
+        created:
+          type: string
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+        destinationEndpoint:
+          $ref: '#/components/schemas/job.EndpointSummary'
+        id:
+          type: integer
+        ignoreObjectInstances:
+          type: boolean
+        name:
+          type: string
+        sourceEndpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.EndpointSummary'
+        status:
+          $ref: '#/components/schemas/job.Status'
+        supplementalDataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.DataType'
+        updated:
+          type: string
+    endpoint.Operation:
+      type: string
+      enum:
+      - Map
+      - Transfer
+      x-enum-varnames:
+      - OperationMap
+      - OperationTransfer
     endpoint.DataType:
       type: string
       enum:
@@ -458,57 +494,25 @@ components:
       - DataTypeHmClaimsExtended
       - DataTypeHmProvidersExtended
       - DataTypeStrings
-    job.TestFile:
+    job.TestRequest:
       type: object
       required:
-      - endpointId
+      - files
       properties:
-        endpointId:
-          type: integer
-        file:
-          type: string
-    endpoint.Operation:
-      type: string
-      enum:
-      - Map
-      - Transfer
-      x-enum-varnames:
-      - OperationMap
-      - OperationTransfer
-    job.ReadModel:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.TestFile'
+    responses.ErrorResponse:
       type: object
-      required:
-      - name
       properties:
-        accountId:
+        code:
           type: integer
-        aiEnabled:
-          type: boolean
-        aiWorkflowSubmitted:
-          type: boolean
-        created:
-          type: string
-        dataType:
-          $ref: '#/components/schemas/endpoint.DataType'
-        destinationEndpoint:
-          $ref: '#/components/schemas/job.EndpointSummary'
-        id:
-          type: integer
-        ignoreObjectInstances:
-          type: boolean
-        name:
-          type: string
-        sourceEndpoints:
+        details:
           type: array
           items:
-            $ref: '#/components/schemas/job.EndpointSummary'
-        status:
-          $ref: '#/components/schemas/job.Status'
-        supplementalDataTypes:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpoint.DataType'
-        updated:
+            type: string
+        message:
           type: string
     endpoint.State:
       type: string
@@ -522,41 +526,37 @@ components:
       - StateRunning
       - StateError
       - StateStopped
-    job.EndpointSummary:
+    job.UpdateModel:
       type: object
       properties:
         aiEnabled:
+          type:
+          - boolean
+          - 'null'
+          default: false
+        aiWorkflowSubmitted:
+          type:
+          - boolean
+          - 'null'
+        destinationEndpointId:
+          type:
+          - integer
+          - 'null'
+        ignoreObjectInstances:
           type: boolean
-        connectionId:
-          type: integer
-        id:
-          type: integer
         name:
-          type: string
-        operation:
-          $ref: '#/components/schemas/endpoint.Operation'
-        state:
-          $ref: '#/components/schemas/endpoint.State'
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
+          type:
+          - string
+          - 'null'
+        sourceEndpointIds:
+          type:
+          - array
+          - 'null'
           items:
-            type: string
-        message:
-          type: string
-    job.ListResponse:
-      type: object
-      properties:
-        jobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/job.ReadModel'
-        nextPageToken:
-          type: string
+            type: integer
+        status:
+          allOf:
+          - $ref: '#/components/schemas/job.Status'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

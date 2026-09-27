@@ -314,17 +314,6 @@ components:
             $ref: '#/components/schemas/accountcontract.ReadModel'
         nextPageToken:
           type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     accountcontract.UpdateModel:
       type: object
       properties:
@@ -348,6 +337,17 @@ components:
           type:
           - integer
           - 'null'
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

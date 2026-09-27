@@ -56,7 +56,7 @@ tags:
 - Claims
 - Knowledge Graph
 - MCP
-- agent-native
+- Agent-Native
 - Authentication
 - Data Engineering
 - Interoperability
@@ -86,7 +86,7 @@ apis:
   baseURL: https://console.flumehealth.com/api/v1/context/mcp
   tags:
   - MCP
-  - agent-native
+  - Agent-Native
   - Knowledge Graph
   - Healthcare
   tags_raw:

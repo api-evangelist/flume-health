@@ -1401,185 +1401,6 @@ paths:
         required: true
 components:
   schemas:
-    knowledgestore.RecallPolicy:
-      type: string
-      enum:
-      - auto
-      - manual
-      - never
-      x-enum-varnames:
-      - RecallAuto
-      - RecallManual
-      - RecallNever
-    knowledge.GraphPeekNode:
-      type: object
-      properties:
-        attachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.GraphPeekAttachment'
-        badge:
-          $ref: '#/components/schemas/knowledgestore.KnowledgeResultBadge'
-        body_excerpt:
-          type: string
-        conflict:
-          type: boolean
-        fqn:
-          type: string
-        kind:
-          type: string
-          example: pitfall
-        phi:
-          type: boolean
-        scope:
-          $ref: '#/components/schemas/knowledge.KnowledgeScope'
-        title:
-          type: string
-    knowledge.EntityArtifact:
-      type: object
-      properties:
-        content_hash:
-          type: string
-        kind:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.ArtifactKind'
-          example: code
-        language:
-          type: string
-        media_type:
-          type: string
-        sensitivity:
-          type: string
-          example: phi_bearing
-    knowledge.DisambiguationResponse:
-      type: object
-      properties:
-        candidates:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgemanager.AttachCandidate'
-        error:
-          type: string
-    knowledge.FeedbackEvent:
-      type: object
-      properties:
-        conversation_id:
-          type: string
-        fqn:
-          type: string
-        message_id:
-          type: string
-        note:
-          type: string
-        vote:
-          allOf:
-          - $ref: '#/components/schemas/knowledge.FeedbackVote'
-          example: up
-    knowledgestore.ReviewItemStatus:
-      type: string
-      enum:
-      - open
-      - accepted
-      - rejected
-      - dismissed
-      x-enum-varnames:
-      - ReviewOpen
-      - ReviewAccepted
-      - ReviewRejected
-      - ReviewDismissed
-    knowledgestore.KnowledgeEntity:
-      type: object
-      properties:
-        account_id:
-          type: string
-          example: '12345'
-        applicability:
-          type: string
-        authored_by:
-          type: string
-        body:
-          type: string
-          x-body-soft-cap-warning: true
-        confidence:
-          type: number
-        corroborated_by:
-          type: array
-          items:
-            type: string
-        created_at:
-          type: string
-        created_by:
-          type: string
-        curator_role:
-          type: string
-          example: system_admin
-        description:
-          type: string
-          example: Rows written before 2021-03 have a null paid_amt.
-        fqn:
-          type: string
-          example: knowledge/019f8899-d6c2-761f-9019-4ad5e8167402
-        kind:
-          type: string
-          example: pitfall
-        knowledge_scope_id:
-          type: string
-          example: '12345'
-        knowledge_scope_type:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
-          example: account
-        last_validated_against_schema:
-          type: string
-        last_verified_at:
-          type: string
-        recall_policy:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
-          example: auto
-        source_refs:
-          type: array
-          items:
-            type: string
-        source_type:
-          type: string
-          example: curator
-        status:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
-          example: active
-        supersedes_fqn:
-          type: string
-        tags:
-          type: array
-          items:
-            type: string
-        title:
-          type: string
-          example: paid_amt is null before the 2021 migration
-        updated_at:
-          type: string
-        updated_by:
-          type: string
-        valid_from:
-          type: string
-        valid_to:
-          type: string
-        verification_interval:
-          type: string
-        verified_by:
-          type: string
-    knowledge.AttachCandidate:
-      type: object
-      properties:
-        fqn:
-          type: string
-        label:
-          type: string
-        parent:
-          type: string
-        snippet:
-          type: string
     knowledge.FeedbackRequest:
       type: object
       required:
@@ -1595,22 +1416,6 @@ components:
           description: up | down
           type: string
           example: up
-    knowledge.KnowledgePrefixResponse:
-      type: object
-      properties:
-        index:
-          $ref: '#/components/schemas/knowledge.KnowledgePrefixBlock'
-        ontology:
-          $ref: '#/components/schemas/knowledge.KnowledgePrefixBlock'
-    knowledge.KnowledgePrefixBlock:
-      type: object
-      properties:
-        content:
-          description: Content is the rendered block text ({ontology} or {index}).
-          type: string
-        version:
-          description: Version is the block's monotonic version (ontology_version / account_index_version).
-          type: integer
     knowledgestore.ReviewItem:
       type: object
       properties:
@@ -1636,37 +1441,148 @@ components:
           allOf:
           - $ref: '#/components/schemas/knowledgestore.ReviewItemStatus'
           example: open
-    knowledgemanager.BulkItem:
+    knowledge.EntityBadges:
+      type: object
+      properties:
+        conflict:
+          type: boolean
+        freshness:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
+          example: fresh
+        needs_review:
+          type: boolean
+        phi:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+    knowledge.ConflictEdgeRef:
+      type: object
+      properties:
+        other_fqn:
+          type: string
+    knowledgemanager.KnowledgeWriteErrorCode:
+      type: string
+      enum:
+      - invalid_input
+      - disambiguation_required
+      - conflict
+      - scope_forbidden
+      - not_found
+      - internal
+      x-enum-varnames:
+      - KnowledgeWriteInvalidInput
+      - KnowledgeWriteDisambiguationRequired
+      - KnowledgeWriteConflict
+      - KnowledgeWriteScopeForbidden
+      - KnowledgeWriteNotFound
+      - KnowledgeWriteInternal
+    knowledge.KnowledgePrefixResponse:
+      type: object
+      properties:
+        index:
+          $ref: '#/components/schemas/knowledge.KnowledgePrefixBlock'
+        ontology:
+          $ref: '#/components/schemas/knowledge.KnowledgePrefixBlock'
+    knowledge.PromotionArtifactFreshness:
+      type: object
+      properties:
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.PromotionArtifactCheck'
+        verdict:
+          allOf:
+          - $ref: '#/components/schemas/knowledge.PromotionFreshnessVerdict'
+          example: fresh
+    knowledge.RecallTraceItem:
+      type: object
+      properties:
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        title:
+          type: string
+    knowledgestore.ReviewItemType:
+      type: string
+      enum:
+      - proposed_knowledge
+      - bulk_seed_ambiguity
+      - feedback_flag
+      x-enum-varnames:
+      - ReviewTypeProposedKnowledge
+      - ReviewTypeBulkSeedAmbiguity
+      - ReviewTypeFeedbackFlag
+    knowledge.AttachCandidate:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        parent:
+          type: string
+        snippet:
+          type: string
+    knowledgestore.RecallPolicy:
+      type: string
+      enum:
+      - auto
+      - manual
+      - never
+      x-enum-varnames:
+      - RecallAuto
+      - RecallManual
+      - RecallNever
+    knowledgemanager.BulkWriteInput:
       type: object
       required:
-      - payload
+      - manifest
       properties:
-        inheritance:
-          $ref: '#/components/schemas/knowledgestore.InheritanceMode'
-        payload:
-          $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
-        target_fqn:
-          type: string
-        target_text:
-          type: string
-    knowledge.ApproveReviewItemRequest:
+        dry_run:
+          type: boolean
+        manifest:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.BulkItem'
+    knowledge.ProposalPayload:
       type: object
       properties:
+        body:
+          type: string
+        confidence:
+          type: number
+        evidence_link:
+          description: to the source tool output
+          type: string
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        proposed_target:
+          description: proposed attachment
+          type: string
+        reason:
+          type: string
         recall_policy:
-          description: RecallPolicy overrides the auto-injection policy the entity goes live under.
           allOf:
           - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
           example: auto
-        verification_interval:
-          description: 'VerificationInterval overrides the re-verification cadence — an ISO-8601 duration
-
-            string such as "P90D", NOT a nanosecond count (see knowledgestore.Duration). It is
-
-            also the one FR-27 field an approver can supply for a proposal that carries none,
-
-            which is what keeps a promotion completable without a manage-surface round trip.'
+        scope_id:
           type: string
-          example: P90D
+        scope_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+          example: account
+        sensitivity:
+          type: string
+        title:
+          type: string
     knowledgemanager.NewBusinessTerm:
       type: object
       required:
@@ -1688,86 +1604,127 @@ components:
           description: Source is the provenance gradient label (e.g. "curator", "scan", "inferred").
           type: string
           example: curator
-    knowledge.PromotionArtifactFreshness:
+    knowledgestore.FreshnessBand:
+      type: string
+      enum:
+      - fresh
+      - aging
+      - stale
+      - expired
+      - needs_review
+      x-enum-varnames:
+      - FreshnessFresh
+      - FreshnessAging
+      - FreshnessStale
+      - FreshnessExpired
+      - FreshnessNeedsReview
+    knowledge.InjectedItem:
       type: object
       properties:
-        artifacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.PromotionArtifactCheck'
-        verdict:
-          allOf:
-          - $ref: '#/components/schemas/knowledge.PromotionFreshnessVerdict'
-          example: fresh
-    knowledge.KnowledgeGraphEdge:
+        badge:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeResultBadge'
+        conflict:
+          description: 'Conflict and PHI are TRI-STATE: true, false, or null for "not established".
+
+
+            They were plain booleans, which meant every row this API served asserted a definite
+
+            negative — including for entities whose governance nothing had read. For `phi` that
+
+            is the unsafe direction of an unsafe field: a curator opening the dock to judge
+
+            whether something should have reached a model was told "no PHI" about an entity
+
+            nobody classified. The rule is that unknown stays unknown; the same reasoning
+
+            reviewmanager''s ToolCall.ResultEmpty documents for its own tri-state, and the same
+
+            distinction §3.1 already draws by OMITTING recall_trace rather than sending it empty.
+
+
+            omitempty, so unknown is ABSENCE rather than an explicit null. Two reasons, and the
+
+            first is decisive: swag renders a *bool as a plain `boolean`, so a null on the wire
+
+            would contradict the generated contract the SPA builds its types from (A5) — the
+
+            field would be typed `boolean` and arrive null. Absence is expressible in that
+
+            contract; null is not.
+
+
+            It is also unambiguous, which an earlier version of this comment got wrong: the
+
+            previous shape was a plain bool with no omitempty, so an older server ALWAYS sent
+
+            the key. An absent phi therefore cannot be version skew — it can only be this
+
+            server saying "not established".'
+          type: boolean
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        phi:
+          type: boolean
+        scope:
+          $ref: '#/components/schemas/knowledge.KnowledgeScope'
+        title:
+          type: string
+    knowledge.Meta:
       type: object
       properties:
-        id:
+        took:
           type: string
-        source:
-          type: string
-        target:
-          type: string
-        type:
-          type: string
-          example: APPLIES_TO
-    knowledgemanager.AttachResult:
-      type: object
-      properties:
-        additional_conflicts:
-          description: 'AdditionalConflicts carries the second-and-later conflicts when multiple
-
-            explicit targets each hit a same-kind active (FR-5: every conflict is
-
-            surfaced, none silently absorbed). Additive so existing consumers of the
-
-            singular field keep working; empty when at most one conflict exists.'
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgemanager.ConflictWarning'
-        conflict_warning:
-          $ref: '#/components/schemas/knowledgemanager.ConflictWarning'
-        edges:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgestore.AppliesToEdge'
-    knowledge.SupersedeRequest:
+    knowledge.CreateArtifactRequest:
       type: object
       required:
-      - payload
+      - kind
       properties:
-        payload:
-          $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
-    knowledge.LinkArtifactRequest:
-      type: object
-      required:
-      - content_hash
-      - edge
-      properties:
+        bytes:
+          description: 'Bytes is the raw binary payload for a document/image artifact. Go''s
+
+            encoding/json marshals a []byte as a base64 JSON string, so the wire
+
+            representation is base64; the swaggertype and format tags below record that
+
+            in the generated spec and client, which would otherwise model a []byte as an
+
+            array of integers.'
+          type: string
+          format: byte
         content_hash:
           type: string
-          example: sha256-9f2c1a
-        edge:
+        extracted_text:
           type: string
-          example: COMPUTED_BY
-    knowledge.RejectReviewItemRequest:
+        kind:
+          type: string
+          example: code
+        language:
+          type: string
+          example: trinosql
+        media_type:
+          type: string
+          example: application/sql
+        scope:
+          type: string
+          example: account
+        sensitivity:
+          type: string
+          example: phi_bearing
+        source:
+          type: string
+    responses.ErrorResponse:
       type: object
       properties:
-        reason:
-          type: string
-          example: unverifiable against the estate
-    knowledge.PromotionPreflightResponse:
-      type: object
-      properties:
-        artifact_freshness:
-          $ref: '#/components/schemas/knowledge.PromotionArtifactFreshness'
-        missing_evidence:
+        code:
+          type: integer
+        details:
           type: array
           items:
             type: string
-        proposal:
-          $ref: '#/components/schemas/knowledge.ProposalPayload'
-        review_item_id:
+        message:
           type: string
     knowledge.GraphPeekAttachment:
       type: object
@@ -1780,34 +1737,6 @@ components:
           type: string
         target_label:
           type: string
-    knowledge.PromotionFreshnessVerdict:
-      type: string
-      enum:
-      - fresh
-      - artifact_revised
-      - no_artifacts
-      - unknown
-      x-enum-varnames:
-      - FreshnessFresh
-      - FreshnessArtifactRevised
-      - FreshnessNoArtifacts
-      - FreshnessUnknown
-    knowledgestore.KnowledgeStatus:
-      type: string
-      enum:
-      - proposed
-      - active
-      - superseded
-      - archived
-      - rejected
-      - tombstoned
-      x-enum-varnames:
-      - StatusProposed
-      - StatusActive
-      - StatusSuperseded
-      - StatusArchived
-      - StatusRejected
-      - StatusTombstoned
     knowledge.EntityAttachment:
       type: object
       properties:
@@ -1820,6 +1749,99 @@ components:
         target_fqn:
           type: string
         target_label:
+          type: string
+    knowledge.ApproveReviewItemRequest:
+      type: object
+      properties:
+        recall_policy:
+          description: RecallPolicy overrides the auto-injection policy the entity goes live under.
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+          example: auto
+        verification_interval:
+          description: 'VerificationInterval overrides the re-verification cadence — an ISO-8601 duration
+
+            string such as "P90D", NOT a nanosecond count (see knowledgestore.Duration). It is
+
+            also the one FR-27 field an approver can supply for a proposal that carries none,
+
+            which is what keeps a promotion completable without a manage-surface round trip.'
+          type: string
+          example: P90D
+    knowledge.GateDecision:
+      type: string
+      enum:
+      - none
+      - light
+      - heavy
+      x-enum-varnames:
+      - GateNone
+      - GateLight
+      - GateHeavy
+    knowledge.DisambiguationResponse:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.AttachCandidate'
+        error:
+          type: string
+    knowledge.CreateArtifactResponse:
+      type: object
+      properties:
+        content_hash:
+          type: string
+          example: sha256-9f2c1a
+    knowledge.SuppressionReason:
+      type: string
+      enum:
+      - budget
+      - expired
+      - out_of_scope
+      - lower_rank
+      - non_active
+      x-enum-varnames:
+      - SuppressBudget
+      - SuppressExpired
+      - SuppressOutOfScope
+      - SuppressLowerRank
+      - SuppressNonActive
+    knowledge.LinkArtifactRequest:
+      type: object
+      required:
+      - content_hash
+      - edge
+      properties:
+        content_hash:
+          type: string
+          example: sha256-9f2c1a
+        edge:
+          type: string
+          example: COMPUTED_BY
+    knowledgemanager.AttachCandidate:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        parent:
+          type: string
+        snippet:
+          type: string
+    knowledgemanager.BulkItem:
+      type: object
+      required:
+      - payload
+      properties:
+        inheritance:
+          $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+        payload:
+          $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
+        target_fqn:
+          type: string
+        target_text:
           type: string
     knowledgemanager.AttachInput:
       type: object
@@ -1883,21 +1905,26 @@ components:
             type: string
         target_text:
           type: string
-    knowledge.GraphNodeBadges:
-      type: object
-      properties:
-        conflict:
-          type: boolean
-        freshness:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
-          example: fresh
-        phi:
-          type: boolean
-        status:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
-          example: active
+    knowledge.FeedbackVote:
+      type: string
+      enum:
+      - up
+      - down
+      x-enum-varnames:
+      - VoteUp
+      - VoteDown
+    knowledge.PromotionFreshnessVerdict:
+      type: string
+      enum:
+      - fresh
+      - artifact_revised
+      - no_artifacts
+      - unknown
+      x-enum-varnames:
+      - FreshnessFresh
+      - FreshnessArtifactRevised
+      - FreshnessNoArtifacts
+      - FreshnessUnknown
     knowledge.EntityProvenance:
       type: object
       properties:
@@ -1929,65 +1956,54 @@ components:
           type: string
         verified_by:
           type: string
-    knowledge.SuppressionReason:
-      type: string
-      enum:
-      - budget
-      - expired
-      - out_of_scope
-      - lower_rank
-      - non_active
-      x-enum-varnames:
-      - SuppressBudget
-      - SuppressExpired
-      - SuppressOutOfScope
-      - SuppressLowerRank
-      - SuppressNonActive
-    knowledge.SuppressedItem:
+    knowledge.ReviewQueueResponse:
       type: object
       properties:
-        fqn:
-          type: string
-        kind:
-          type: string
-          example: definition
-        reason:
-          allOf:
-          - $ref: '#/components/schemas/knowledge.SuppressionReason'
-          example: budget
-        title:
-          type: string
-    knowledgestore.FreshnessBand:
-      type: string
-      enum:
-      - fresh
-      - aging
-      - stale
-      - expired
-      - needs_review
-      x-enum-varnames:
-      - FreshnessFresh
-      - FreshnessAging
-      - FreshnessStale
-      - FreshnessExpired
-      - FreshnessNeedsReview
-    knowledge.EntityBadges:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.ReviewItemPayload'
+    knowledgestore.AppliesToEdge:
       type: object
       properties:
-        conflict:
-          type: boolean
-        freshness:
+        confidence:
+          description: 'Confidence is presence-aware: nil means "no confidence supplied" (the property
+
+            is omitted at persistence), while a non-nil pointer persists its value —
+
+            including a legal 0.0 — so "zero confidence" and "unset" round-trip distinctly
+
+            instead of collapsing to the same stored state.'
+          type: number
+        created_at:
+          type: string
+        created_by:
+          type: string
+        inheritance:
           allOf:
-          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
-          example: fresh
-        needs_review:
-          type: boolean
-        phi:
-          type: boolean
-        status:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
-          example: active
+          - $ref: '#/components/schemas/knowledgestore.InheritanceMode'
+          example: exact
+        source_fqn:
+          type: string
+        target_fqn:
+          type: string
+    knowledgestore.ArtifactKind:
+      type: string
+      enum:
+      - code
+      - document
+      - image
+      x-enum-varnames:
+      - ArtifactKindCode
+      - ArtifactKindDocument
+      - ArtifactKindImage
+    knowledgemanager.BulkItemError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/knowledgemanager.KnowledgeWriteError'
+        index:
+          type: integer
     knowledge.FeedbackEventListResponse:
       type: object
       properties:
@@ -1995,6 +2011,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/knowledge.FeedbackEvent'
+    knowledgestore.KnowledgeStatus:
+      type: string
+      enum:
+      - proposed
+      - active
+      - superseded
+      - archived
+      - rejected
+      - tombstoned
+      x-enum-varnames:
+      - StatusProposed
+      - StatusActive
+      - StatusSuperseded
+      - StatusArchived
+      - StatusRejected
+      - StatusTombstoned
     knowledge.EntityLifecycle:
       type: object
       properties:
@@ -2014,95 +2046,210 @@ components:
           type: string
         valid_to:
           type: string
-    knowledge.AttachCandidatesResponse:
+    knowledge.GraphPeekNode:
       type: object
       properties:
-        candidates:
+        attachments:
           type: array
           items:
-            $ref: '#/components/schemas/knowledge.AttachCandidate'
-        conflict_warning:
-          $ref: '#/components/schemas/knowledge.ConflictWarningResp'
-    knowledge.KnowledgeScope:
+            $ref: '#/components/schemas/knowledge.GraphPeekAttachment'
+        badge:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeResultBadge'
+        body_excerpt:
+          type: string
+        conflict:
+          type: boolean
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: pitfall
+        phi:
+          type: boolean
+        scope:
+          $ref: '#/components/schemas/knowledge.KnowledgeScope'
+        title:
+          type: string
+    knowledge.PatchKnowledgeRequest:
       type: object
       properties:
-        scope_id:
+        applicability:
           type: string
-          example: acct-benchmark-a
-        scope_type:
+        body:
+          type: string
+        description:
+          type: string
+        last_verified_at:
+          type: string
+        recall_policy:
+          $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+        status:
+          $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        verified_by:
+          type: string
+    knowledge.FeedbackEvent:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        fqn:
+          type: string
+        message_id:
+          type: string
+        note:
+          type: string
+        vote:
           allOf:
-          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
-          example: account
-    knowledge.ConflictWarningResp:
+          - $ref: '#/components/schemas/knowledge.FeedbackVote'
+          example: up
+    knowledgestore.ReviewItemStatus:
+      type: string
+      enum:
+      - open
+      - accepted
+      - rejected
+      - dismissed
+      x-enum-varnames:
+      - ReviewOpen
+      - ReviewAccepted
+      - ReviewRejected
+      - ReviewDismissed
+    knowledgemanager.KnowledgeWriteError:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/knowledgemanager.KnowledgeWriteErrorCode'
+        field:
+          type: string
+        message:
+          type: string
+    knowledge.KnowledgeGraphResponse:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.KnowledgeGraphEdge'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.KnowledgeGraphNode'
+    knowledgestore.InheritanceMode:
+      type: string
+      enum:
+      - exact
+      - descendants
+      x-enum-varnames:
+      - InheritanceExact
+      - InheritanceDescendants
+    knowledge.GraphNodeBadges:
+      type: object
+      properties:
+        conflict:
+          type: boolean
+        freshness:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.FreshnessBand'
+          example: fresh
+        phi:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+    knowledge.SupersedeRequest:
+      type: object
+      required:
+      - payload
+      properties:
+        payload:
+          $ref: '#/components/schemas/knowledgemanager.CreateKnowledgeInput'
+    knowledge.SuppressedItem:
+      type: object
+      properties:
+        fqn:
+          type: string
+        kind:
+          type: string
+          example: definition
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/knowledge.SuppressionReason'
+          example: budget
+        title:
+          type: string
+    knowledge.ReviewItemPayload:
+      type: object
+      properties:
+        assigned_to:
+          type: string
+        created_at:
+          type: string
+        item_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ReviewItemType'
+          example: proposed_knowledge
+        proposed_payload:
+          type: object
+        reason:
+          type: string
+        review_item_id:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ReviewItemStatus'
+          example: open
+    knowledge.ProposalListResponse:
+      type: object
+      properties:
+        proposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.ProposalPayload'
+    knowledge.PromotionArtifactCheck:
+      type: object
+      properties:
+        content_hash:
+          type: string
+        current_content_hash:
+          description: 'CurrentContentHash names the head that replaced this version; absent when the
+
+            version IS the head. On a forked revision history it names ONE of several heads
+
+            (content-addressing lets a version have multiple successors, so there is no unique
+
+            "latest") — `revised` is the field that carries the verdict.'
+          type: string
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ArtifactKind'
+          example: code
+        revised:
+          type: boolean
+    knowledge.KnowledgePrefixBlock:
+      type: object
+      properties:
+        content:
+          description: Content is the rendered block text ({ontology} or {index}).
+          type: string
+        version:
+          description: Version is the block's monotonic version (ontology_version / account_index_version).
+          type: integer
+    knowledgemanager.ConflictWarning:
       type: object
       properties:
         existing_fqn:
           type: string
         kind:
           type: string
-          example: pitfall
         target_fqn:
           type: string
-    knowledgestore.ArtifactKind:
-      type: string
-      enum:
-      - code
-      - document
-      - image
-      x-enum-varnames:
-      - ArtifactKindCode
-      - ArtifactKindDocument
-      - ArtifactKindImage
-    knowledge.TurnKnowledgePayload:
-      type: object
-      properties:
-        conversation_id:
-          type: string
-        gate_decision:
-          allOf:
-          - $ref: '#/components/schemas/knowledge.GateDecision'
-          example: heavy
-        injected:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.InjectedItem'
-        message_id:
-          type: string
-        recall_trace:
-          description: RecallTrace is the at-a-glance banner list; ABSENT on a zero-injection turn.
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.RecallTraceItem'
-        suppressed:
-          description: 'C14 branch A — the suppressed set enumerated inline. Mutually exclusive with
-
-            SuppressedRef; a builder picks a branch by measurement.'
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.SuppressedItem'
-        suppressed_count:
-          description: the "+N considered, not injected" headline
-          type: integer
-        suppressed_detail_ref:
-          description: 'C14 branch B — a handle the dock fetches on expand when inlining the full
-
-            suppressed set is too heavy for the turn payload.'
-          type: string
-    knowledge.FeedbackVote:
-      type: string
-      enum:
-      - up
-      - down
-      x-enum-varnames:
-      - VoteUp
-      - VoteDown
-    knowledge.ReviewQueueResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.ReviewItemPayload'
     knowledge.KnowledgeEntityPayload:
       type: object
       properties:
@@ -2150,207 +2297,40 @@ components:
             type: string
         title:
           type: string
-    knowledgemanager.KnowledgeWriteErrorCode:
-      type: string
-      enum:
-      - invalid_input
-      - disambiguation_required
-      - conflict
-      - scope_forbidden
-      - not_found
-      - internal
-      x-enum-varnames:
-      - KnowledgeWriteInvalidInput
-      - KnowledgeWriteDisambiguationRequired
-      - KnowledgeWriteConflict
-      - KnowledgeWriteScopeForbidden
-      - KnowledgeWriteNotFound
-      - KnowledgeWriteInternal
-    knowledgemanager.BulkWriteInput:
-      type: object
-      required:
-      - manifest
-      properties:
-        dry_run:
-          type: boolean
-        manifest:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgemanager.BulkItem'
-    knowledgestore.ReviewItemType:
-      type: string
-      enum:
-      - proposed_knowledge
-      - bulk_seed_ambiguity
-      - feedback_flag
-      x-enum-varnames:
-      - ReviewTypeProposedKnowledge
-      - ReviewTypeBulkSeedAmbiguity
-      - ReviewTypeFeedbackFlag
-    knowledgestore.InheritanceMode:
-      type: string
-      enum:
-      - exact
-      - descendants
-      x-enum-varnames:
-      - InheritanceExact
-      - InheritanceDescendants
-    knowledge.PromotionArtifactCheck:
+    knowledge.TurnKnowledgePayload:
       type: object
       properties:
-        content_hash:
+        conversation_id:
           type: string
-        current_content_hash:
-          description: 'CurrentContentHash names the head that replaced this version; absent when the
-
-            version IS the head. On a forked revision history it names ONE of several heads
-
-            (content-addressing lets a version have multiple successors, so there is no unique
-
-            "latest") — `revised` is the field that carries the verdict.'
-          type: string
-        kind:
+        gate_decision:
           allOf:
-          - $ref: '#/components/schemas/knowledgestore.ArtifactKind'
-          example: code
-        revised:
-          type: boolean
-    knowledge.ProposalListResponse:
-      type: object
-      properties:
-        proposals:
+          - $ref: '#/components/schemas/knowledge.GateDecision'
+          example: heavy
+        injected:
           type: array
           items:
-            $ref: '#/components/schemas/knowledge.ProposalPayload'
-    knowledgemanager.ConflictWarning:
-      type: object
-      properties:
-        existing_fqn:
+            $ref: '#/components/schemas/knowledge.InjectedItem'
+        message_id:
           type: string
-        kind:
-          type: string
-        target_fqn:
-          type: string
-    knowledge.KnowledgeListResponse:
-      type: object
-      properties:
-        _meta:
-          $ref: '#/components/schemas/knowledge.Meta'
-        results:
+        recall_trace:
+          description: RecallTrace is the at-a-glance banner list; ABSENT on a zero-injection turn.
           type: array
           items:
-            $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
-    knowledgestore.AppliesToEdge:
-      type: object
-      properties:
-        confidence:
-          description: 'Confidence is presence-aware: nil means "no confidence supplied" (the property
+            $ref: '#/components/schemas/knowledge.RecallTraceItem'
+        suppressed:
+          description: 'C14 branch A — the suppressed set enumerated inline. Mutually exclusive with
 
-            is omitted at persistence), while a non-nil pointer persists its value —
+            SuppressedRef; a builder picks a branch by measurement.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.SuppressedItem'
+        suppressed_count:
+          description: the "+N considered, not injected" headline
+          type: integer
+        suppressed_detail_ref:
+          description: 'C14 branch B — a handle the dock fetches on expand when inlining the full
 
-            including a legal 0.0 — so "zero confidence" and "unset" round-trip distinctly
-
-            instead of collapsing to the same stored state.'
-          type: number
-        created_at:
-          type: string
-        created_by:
-          type: string
-        inheritance:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.InheritanceMode'
-          example: exact
-        source_fqn:
-          type: string
-        target_fqn:
-          type: string
-    knowledge.RecallTraceItem:
-      type: object
-      properties:
-        fqn:
-          type: string
-        kind:
-          type: string
-          example: pitfall
-        title:
-          type: string
-    knowledgemanager.AttachCandidate:
-      type: object
-      properties:
-        fqn:
-          type: string
-        label:
-          type: string
-        parent:
-          type: string
-        snippet:
-          type: string
-    knowledge.CreateArtifactRequest:
-      type: object
-      required:
-      - kind
-      properties:
-        bytes:
-          description: 'Bytes is the raw binary payload for a document/image artifact. Go''s
-
-            encoding/json marshals a []byte as a base64 JSON string, so the wire
-
-            representation is base64; the swaggertype and format tags below record that
-
-            in the generated spec and client, which would otherwise model a []byte as an
-
-            array of integers.'
-          type: string
-          format: byte
-        content_hash:
-          type: string
-        extracted_text:
-          type: string
-        kind:
-          type: string
-          example: code
-        language:
-          type: string
-          example: trinosql
-        media_type:
-          type: string
-          example: application/sql
-        scope:
-          type: string
-          example: account
-        sensitivity:
-          type: string
-          example: phi_bearing
-        source:
-          type: string
-    knowledge.GateDecision:
-      type: string
-      enum:
-      - none
-      - light
-      - heavy
-      x-enum-varnames:
-      - GateNone
-      - GateLight
-      - GateHeavy
-    knowledgestore.KnowledgeScopeType:
-      type: string
-      enum:
-      - flume_core
-      - account
-      - project
-      - user
-      - session
-      x-enum-varnames:
-      - ScopeTypeFlumeCore
-      - ScopeTypeAccount
-      - ScopeTypeProject
-      - ScopeTypeUser
-      - ScopeTypeSession
-    knowledge.Meta:
-      type: object
-      properties:
-        took:
+            suppressed set is too heavy for the turn payload.'
           type: string
     knowledge.KnowledgeGraphNode:
       type: object
@@ -2367,6 +2347,42 @@ components:
         label:
           type: string
           example: Knowledge
+    knowledgestore.KnowledgeScopeType:
+      type: string
+      enum:
+      - flume_core
+      - account
+      - project
+      - user
+      - session
+      x-enum-varnames:
+      - ScopeTypeFlumeCore
+      - ScopeTypeAccount
+      - ScopeTypeProject
+      - ScopeTypeUser
+      - ScopeTypeSession
+    knowledge.KnowledgeListResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/knowledge.Meta'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.KnowledgeEntity'
+    knowledge.PromotionPreflightResponse:
+      type: object
+      properties:
+        artifact_freshness:
+          $ref: '#/components/schemas/knowledge.PromotionArtifactFreshness'
+        missing_evidence:
+          type: array
+          items:
+            type: string
+        proposal:
+          $ref: '#/components/schemas/knowledge.ProposalPayload'
+        review_item_id:
+          type: string
     knowledgemanager.CreateKnowledgeInput:
       type: object
       required:
@@ -2460,120 +2476,28 @@ components:
             lets the proposal arrive with a defensible default already on it.'
           type: string
           example: P90D
-    knowledge.ConflictEdgeRef:
+    knowledge.KnowledgeScope:
       type: object
       properties:
-        other_fqn:
-          type: string
-    knowledge.KnowledgeGraphResponse:
-      type: object
-      properties:
-        edges:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.KnowledgeGraphEdge'
-        nodes:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledge.KnowledgeGraphNode'
-    knowledge.ProposalPayload:
-      type: object
-      properties:
-        body:
-          type: string
-        confidence:
-          type: number
-        evidence_link:
-          description: to the source tool output
-          type: string
-        fqn:
-          type: string
-        kind:
-          type: string
-          example: pitfall
-        proposed_target:
-          description: proposed attachment
-          type: string
-        reason:
-          type: string
-        recall_policy:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
-          example: auto
         scope_id:
           type: string
+          example: acct-benchmark-a
         scope_type:
           allOf:
           - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
           example: account
-        sensitivity:
-          type: string
-        title:
-          type: string
-    knowledge.ReviewItemPayload:
+    knowledge.KnowledgeGraphEdge:
       type: object
       properties:
-        assigned_to:
+        id:
           type: string
-        created_at:
+        source:
           type: string
-        item_type:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.ReviewItemType'
-          example: proposed_knowledge
-        proposed_payload:
-          type: object
-        reason:
+        target:
           type: string
-        review_item_id:
+        type:
           type: string
-        status:
-          allOf:
-          - $ref: '#/components/schemas/knowledgestore.ReviewItemStatus'
-          example: open
-    knowledgemanager.KnowledgeWriteError:
-      type: object
-      properties:
-        code:
-          $ref: '#/components/schemas/knowledgemanager.KnowledgeWriteErrorCode'
-        field:
-          type: string
-        message:
-          type: string
-    knowledge.PatchKnowledgeRequest:
-      type: object
-      properties:
-        applicability:
-          type: string
-        body:
-          type: string
-        description:
-          type: string
-        last_verified_at:
-          type: string
-        recall_policy:
-          $ref: '#/components/schemas/knowledgestore.RecallPolicy'
-        status:
-          $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
-        tags:
-          type: array
-          items:
-            type: string
-        title:
-          type: string
-        verified_by:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
+          example: APPLIES_TO
     knowledgemanager.BulkResult:
       type: object
       properties:
@@ -2615,6 +2539,26 @@ components:
             $ref: '#/components/schemas/knowledgemanager.BulkItemError'
         written:
           type: integer
+    knowledgemanager.AttachResult:
+      type: object
+      properties:
+        additional_conflicts:
+          description: 'AdditionalConflicts carries the second-and-later conflicts when multiple
+
+            explicit targets each hit a same-kind active (FR-5: every conflict is
+
+            surfaced, none silently absorbed). Additive so existing consumers of the
+
+            singular field keep working; empty when at most one conflict exists.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.ConflictWarning'
+        conflict_warning:
+          $ref: '#/components/schemas/knowledgemanager.ConflictWarning'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.AppliesToEdge'
     knowledge.MergeReviewItemRequest:
       type: object
       required:
@@ -2623,73 +2567,129 @@ components:
         target_fqn:
           type: string
           example: knowledge/019f8899-d6c2-761e-b01e-3fa71d083a7b
-    knowledgemanager.BulkItemError:
+    knowledge.ConflictWarningResp:
       type: object
       properties:
-        error:
-          $ref: '#/components/schemas/knowledgemanager.KnowledgeWriteError'
-        index:
-          type: integer
-    knowledge.InjectedItem:
-      type: object
-      properties:
-        badge:
-          $ref: '#/components/schemas/knowledgestore.KnowledgeResultBadge'
-        conflict:
-          description: 'Conflict and PHI are TRI-STATE: true, false, or null for "not established".
-
-
-            They were plain booleans, which meant every row this API served asserted a definite
-
-            negative — including for entities whose governance nothing had read. For `phi` that
-
-            is the unsafe direction of an unsafe field: a curator opening the dock to judge
-
-            whether something should have reached a model was told "no PHI" about an entity
-
-            nobody classified. The rule is that unknown stays unknown; the same reasoning
-
-            reviewmanager''s ToolCall.ResultEmpty documents for its own tri-state, and the same
-
-            distinction §3.1 already draws by OMITTING recall_trace rather than sending it empty.
-
-
-            omitempty, so unknown is ABSENCE rather than an explicit null. Two reasons, and the
-
-            first is decisive: swag renders a *bool as a plain `boolean`, so a null on the wire
-
-            would contradict the generated contract the SPA builds its types from (A5) — the
-
-            field would be typed `boolean` and arrive null. Absence is expressible in that
-
-            contract; null is not.
-
-
-            It is also unambiguous, which an earlier version of this comment got wrong: the
-
-            previous shape was a plain bool with no omitempty, so an older server ALWAYS sent
-
-            the key. An absent phi therefore cannot be version skew — it can only be this
-
-            server saying "not established".'
-          type: boolean
-        fqn:
+        existing_fqn:
           type: string
         kind:
           type: string
           example: pitfall
-        phi:
-          type: boolean
-        scope:
-          $ref: '#/components/schemas/knowledge.KnowledgeScope'
+        target_fqn:
+          type: string
+    knowledge.RejectReviewItemRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: unverifiable against the estate
+    knowledge.AttachCandidatesResponse:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledge.AttachCandidate'
+        conflict_warning:
+          $ref: '#/components/schemas/knowledge.ConflictWarningResp'
+    knowledgestore.KnowledgeEntity:
+      type: object
+      properties:
+        account_id:
+          type: string
+          example: '12345'
+        applicability:
+          type: string
+        authored_by:
+          type: string
+        body:
+          type: string
+          x-body-soft-cap-warning: true
+        confidence:
+          type: number
+        corroborated_by:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+        created_by:
+          type: string
+        curator_role:
+          type: string
+          example: system_admin
+        description:
+          type: string
+          example: Rows written before 2021-03 have a null paid_amt.
+        fqn:
+          type: string
+          example: knowledge/019f8899-d6c2-761f-9019-4ad5e8167402
+        kind:
+          type: string
+          example: pitfall
+        knowledge_scope_id:
+          type: string
+          example: '12345'
+        knowledge_scope_type:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeScopeType'
+          example: account
+        last_validated_against_schema:
+          type: string
+        last_verified_at:
+          type: string
+        recall_policy:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.RecallPolicy'
+          example: auto
+        source_refs:
+          type: array
+          items:
+            type: string
+        source_type:
+          type: string
+          example: curator
+        status:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.KnowledgeStatus'
+          example: active
+        supersedes_fqn:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
         title:
           type: string
-    knowledge.CreateArtifactResponse:
+          example: paid_amt is null before the 2021 migration
+        updated_at:
+          type: string
+        updated_by:
+          type: string
+        valid_from:
+          type: string
+        valid_to:
+          type: string
+        verification_interval:
+          type: string
+        verified_by:
+          type: string
+    knowledge.EntityArtifact:
       type: object
       properties:
         content_hash:
           type: string
-          example: sha256-9f2c1a
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.ArtifactKind'
+          example: code
+        language:
+          type: string
+        media_type:
+          type: string
+        sensitivity:
+          type: string
+          example: phi_bearing
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

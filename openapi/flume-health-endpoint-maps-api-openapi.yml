@@ -159,31 +159,6 @@ paths:
         - email
 components:
   schemas:
-    endpointmap.MapVersion:
-      type: object
-      properties:
-        createdAt:
-          type: string
-        createdBy:
-          $ref: '#/components/schemas/user.ReadModel'
-        id:
-          type: integer
-        map:
-          type: string
-        version:
-          type: integer
-    user.Role:
-      type: string
-      enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
-      x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
     endpointmap.FieldType:
       type: string
       enum:
@@ -198,15 +173,6 @@ components:
       - FieldTypeApi
       - FieldTypeDatabase
       - FieldTypeFlumeLakehouse
-    endpointmap.ListResponse:
-      type: object
-      properties:
-        endpointMaps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.ReadModel'
-        nextPageToken:
-          type: string
     user.ReadModel:
       type: object
       properties:
@@ -254,6 +220,40 @@ components:
         name:
           type: string
         ordinal:
+          type: integer
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    endpointmap.ListResponse:
+      type: object
+      properties:
+        endpointMaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.ReadModel'
+        nextPageToken:
+          type: string
+    endpointmap.MapVersion:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        id:
+          type: integer
+        map:
+          type: string
+        version:
           type: integer
     responses.ErrorResponse:
       type: object

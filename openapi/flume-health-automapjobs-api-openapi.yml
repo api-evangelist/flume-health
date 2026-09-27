@@ -301,6 +301,14 @@ paths:
         - email
 components:
   schemas:
+    automapjob.FieldStatus:
+      type: string
+      enum:
+      - Accepted
+      - Rejected
+      x-enum-varnames:
+      - FieldStatusAccepted
+      - FieldStatusRejected
     automapjob.MapsUpdate:
       type: object
       properties:
@@ -312,117 +320,44 @@ components:
           type:
           - string
           - 'null'
-    user.Role:
-      type: string
-      enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
-      x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
-    automapjob.ConfidenceLevel:
-      type: string
-      enum:
-      - Low
-      - Medium
-      - High
-      x-enum-varnames:
-      - ConfidenceLevelLow
-      - ConfidenceLevelMedium
-      - ConfidenceLevelHigh
-    automapjob.ListResponse:
+    automapjob.UpdateModel:
       type: object
       properties:
-        automapJobs:
-          type: array
+        endTime:
+          type:
+          - string
+          - 'null'
+        error:
+          type:
+          - string
+          - 'null'
+        explanation:
+          type:
+          - string
+          - 'null'
+        feedback:
+          type:
+          - string
+          - 'null'
+        fieldMappings:
+          type:
+          - array
+          - 'null'
           items:
-            $ref: '#/components/schemas/automapjob.ReadModel'
-        nextPageToken:
-          type: string
-    automapjob.Status:
-      type: string
-      enum:
-      - Queued
-      - Processing
-      - Failed
-      - Cancelled
-      - Success
-      x-enum-varnames:
-      - StatusQueued
-      - StatusProcessing
-      - StatusFailed
-      - StatusCancelled
-      - StatusSuccess
-    automapjob.Outputs:
-      type: object
-      properties:
-        destination:
-          type: string
-        source:
-          type: string
-    automapjob.FieldMappingUpdate:
-      type: object
-      properties:
-        confidenceLevel:
+            $ref: '#/components/schemas/automapjob.FieldMappingUpdate'
+        maps:
           allOf:
-          - $ref: '#/components/schemas/automapjob.ConfidenceLevel'
-        destination:
-          type:
-          - string
-          - 'null'
-        explanation:
-          type:
-          - string
-          - 'null'
-        feedback:
-          type:
-          - string
-          - 'null'
-        fieldStatus:
+          - $ref: '#/components/schemas/automapjob.MapsUpdate'
+        outputs:
           allOf:
-          - $ref: '#/components/schemas/automapjob.FieldStatus'
-        source:
+          - $ref: '#/components/schemas/automapjob.OutputsUpdate'
+        startTime:
           type:
           - string
           - 'null'
-    automapjob.Maps:
-      type: object
-      properties:
-        destination:
-          type: string
-        source:
-          type: string
-    automapjob.FieldStatus:
-      type: string
-      enum:
-      - Accepted
-      - Rejected
-      x-enum-varnames:
-      - FieldStatusAccepted
-      - FieldStatusRejected
-    automapjob.FieldMapping:
-      type: object
-      required:
-      - confidenceLevel
-      - destination
-      - source
-      properties:
-        confidenceLevel:
-          $ref: '#/components/schemas/automapjob.ConfidenceLevel'
-        destination:
-          type: string
-        explanation:
-          type: string
-        feedback:
-          type: string
-        fieldStatus:
-          $ref: '#/components/schemas/automapjob.FieldStatus'
-        source:
-          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.Status'
     user.ReadModel:
       type: object
       properties:
@@ -465,6 +400,31 @@ components:
           type:
           - string
           - 'null'
+    automapjob.FieldMappingUpdate:
+      type: object
+      properties:
+        confidenceLevel:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.ConfidenceLevel'
+        destination:
+          type:
+          - string
+          - 'null'
+        explanation:
+          type:
+          - string
+          - 'null'
+        feedback:
+          type:
+          - string
+          - 'null'
+        fieldStatus:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.FieldStatus'
+        source:
+          type:
+          - string
+          - 'null'
     automapjob.ReadModel:
       type: object
       properties:
@@ -496,6 +456,77 @@ components:
           $ref: '#/components/schemas/automapjob.Status'
         version:
           type: integer
+    automapjob.ListResponse:
+      type: object
+      properties:
+        automapJobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/automapjob.ReadModel'
+        nextPageToken:
+          type: string
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    automapjob.Maps:
+      type: object
+      properties:
+        destination:
+          type: string
+        source:
+          type: string
+    automapjob.FieldMapping:
+      type: object
+      required:
+      - confidenceLevel
+      - destination
+      - source
+      properties:
+        confidenceLevel:
+          $ref: '#/components/schemas/automapjob.ConfidenceLevel'
+        destination:
+          type: string
+        explanation:
+          type: string
+        feedback:
+          type: string
+        fieldStatus:
+          $ref: '#/components/schemas/automapjob.FieldStatus'
+        source:
+          type: string
+    automapjob.Status:
+      type: string
+      enum:
+      - Queued
+      - Processing
+      - Failed
+      - Cancelled
+      - Success
+      x-enum-varnames:
+      - StatusQueued
+      - StatusProcessing
+      - StatusFailed
+      - StatusCancelled
+      - StatusSuccess
+    automapjob.ConfidenceLevel:
+      type: string
+      enum:
+      - Low
+      - Medium
+      - High
+      x-enum-varnames:
+      - ConfidenceLevelLow
+      - ConfidenceLevelMedium
+      - ConfidenceLevelHigh
     responses.ErrorResponse:
       type: object
       properties:
@@ -507,44 +538,13 @@ components:
             type: string
         message:
           type: string
-    automapjob.UpdateModel:
+    automapjob.Outputs:
       type: object
       properties:
-        endTime:
-          type:
-          - string
-          - 'null'
-        error:
-          type:
-          - string
-          - 'null'
-        explanation:
-          type:
-          - string
-          - 'null'
-        feedback:
-          type:
-          - string
-          - 'null'
-        fieldMappings:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/automapjob.FieldMappingUpdate'
-        maps:
-          allOf:
-          - $ref: '#/components/schemas/automapjob.MapsUpdate'
-        outputs:
-          allOf:
-          - $ref: '#/components/schemas/automapjob.OutputsUpdate'
-        startTime:
-          type:
-          - string
-          - 'null'
-        status:
-          allOf:
-          - $ref: '#/components/schemas/automapjob.Status'
+        destination:
+          type: string
+        source:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

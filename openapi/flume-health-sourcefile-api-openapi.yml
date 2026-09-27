@@ -465,26 +465,63 @@ paths:
         - email
 components:
   schemas:
-    sourcefile.ControlFile:
+    sourcefile.WriteModel:
       type: object
+      required:
+      - endpointId
+      - fileName
+      - lastModified
+      - sizeBytes
       properties:
+        archiveFileName:
+          type: string
+        archiveType:
+          $ref: '#/components/schemas/sourcefile.ArchiveType'
         blobKey:
           type: string
+        controlFile:
+          $ref: '#/components/schemas/sourcefile.ControlFile'
+        discoveredAt:
+          type: string
+        discoveredRank:
+          type: integer
+        duckDbBatchKey:
+          type: string
+        duckDbTable:
+          type: string
+        endpointId:
+          type: integer
         fileName:
           type: string
+        isArchive:
+          type: boolean
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
         lastModified:
+          type: string
+        shardBatchKey:
           type: string
         sizeBytes:
           type: integer
-    sourcefile.ListResponse:
+    sourcefile.BulkPatchModel:
       type: object
+      required:
+      - endpointId
+      - ids
       properties:
-        nextPageToken:
-          type: string
-        sourceFiles:
+        endpointId:
+          type: integer
+        ids:
           type: array
+          minItems: 1
           items:
-            $ref: '#/components/schemas/sourcefile.ReadModel'
+            type: integer
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
     sourcefile.ReadModel:
       type: object
       properties:
@@ -526,6 +563,17 @@ components:
           type: string
         sizeBytes:
           type: integer
+    sourcefile.ControlFile:
+      type: object
+      properties:
+        blobKey:
+          type: string
+        fileName:
+          type: string
+        lastModified:
+          type: string
+        sizeBytes:
+          type: integer
     sourcefile.PatchModel:
       type: object
       properties:
@@ -537,46 +585,6 @@ components:
           type: boolean
         isStaged:
           type: boolean
-        shardBatchKey:
-          type: string
-        sizeBytes:
-          type: integer
-    sourcefile.WriteModel:
-      type: object
-      required:
-      - endpointId
-      - fileName
-      - lastModified
-      - sizeBytes
-      properties:
-        archiveFileName:
-          type: string
-        archiveType:
-          $ref: '#/components/schemas/sourcefile.ArchiveType'
-        blobKey:
-          type: string
-        controlFile:
-          $ref: '#/components/schemas/sourcefile.ControlFile'
-        discoveredAt:
-          type: string
-        discoveredRank:
-          type: integer
-        duckDbBatchKey:
-          type: string
-        duckDbTable:
-          type: string
-        endpointId:
-          type: integer
-        fileName:
-          type: string
-        isArchive:
-          type: boolean
-        isProcessed:
-          type: boolean
-        isStaged:
-          type: boolean
-        lastModified:
-          type: string
         shardBatchKey:
           type: string
         sizeBytes:
@@ -599,6 +607,22 @@ components:
       - ArchiveTypeTarGzip
       - ArchiveTypeTarBzip2
       - ArchiveType7zip
+    sourcefile.BulkWriteModel:
+      type: object
+      properties:
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/sourcefile.WriteModel'
+    sourcefile.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/sourcefile.ReadModel'
     responses.ErrorResponse:
       type: object
       properties:
@@ -610,30 +634,6 @@ components:
             type: string
         message:
           type: string
-    sourcefile.BulkWriteModel:
-      type: object
-      properties:
-        sourceFiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/sourcefile.WriteModel'
-    sourcefile.BulkPatchModel:
-      type: object
-      required:
-      - endpointId
-      - ids
-      properties:
-        endpointId:
-          type: integer
-        ids:
-          type: array
-          minItems: 1
-          items:
-            type: integer
-        isProcessed:
-          type: boolean
-        isStaged:
-          type: boolean
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

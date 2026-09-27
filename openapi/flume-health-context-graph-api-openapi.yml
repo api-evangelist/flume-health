@@ -163,11 +163,15 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    graph.Meta:
+    graph.QueryMeta:
       type: object
       properties:
+        rowCount:
+          type: integer
         took:
           type: string
+        truncated:
+          type: boolean
     graph.StatusResponse:
       type: object
       properties:
@@ -181,22 +185,6 @@ components:
           type: integer
         status:
           type: string
-    graph.QueryRequest:
-      type: object
-      required:
-      - cypher
-      properties:
-        cypher:
-          type: string
-    graph.SearchResponse:
-      type: object
-      properties:
-        _meta:
-          $ref: '#/components/schemas/graph.SearchMeta'
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgestore.SearchResult'
     knowledgestore.SearchResult:
       type: object
       properties:
@@ -211,15 +199,27 @@ components:
           additionalProperties: {}
         score:
           type: number
-    graph.QueryMeta:
+    graph.SearchResponse:
       type: object
       properties:
-        rowCount:
-          type: integer
+        _meta:
+          $ref: '#/components/schemas/graph.SearchMeta'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.SearchResult'
+    graph.QueryRequest:
+      type: object
+      required:
+      - cypher
+      properties:
+        cypher:
+          type: string
+    graph.Meta:
+      type: object
+      properties:
         took:
           type: string
-        truncated:
-          type: boolean
     graph.SearchMeta:
       type: object
       properties:
@@ -228,17 +228,6 @@ components:
         resultCount:
           type: integer
         took:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
           type: string
     graph.QueryResponse:
       type: object
@@ -254,6 +243,17 @@ components:
           items:
             type: object
             additionalProperties: {}
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

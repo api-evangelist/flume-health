@@ -302,124 +302,6 @@ paths:
         required: true
 components:
   schemas:
-    transaction.Step:
-      type: object
-      properties:
-        endTime:
-          type: string
-        error:
-          type: string
-        errorLogBlobKey:
-          type: string
-        file:
-          $ref: '#/components/schemas/transaction.FileDetail'
-        logBlobKey:
-          type: string
-        logs:
-          type: string
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        watermark:
-          type: string
-        watermarkBlobKey:
-          type: string
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
-    transaction.Steps:
-      type: object
-      properties:
-        extract:
-          $ref: '#/components/schemas/transaction.Step'
-        load:
-          $ref: '#/components/schemas/transaction.Step'
-        transform:
-          $ref: '#/components/schemas/transaction.Step'
-    transaction.FileDetail:
-      type: object
-      properties:
-        archiveFileName:
-          type: string
-        compressedFilesFound:
-          type: array
-          items:
-            type: string
-        downloadDurationMillis:
-          type: integer
-        lastModifiedTime:
-          type: string
-        name:
-          type: string
-        recordsIn:
-          type: integer
-        recordsOut:
-          type: integer
-        retrievalTime:
-          type: string
-        sizeBytes:
-          type: integer
-        uploadDurationMillis:
-          type: integer
-    transaction.Operation:
-      type: string
-      enum:
-      - SourceMap
-      - SourceTransfer
-      - SourceExtract
-      - SourceMapBatchLoad
-      - SourceMapBatchProcess
-      - DestinationMap
-      - DestinationTransfer
-      x-enum-varnames:
-      - OperationSourceMap
-      - OperationSourceTransfer
-      - OperationSourceExtract
-      - OperationSourceMapBatchLoad
-      - OperationSourceMapBatchProcess
-      - OperationDestinationMap
-      - OperationDestinationTransfer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
     transaction.ReadModel:
       type: object
       properties:
@@ -457,6 +339,57 @@ components:
           type: string
         workerId:
           type: string
+    transaction.Step:
+      type: object
+      properties:
+        endTime:
+          type: string
+        error:
+          type: string
+        errorLogBlobKey:
+          type: string
+        file:
+          $ref: '#/components/schemas/transaction.FileDetail'
+        logBlobKey:
+          type: string
+        logs:
+          type: string
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        watermark:
+          type: string
+        watermarkBlobKey:
+          type: string
+    transaction.Operation:
+      type: string
+      enum:
+      - SourceMap
+      - SourceTransfer
+      - SourceExtract
+      - SourceMapBatchLoad
+      - SourceMapBatchProcess
+      - DestinationMap
+      - DestinationTransfer
+      x-enum-varnames:
+      - OperationSourceMap
+      - OperationSourceTransfer
+      - OperationSourceExtract
+      - OperationSourceMapBatchLoad
+      - OperationSourceMapBatchProcess
+      - OperationDestinationMap
+      - OperationDestinationTransfer
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
     transaction.ListReadModel:
       type: object
       properties:
@@ -466,6 +399,62 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/transaction.ReadModel'
+    transaction.Steps:
+      type: object
+      properties:
+        extract:
+          $ref: '#/components/schemas/transaction.Step'
+        load:
+          $ref: '#/components/schemas/transaction.Step'
+        transform:
+          $ref: '#/components/schemas/transaction.Step'
+    transaction.FileDetail:
+      type: object
+      properties:
+        archiveFileName:
+          type: string
+        compressedFilesFound:
+          type: array
+          items:
+            type: string
+        downloadDurationMillis:
+          type: integer
+        lastModifiedTime:
+          type: string
+        name:
+          type: string
+        recordsIn:
+          type: integer
+        recordsOut:
+          type: integer
+        retrievalTime:
+          type: string
+        sizeBytes:
+          type: integer
+        uploadDurationMillis:
+          type: integer
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
     transaction.WriteModel:
       type: object
       required:
@@ -491,6 +480,17 @@ components:
         trigger:
           $ref: '#/components/schemas/transaction.Trigger'
         workerId:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
   securitySchemes:
     OAuth2Implicit:
