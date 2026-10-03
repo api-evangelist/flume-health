@@ -271,6 +271,15 @@ paths:
         required: true
 components:
   schemas:
+    accountcontract.ListResponse:
+      type: object
+      properties:
+        accountContracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/accountcontract.ReadModel'
+        nextPageToken:
+          type: string
     accountcontract.ReadModel:
       type: object
       properties:
@@ -305,14 +314,16 @@ components:
           type: number
         totalAllocatedRows:
           type: integer
-    accountcontract.ListResponse:
+    responses.ErrorResponse:
       type: object
       properties:
-        accountContracts:
+        code:
+          type: integer
+        details:
           type: array
           items:
-            $ref: '#/components/schemas/accountcontract.ReadModel'
-        nextPageToken:
+            type: string
+        message:
           type: string
     accountcontract.UpdateModel:
       type: object
@@ -337,17 +348,6 @@ components:
           type:
           - integer
           - 'null'
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

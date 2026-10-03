@@ -459,6 +459,28 @@ paths:
         - email
 components:
   schemas:
+    user.WriteModel:
+      type: object
+      required:
+      - active
+      - email
+      - firstName
+      - lastName
+      - role
+      properties:
+        active:
+          description: pointer so we can distinguish between false and not set
+          type: boolean
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          $ref: '#/components/schemas/user.Role'
     user.QueryEngineGrantRequest:
       type: object
       required:
@@ -471,15 +493,17 @@ components:
           minimum: 1
         reason:
           type: string
-    user.ListModel:
+    user.QueryEngineGrantResponse:
       type: object
       properties:
-        nextPageToken:
+        expiresAt:
           type: string
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/user.ReadModel'
+        message:
+          type: string
+        reason:
+          type: string
+        userId:
+          type: integer
     user.SelfUser:
       type: object
       properties:
@@ -495,6 +519,20 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/user.Role'
+    user.ListModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/user.ReadModel'
+    user.SelfUserPatchModel:
+      type: object
+      properties:
+        receiveEmailAlerts:
+          type: boolean
     user.ReadModel:
       type: object
       properties:
@@ -526,44 +564,17 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
-    user.QueryEngineGrantResponse:
+    responses.ErrorResponse:
       type: object
       properties:
-        expiresAt:
-          type: string
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
         message:
           type: string
-        reason:
-          type: string
-        userId:
-          type: integer
-    user.WriteModel:
-      type: object
-      required:
-      - active
-      - email
-      - firstName
-      - lastName
-      - role
-      properties:
-        active:
-          description: pointer so we can distinguish between false and not set
-          type: boolean
-        aiEnabled:
-          type: boolean
-        email:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        role:
-          $ref: '#/components/schemas/user.Role'
-    user.SelfUserPatchModel:
-      type: object
-      properties:
-        receiveEmailAlerts:
-          type: boolean
     user.Role:
       type: string
       enum:
@@ -576,17 +587,6 @@ components:
       - RoleAdmin
       - RoleEditor
       - RoleViewer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

@@ -159,20 +159,23 @@ paths:
         - email
 components:
   schemas:
-    endpointmap.FieldType:
-      type: string
-      enum:
-      - File
-      - ControlFile
-      - API
-      - Database
-      - FlumeLakehouse
-      x-enum-varnames:
-      - FieldTypeFile
-      - FieldTypeControlFile
-      - FieldTypeApi
-      - FieldTypeDatabase
-      - FieldTypeFlumeLakehouse
+    endpointmap.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        fieldType:
+          $ref: '#/components/schemas/endpointmap.FieldType'
+        id:
+          type: integer
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.MapVersion'
+        name:
+          type: string
+        ordinal:
+          type: integer
     user.ReadModel:
       type: object
       properties:
@@ -204,23 +207,40 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
-    endpointmap.ReadModel:
+    endpointmap.ListResponse:
       type: object
       properties:
-        accountId:
-          type: integer
-        fieldType:
-          $ref: '#/components/schemas/endpointmap.FieldType'
-        id:
-          type: integer
-        maps:
+        endpointMaps:
           type: array
           items:
-            $ref: '#/components/schemas/endpointmap.MapVersion'
-        name:
+            $ref: '#/components/schemas/endpointmap.ReadModel'
+        nextPageToken:
           type: string
-        ordinal:
+    endpointmap.FieldType:
+      type: string
+      enum:
+      - File
+      - ControlFile
+      - API
+      - Database
+      - FlumeLakehouse
+      x-enum-varnames:
+      - FieldTypeFile
+      - FieldTypeControlFile
+      - FieldTypeApi
+      - FieldTypeDatabase
+      - FieldTypeFlumeLakehouse
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
           type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     user.Role:
       type: string
       enum:
@@ -233,15 +253,6 @@ components:
       - RoleAdmin
       - RoleEditor
       - RoleViewer
-    endpointmap.ListResponse:
-      type: object
-      properties:
-        endpointMaps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.ReadModel'
-        nextPageToken:
-          type: string
     endpointmap.MapVersion:
       type: object
       properties:
@@ -255,17 +266,6 @@ components:
           type: string
         version:
           type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

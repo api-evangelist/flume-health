@@ -1374,118 +1374,12 @@ paths:
         required: true
 components:
   schemas:
-    discovery.SessionStatus:
-      type: string
-      enum:
-      - pending
-      - approved
-      - denied
-      - expired
-      - revoked
-      - cancelled
-      - extension_pending
-      x-enum-varnames:
-      - SessionStatusPending
-      - SessionStatusApproved
-      - SessionStatusDenied
-      - SessionStatusExpired
-      - SessionStatusRevoked
-      - SessionStatusCancelled
-      - SessionStatusExtensionPending
-    discovery.ExtractionStatus:
-      type: string
-      enum:
-      - pending
-      - running
-      - success
-      - failed
-      - blocked
-      - timeout
-      x-enum-varnames:
-      - ExtractionStatusPending
-      - ExtractionStatusRunning
-      - ExtractionStatusSuccess
-      - ExtractionStatusFailed
-      - ExtractionStatusBlocked
-      - ExtractionStatusTimeout
-    discovery.ConnectionReadModel:
+    discovery.SessionGrantReadModel:
       type: object
       properties:
-        allowAnalysisMode:
-          description: Reduced exfiltration penalties for dev/staging
-          type: boolean
-        connectionConfig:
-          type: object
-          additionalProperties: {}
-        connectionType:
-          $ref: '#/components/schemas/discovery.ConnectionType'
-        createdAt:
-          type: string
-        defaultRowLimit:
+        connectionId:
           type: integer
-        deletedAt:
-          description: Set when soft-deleted; secret has been destroyed and connection is rejected by all execution paths
-          type: string
-        description:
-          type: string
-        enabled:
-          type: boolean
-        id:
-          type: integer
-        maxResultBytes:
-          description: Per-connection byte limit (nil = use default)
-          type: integer
-        name:
-          type: string
-        supportsSQL:
-          type: boolean
-        timeoutSeconds:
-          type: integer
-        updatedAt:
-          type: string
-    discovery.ExtractionType:
-      type: string
-      enum:
-      - sql_query
-      x-enum-varnames:
-      - ExtractionTypeSQLQuery
-    discovery.ApproverCreateRequest:
-      type: object
-      required:
-      - email
-      properties:
-        accountId:
-          description: 'Optional: scope to specific account. If nil, approver has no account restriction.'
-          type: integer
-        canGrantApprovers:
-          description: 'Default: false'
-          type: boolean
-        email:
-          type: string
-        reason:
-          type: string
-    discovery.ApproverRevokeRequest:
-      type: object
-      properties:
-        reason:
-          type: string
-    discovery.SessionDenyRequest:
-      type: object
-      required:
-      - reason
-      properties:
-        reason:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
+        connectionName:
           type: string
     discovery.SessionGrantRequest:
       description: Approver creates a pre-approved PAM session for another user.
@@ -1552,64 +1446,25 @@ components:
             the email being correct.'
           type: string
           example: newuser@example.com
-    discovery.SessionListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        sessions:
-          type: array
-          items:
-            $ref: '#/components/schemas/discovery.SessionReadModel'
-    discovery.ConnectionType:
-      type: string
-      enum:
-      - database
-      - lakehouse
-      x-enum-varnames:
-      - ConnectionTypeDatabase
-      - ConnectionTypeLakehouse
-    discovery.ConnectionWriteModel:
+    discovery.SessionDenyRequest:
       type: object
       required:
-      - connectionConfig
-      - connectionType
-      - name
-      properties:
-        allowAnalysisMode:
-          description: Reduced exfiltration penalties
-          type: boolean
-        connectionConfig:
-          type: object
-          additionalProperties: {}
-        connectionType:
-          $ref: '#/components/schemas/discovery.ConnectionType'
-        defaultRowLimit:
-          type: integer
-        description:
-          type: string
-        maxResultBytes:
-          description: Per-connection byte limit
-          type: integer
-        name:
-          type: string
-        secretValue:
-          description: Written to Secret Manager, not stored
-          type: string
-        timeoutSeconds:
-          type: integer
-    discovery.SessionCancelRequest:
-      type: object
+      - reason
       properties:
         reason:
           type: string
-    discovery.ExtractionListResponse:
+    discovery.SessionApproveRequest:
       type: object
       properties:
-        extractions:
+        comment:
+          type: string
+    discovery.ConnectionListResponse:
+      type: object
+      properties:
+        connections:
           type: array
           items:
-            $ref: '#/components/schemas/discovery.ExtractionReadModel'
+            $ref: '#/components/schemas/discovery.ConnectionReadModel'
         nextPageToken:
           type: string
     discovery.SessionLaunchResponse:
@@ -1643,49 +1498,181 @@ components:
           - claude
           - codex
           example: claude
-    discovery.ConnectionListResponse:
+    discovery.ApproverRevokeRequest:
       type: object
       properties:
-        connections:
+        reason:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
           type: array
           items:
-            $ref: '#/components/schemas/discovery.ConnectionReadModel'
-        nextPageToken:
+            type: string
+        message:
           type: string
-    discovery.ExtractionReadModel:
+    discovery.ApproverListResponse:
       type: object
       properties:
-        bytesReturned:
-          type: integer
-        connectionId:
-          type: integer
-        createdAt:
+        approvers:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.ApproverReadModel'
+        nextPageToken:
           type: string
-        errorMessage:
-          type: string
-        executionMs:
-          type: integer
-        exfiltrationScore:
-          type: number
-        extractionType:
-          $ref: '#/components/schemas/discovery.ExtractionType'
-        id:
-          type: string
-        params:
+    discovery.SessionStatus:
+      type: string
+      enum:
+      - pending
+      - approved
+      - denied
+      - expired
+      - revoked
+      - cancelled
+      - extension_pending
+      x-enum-varnames:
+      - SessionStatusPending
+      - SessionStatusApproved
+      - SessionStatusDenied
+      - SessionStatusExpired
+      - SessionStatusRevoked
+      - SessionStatusCancelled
+      - SessionStatusExtensionPending
+    discovery.ConnectionReadModel:
+      type: object
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties for dev/staging
+          type: boolean
+        connectionConfig:
           type: object
           additionalProperties: {}
-        requesterEmail:
+        connectionType:
+          $ref: '#/components/schemas/discovery.ConnectionType'
+        createdAt:
           type: string
-        resultLocation:
-          type: string
-        rowCount:
+        defaultRowLimit:
           type: integer
-        sessionId:
+        deletedAt:
+          description: Set when soft-deleted; secret has been destroyed and connection is rejected by all execution paths
           type: string
-        sql:
+        description:
           type: string
-        status:
-          $ref: '#/components/schemas/discovery.ExtractionStatus'
+        enabled:
+          type: boolean
+        id:
+          type: integer
+        maxResultBytes:
+          description: Per-connection byte limit (nil = use default)
+          type: integer
+        name:
+          type: string
+        supportsSQL:
+          type: boolean
+        timeoutSeconds:
+          type: integer
+        updatedAt:
+          type: string
+    discovery.ConnectionPatchModel:
+      type: object
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties
+          type: boolean
+        connectionConfig:
+          type: object
+          additionalProperties: {}
+        defaultRowLimit:
+          type: integer
+        description:
+          type: string
+        enabled:
+          type: boolean
+        maxResultBytes:
+          description: Per-connection byte limit
+          type: integer
+        name:
+          type: string
+        secretValue:
+          description: Updates Secret Manager
+          type: string
+        timeoutSeconds:
+          type: integer
+    discovery.ConnectionWriteModel:
+      type: object
+      required:
+      - connectionConfig
+      - connectionType
+      - name
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties
+          type: boolean
+        connectionConfig:
+          type: object
+          additionalProperties: {}
+        connectionType:
+          $ref: '#/components/schemas/discovery.ConnectionType'
+        defaultRowLimit:
+          type: integer
+        description:
+          type: string
+        maxResultBytes:
+          description: Per-connection byte limit
+          type: integer
+        name:
+          type: string
+        secretValue:
+          description: Written to Secret Manager, not stored
+          type: string
+        timeoutSeconds:
+          type: integer
+    discovery.SessionLaunchRequest:
+      description: Record of a single AI CLI tool launch under a subscription_access session.
+      type: object
+      properties:
+        cliVersion:
+          description: Version string of the CLI binary. Required; capped at 64 characters.
+          type: string
+          example: 0.1.42
+        cwd:
+          description: Working directory the tool was launched from. Optional; capped at 1024 characters.
+          type: string
+          example: /Users/dev/project
+        tool:
+          description: AI CLI tool being launched. Must be exactly "claude" or "codex".
+          type: string
+          enum:
+          - claude
+          - codex
+          example: claude
+    discovery.ApproverCreateRequest:
+      type: object
+      required:
+      - email
+      properties:
+        accountId:
+          description: 'Optional: scope to specific account. If nil, approver has no account restriction.'
+          type: integer
+        canGrantApprovers:
+          description: 'Default: false'
+          type: boolean
+        email:
+          type: string
+        reason:
+          type: string
+    discovery.ConnectionTestResult:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+        latencyMs:
+          type: integer
+        success:
+          type: boolean
     discovery.SessionExtendRequest:
       type: object
       required:
@@ -1697,68 +1684,6 @@ components:
           type: string
         reason:
           description: Reason for requesting extension
-          type: string
-    discovery.ConnectionTestResult:
-      type: object
-      properties:
-        errorMessage:
-          type: string
-        latencyMs:
-          type: integer
-        success:
-          type: boolean
-    discovery.ExtractionResultModel:
-      type: object
-      properties:
-        bytesReturned:
-          type: integer
-        columns:
-          type: array
-          items:
-            type: string
-        connectionId:
-          type: integer
-        createdAt:
-          type: string
-        errorMessage:
-          type: string
-        executionMs:
-          type: integer
-        exfiltrationScore:
-          type: number
-        extractionType:
-          $ref: '#/components/schemas/discovery.ExtractionType'
-        id:
-          type: string
-        params:
-          type: object
-          additionalProperties: {}
-        requesterEmail:
-          type: string
-        resultLocation:
-          type: string
-        rowCount:
-          type: integer
-        rows:
-          type: array
-          items:
-            type: array
-            items: {}
-        sessionId:
-          type: string
-        sql:
-          type: string
-        status:
-          $ref: '#/components/schemas/discovery.ExtractionStatus'
-    discovery.SessionRevokeRequest:
-      type: object
-      properties:
-        reason:
-          type: string
-    discovery.SessionApproveRequest:
-      type: object
-      properties:
-        comment:
           type: string
     discovery.SessionCreateRequest:
       description: Request to create a PAM session for database access or approver delegation.
@@ -1825,6 +1750,170 @@ components:
           description: 'For approver_access grants: email of user to grant approver rights to'
           type: string
           example: newapprover@example.com
+    discovery.ExtractionReadModel:
+      type: object
+      properties:
+        bytesReturned:
+          type: integer
+        connectionId:
+          type: integer
+        createdAt:
+          type: string
+        errorMessage:
+          type: string
+        executionMs:
+          type: integer
+        exfiltrationScore:
+          type: number
+        extractionType:
+          $ref: '#/components/schemas/discovery.ExtractionType'
+        id:
+          type: string
+        params:
+          type: object
+          additionalProperties: {}
+        requesterEmail:
+          type: string
+        resultLocation:
+          type: string
+        rowCount:
+          type: integer
+        sessionId:
+          type: string
+        sql:
+          type: string
+        status:
+          $ref: '#/components/schemas/discovery.ExtractionStatus'
+    discovery.ExtractionType:
+      type: string
+      enum:
+      - sql_query
+      x-enum-varnames:
+      - ExtractionTypeSQLQuery
+    discovery.SessionListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.SessionReadModel'
+    discovery.ExtractionListResponse:
+      type: object
+      properties:
+        extractions:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.ExtractionReadModel'
+        nextPageToken:
+          type: string
+    discovery.SessionCancelRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.ConnectionType:
+      type: string
+      enum:
+      - database
+      - lakehouse
+      x-enum-varnames:
+      - ConnectionTypeDatabase
+      - ConnectionTypeLakehouse
+    discovery.ApproverReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        accountName:
+          type: string
+        active:
+          type: boolean
+        canGrantApprovers:
+          type: boolean
+        createdAt:
+          type: string
+        email:
+          type: string
+        grantReason:
+          type: string
+        grantedBy:
+          type: string
+        id:
+          type: integer
+        revokeReason:
+          type: string
+        revokedAt:
+          type: string
+        revokedBy:
+          type: string
+        updatedAt:
+          type: string
+    discovery.SessionRevokeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.ExtractionStatus:
+      type: string
+      enum:
+      - pending
+      - running
+      - success
+      - failed
+      - blocked
+      - timeout
+      x-enum-varnames:
+      - ExtractionStatusPending
+      - ExtractionStatusRunning
+      - ExtractionStatusSuccess
+      - ExtractionStatusFailed
+      - ExtractionStatusBlocked
+      - ExtractionStatusTimeout
+    discovery.ExtractionResultModel:
+      type: object
+      properties:
+        bytesReturned:
+          type: integer
+        columns:
+          type: array
+          items:
+            type: string
+        connectionId:
+          type: integer
+        createdAt:
+          type: string
+        errorMessage:
+          type: string
+        executionMs:
+          type: integer
+        exfiltrationScore:
+          type: number
+        extractionType:
+          $ref: '#/components/schemas/discovery.ExtractionType'
+        id:
+          type: string
+        params:
+          type: object
+          additionalProperties: {}
+        requesterEmail:
+          type: string
+        resultLocation:
+          type: string
+        rowCount:
+          type: integer
+        rows:
+          type: array
+          items:
+            type: array
+            items: {}
+        sessionId:
+          type: string
+        sql:
+          type: string
+        status:
+          $ref: '#/components/schemas/discovery.ExtractionStatus'
     discovery.SessionReadModel:
       description: PAM session granting time-limited access to database connections.
       type: object
@@ -1970,95 +2059,6 @@ components:
       - GrantTypeDataAccess
       - GrantTypeApproverAccess
       - GrantTypeSubscriptionAccess
-    discovery.ApproverListResponse:
-      type: object
-      properties:
-        approvers:
-          type: array
-          items:
-            $ref: '#/components/schemas/discovery.ApproverReadModel'
-        nextPageToken:
-          type: string
-    discovery.SessionLaunchRequest:
-      description: Record of a single AI CLI tool launch under a subscription_access session.
-      type: object
-      properties:
-        cliVersion:
-          description: Version string of the CLI binary. Required; capped at 64 characters.
-          type: string
-          example: 0.1.42
-        cwd:
-          description: Working directory the tool was launched from. Optional; capped at 1024 characters.
-          type: string
-          example: /Users/dev/project
-        tool:
-          description: AI CLI tool being launched. Must be exactly "claude" or "codex".
-          type: string
-          enum:
-          - claude
-          - codex
-          example: claude
-    discovery.SessionGrantReadModel:
-      type: object
-      properties:
-        connectionId:
-          type: integer
-        connectionName:
-          type: string
-    discovery.ApproverReadModel:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        accountName:
-          type: string
-        active:
-          type: boolean
-        canGrantApprovers:
-          type: boolean
-        createdAt:
-          type: string
-        email:
-          type: string
-        grantReason:
-          type: string
-        grantedBy:
-          type: string
-        id:
-          type: integer
-        revokeReason:
-          type: string
-        revokedAt:
-          type: string
-        revokedBy:
-          type: string
-        updatedAt:
-          type: string
-    discovery.ConnectionPatchModel:
-      type: object
-      properties:
-        allowAnalysisMode:
-          description: Reduced exfiltration penalties
-          type: boolean
-        connectionConfig:
-          type: object
-          additionalProperties: {}
-        defaultRowLimit:
-          type: integer
-        description:
-          type: string
-        enabled:
-          type: boolean
-        maxResultBytes:
-          description: Per-connection byte limit
-          type: integer
-        name:
-          type: string
-        secretValue:
-          description: Updates Secret Manager
-          type: string
-        timeoutSeconds:
-          type: integer
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

@@ -263,30 +263,15 @@ paths:
         required: true
 components:
   schemas:
-    connection.PatchModel:
-      type: object
-      properties:
-        customColumns:
-          type: array
-          items:
-            type: string
-        logo:
-          type: string
-        name:
-          type: string
-    connection.ReadModel:
+    connection.WriteModel:
       type: object
       required:
       - name
       properties:
-        created:
-          type: string
         customColumns:
           type: array
           items:
             type: string
-        id:
-          type: integer
         logo:
           type: string
         name:
@@ -311,10 +296,25 @@ components:
             type: string
         message:
           type: string
-    connection.WriteModel:
+    connection.ReadModel:
       type: object
       required:
       - name
+      properties:
+        created:
+          type: string
+        customColumns:
+          type: array
+          items:
+            type: string
+        id:
+          type: integer
+        logo:
+          type: string
+        name:
+          type: string
+    connection.PatchModel:
+      type: object
       properties:
         customColumns:
           type: array

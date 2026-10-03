@@ -612,27 +612,6 @@ paths:
         required: true
 components:
   schemas:
-    object.WriteModel:
-      type: object
-      required:
-      - canonicalColumns
-      - name
-      properties:
-        canonicalColumns:
-          type: array
-          items:
-            $ref: '#/components/schemas/object.CanonicalColumn'
-        name:
-          type: string
-    object.UpdateModel:
-      type: object
-      properties:
-        canonicalColumns:
-          type: array
-          items:
-            $ref: '#/components/schemas/object.CanonicalColumn'
-        name:
-          type: string
     objectinstance.ReadModel:
       type: object
       required:
@@ -661,6 +640,27 @@ components:
           type: string
         object:
           $ref: '#/components/schemas/objectinstance.ObjectSummary'
+    object.WriteModel:
+      type: object
+      required:
+      - canonicalColumns
+      - name
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
+        name:
+          type: string
+    object.UpdateModel:
+      type: object
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
+        name:
+          type: string
     object.ReadModel:
       type: object
       required:
@@ -677,48 +677,25 @@ components:
           type: string
         numInstances:
           type: integer
-    objectinstance.BulkWriteModel:
+    objectinstance.UpdateModel:
       type: object
       properties:
-        instances:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
           type: array
+          uniqueItems: true
           items:
-            $ref: '#/components/schemas/objectinstance.WriteModel'
-    object.ListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        objects:
+            type: integer
+        jobIds:
           type: array
+          uniqueItems: true
           items:
-            $ref: '#/components/schemas/object.ReadModel'
-    objectinstance.ListResponse:
-      type: object
-      properties:
-        instances:
-          type: array
-          items:
-            $ref: '#/components/schemas/objectinstance.ReadModel'
-        nextPageToken:
+            type: integer
+        name:
           type: string
-    objectinstance.CustomValue:
-      type: object
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-    object.CanonicalColumn:
-      type: object
-      required:
-      - column
-      - dataType
-      properties:
-        column:
-          type: string
-        dataType:
-          $ref: '#/components/schemas/endpoint.DataType'
     endpoint.DataType:
       type: string
       enum:
@@ -759,6 +736,72 @@ components:
       - DataTypeHmClaimsExtended
       - DataTypeHmProvidersExtended
       - DataTypeStrings
+    objectinstance.ListResponse:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.ReadModel'
+        nextPageToken:
+          type: string
+    objectinstance.ObjectSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    objectinstance.CustomValue:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    object.CanonicalColumn:
+      type: object
+      required:
+      - column
+      - dataType
+      properties:
+        column:
+          type: string
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+    objectinstance.CustomValuesByConnection:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/objectinstance.CustomValue'
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    objectinstance.BulkWriteModel:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.WriteModel'
+    object.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.ReadModel'
     objectinstance.WriteModel:
       type: object
       required:
@@ -781,49 +824,6 @@ components:
           uniqueItems: true
           items:
             type: integer
-        name:
-          type: string
-    objectinstance.CustomValuesByConnection:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/objectinstance.CustomValue'
-    objectinstance.UpdateModel:
-      type: object
-      properties:
-        canonicalValue:
-          type: string
-        connectionCustomValues:
-          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
-        connectionIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        jobIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        name:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    objectinstance.ObjectSummary:
-      type: object
-      properties:
-        id:
-          type: integer
         name:
           type: string
   securitySchemes:

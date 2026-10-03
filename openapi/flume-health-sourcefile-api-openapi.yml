@@ -465,63 +465,66 @@ paths:
         - email
 components:
   schemas:
-    sourcefile.WriteModel:
+    sourcefile.ArchiveType:
+      type: string
+      enum:
+      - Zip
+      - Gzip
+      - Bzip2
+      - Tar
+      - TarGzip
+      - TarBzip2
+      - 7zip
+      x-enum-varnames:
+      - ArchiveTypeZip
+      - ArchiveTypeGzip
+      - ArchiveTypeBzip2
+      - ArchiveTypeTar
+      - ArchiveTypeTarGzip
+      - ArchiveTypeTarBzip2
+      - ArchiveType7zip
+    sourcefile.BulkWriteModel:
       type: object
-      required:
-      - endpointId
-      - fileName
-      - lastModified
-      - sizeBytes
       properties:
-        archiveFileName:
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/sourcefile.WriteModel'
+    sourcefile.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
           type: string
-        archiveType:
-          $ref: '#/components/schemas/sourcefile.ArchiveType'
-        blobKey:
-          type: string
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/sourcefile.ReadModel'
+    sourcefile.PatchModel:
+      type: object
+      properties:
         controlFile:
           $ref: '#/components/schemas/sourcefile.ControlFile'
-        discoveredAt:
-          type: string
-        discoveredRank:
-          type: integer
-        duckDbBatchKey:
-          type: string
-        duckDbTable:
-          type: string
-        endpointId:
-          type: integer
-        fileName:
-          type: string
-        isArchive:
+        fileDisappeared:
           type: boolean
         isProcessed:
           type: boolean
         isStaged:
           type: boolean
-        lastModified:
-          type: string
         shardBatchKey:
           type: string
         sizeBytes:
           type: integer
-    sourcefile.BulkPatchModel:
+    sourcefile.ControlFile:
       type: object
-      required:
-      - endpointId
-      - ids
       properties:
-        endpointId:
+        blobKey:
+          type: string
+        fileName:
+          type: string
+        lastModified:
+          type: string
+        sizeBytes:
           type: integer
-        ids:
-          type: array
-          minItems: 1
-          items:
-            type: integer
-        isProcessed:
-          type: boolean
-        isStaged:
-          type: boolean
     sourcefile.ReadModel:
       type: object
       properties:
@@ -563,66 +566,46 @@ components:
           type: string
         sizeBytes:
           type: integer
-    sourcefile.ControlFile:
+    sourcefile.WriteModel:
       type: object
+      required:
+      - endpointId
+      - fileName
+      - lastModified
+      - sizeBytes
       properties:
+        archiveFileName:
+          type: string
+        archiveType:
+          $ref: '#/components/schemas/sourcefile.ArchiveType'
         blobKey:
           type: string
-        fileName:
-          type: string
-        lastModified:
-          type: string
-        sizeBytes:
-          type: integer
-    sourcefile.PatchModel:
-      type: object
-      properties:
         controlFile:
           $ref: '#/components/schemas/sourcefile.ControlFile'
-        fileDisappeared:
+        discoveredAt:
+          type: string
+        discoveredRank:
+          type: integer
+        duckDbBatchKey:
+          type: string
+        duckDbTable:
+          type: string
+        endpointId:
+          type: integer
+        fileName:
+          type: string
+        isArchive:
           type: boolean
         isProcessed:
           type: boolean
         isStaged:
           type: boolean
+        lastModified:
+          type: string
         shardBatchKey:
           type: string
         sizeBytes:
           type: integer
-    sourcefile.ArchiveType:
-      type: string
-      enum:
-      - Zip
-      - Gzip
-      - Bzip2
-      - Tar
-      - TarGzip
-      - TarBzip2
-      - 7zip
-      x-enum-varnames:
-      - ArchiveTypeZip
-      - ArchiveTypeGzip
-      - ArchiveTypeBzip2
-      - ArchiveTypeTar
-      - ArchiveTypeTarGzip
-      - ArchiveTypeTarBzip2
-      - ArchiveType7zip
-    sourcefile.BulkWriteModel:
-      type: object
-      properties:
-        sourceFiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/sourcefile.WriteModel'
-    sourcefile.ListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        sourceFiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/sourcefile.ReadModel'
     responses.ErrorResponse:
       type: object
       properties:
@@ -634,6 +617,23 @@ components:
             type: string
         message:
           type: string
+    sourcefile.BulkPatchModel:
+      type: object
+      required:
+      - endpointId
+      - ids
+      properties:
+        endpointId:
+          type: integer
+        ids:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

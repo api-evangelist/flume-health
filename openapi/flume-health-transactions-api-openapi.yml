@@ -302,6 +302,114 @@ paths:
         required: true
 components:
   schemas:
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
+    transaction.Operation:
+      type: string
+      enum:
+      - SourceMap
+      - SourceTransfer
+      - SourceExtract
+      - SourceMapBatchLoad
+      - SourceMapBatchProcess
+      - DestinationMap
+      - DestinationTransfer
+      x-enum-varnames:
+      - OperationSourceMap
+      - OperationSourceTransfer
+      - OperationSourceExtract
+      - OperationSourceMapBatchLoad
+      - OperationSourceMapBatchProcess
+      - OperationDestinationMap
+      - OperationDestinationTransfer
+    transaction.WriteModel:
+      type: object
+      required:
+      - state
+      - trigger
+      properties:
+        endTime:
+          type: string
+        groupIds:
+          type: array
+          items:
+            type: string
+        operation:
+          $ref: '#/components/schemas/transaction.Operation'
+        shardBatchKey:
+          type: string
+        shardId:
+          type: integer
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        steps:
+          $ref: '#/components/schemas/transaction.Steps'
+        trigger:
+          $ref: '#/components/schemas/transaction.Trigger'
+        workerId:
+          type: string
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    transaction.Step:
+      type: object
+      properties:
+        endTime:
+          type: string
+        error:
+          type: string
+        errorLogBlobKey:
+          type: string
+        file:
+          $ref: '#/components/schemas/transaction.FileDetail'
+        logBlobKey:
+          type: string
+        logs:
+          type: string
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        watermark:
+          type: string
+        watermarkBlobKey:
+          type: string
+    transaction.ListReadModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/transaction.ReadModel'
     transaction.ReadModel:
       type: object
       properties:
@@ -339,66 +447,6 @@ components:
           type: string
         workerId:
           type: string
-    transaction.Step:
-      type: object
-      properties:
-        endTime:
-          type: string
-        error:
-          type: string
-        errorLogBlobKey:
-          type: string
-        file:
-          $ref: '#/components/schemas/transaction.FileDetail'
-        logBlobKey:
-          type: string
-        logs:
-          type: string
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        watermark:
-          type: string
-        watermarkBlobKey:
-          type: string
-    transaction.Operation:
-      type: string
-      enum:
-      - SourceMap
-      - SourceTransfer
-      - SourceExtract
-      - SourceMapBatchLoad
-      - SourceMapBatchProcess
-      - DestinationMap
-      - DestinationTransfer
-      x-enum-varnames:
-      - OperationSourceMap
-      - OperationSourceTransfer
-      - OperationSourceExtract
-      - OperationSourceMapBatchLoad
-      - OperationSourceMapBatchProcess
-      - OperationDestinationMap
-      - OperationDestinationTransfer
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
-    transaction.ListReadModel:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/transaction.ReadModel'
     transaction.Steps:
       type: object
       properties:
@@ -433,54 +481,6 @@ components:
           type: integer
         uploadDurationMillis:
           type: integer
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
-    transaction.WriteModel:
-      type: object
-      required:
-      - state
-      - trigger
-      properties:
-        endTime:
-          type: string
-        groupIds:
-          type: array
-          items:
-            type: string
-        operation:
-          $ref: '#/components/schemas/transaction.Operation'
-        shardBatchKey:
-          type: string
-        shardId:
-          type: integer
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        steps:
-          $ref: '#/components/schemas/transaction.Steps'
-        trigger:
-          $ref: '#/components/schemas/transaction.Trigger'
-        workerId:
-          type: string
     responses.ErrorResponse:
       type: object
       properties:
