@@ -354,37 +354,14 @@ components:
           $ref: '#/components/schemas/endpoint.Operation'
         state:
           $ref: '#/components/schemas/endpoint.State'
-    job.UpdateModel:
-      type: object
-      properties:
-        aiEnabled:
-          type:
-          - boolean
-          - 'null'
-          default: false
-        aiWorkflowSubmitted:
-          type:
-          - boolean
-          - 'null'
-        destinationEndpointId:
-          type:
-          - integer
-          - 'null'
-        ignoreObjectInstances:
-          type: boolean
-        name:
-          type:
-          - string
-          - 'null'
-        sourceEndpointIds:
-          type:
-          - array
-          - 'null'
-          items:
-            type: integer
-        status:
-          allOf:
-          - $ref: '#/components/schemas/job.Status'
+    endpoint.Operation:
+      type: string
+      enum:
+      - Map
+      - Transfer
+      x-enum-varnames:
+      - OperationMap
+      - OperationTransfer
     job.ReadModel:
       type: object
       required:
@@ -420,6 +397,15 @@ components:
             $ref: '#/components/schemas/endpoint.DataType'
         updated:
           type: string
+    job.ListResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.ReadModel'
+        nextPageToken:
+          type: string
     endpoint.State:
       type: string
       enum:
@@ -432,6 +418,73 @@ components:
       - StateRunning
       - StateError
       - StateStopped
+    job.TestFile:
+      type: object
+      required:
+      - endpointId
+      properties:
+        endpointId:
+          type: integer
+        file:
+          type: string
+    job.Status:
+      type: string
+      enum:
+      - Test
+      - Production
+      - Published
+      - Draft
+      - Archived
+      - Paused
+      x-enum-varnames:
+      - StatusTest
+      - StatusProduction
+      - StatusPublished
+      - StatusDraft
+      - StatusArchived
+      - StatusPaused
+    job.UpdateModel:
+      type: object
+      properties:
+        aiEnabled:
+          type:
+          - boolean
+          - 'null'
+          default: false
+        aiWorkflowSubmitted:
+          type:
+          - boolean
+          - 'null'
+        destinationEndpointId:
+          type:
+          - integer
+          - 'null'
+        ignoreObjectInstances:
+          type: boolean
+        name:
+          type:
+          - string
+          - 'null'
+        sourceEndpointIds:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+        status:
+          allOf:
+          - $ref: '#/components/schemas/job.Status'
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     endpoint.DataType:
       type: string
       enum:
@@ -472,15 +525,6 @@ components:
       - DataTypeHmClaimsExtended
       - DataTypeHmProvidersExtended
       - DataTypeStrings
-    job.TestRequest:
-      type: object
-      required:
-      - files
-      properties:
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/job.TestFile'
     job.WriteModel:
       type: object
       required:
@@ -504,59 +548,15 @@ components:
             type: integer
         status:
           $ref: '#/components/schemas/job.Status'
-    job.TestFile:
+    job.TestRequest:
       type: object
       required:
-      - endpointId
+      - files
       properties:
-        endpointId:
-          type: integer
-        file:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
+        files:
           type: array
           items:
-            type: string
-        message:
-          type: string
-    job.Status:
-      type: string
-      enum:
-      - Test
-      - Production
-      - Published
-      - Draft
-      - Archived
-      - Paused
-      x-enum-varnames:
-      - StatusTest
-      - StatusProduction
-      - StatusPublished
-      - StatusDraft
-      - StatusArchived
-      - StatusPaused
-    endpoint.Operation:
-      type: string
-      enum:
-      - Map
-      - Transfer
-      x-enum-varnames:
-      - OperationMap
-      - OperationTransfer
-    job.ListResponse:
-      type: object
-      properties:
-        jobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/job.ReadModel'
-        nextPageToken:
-          type: string
+            $ref: '#/components/schemas/job.TestFile'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

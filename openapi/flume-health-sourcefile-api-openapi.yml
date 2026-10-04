@@ -465,6 +465,57 @@ paths:
         - email
 components:
   schemas:
+    sourcefile.WriteModel:
+      type: object
+      required:
+      - endpointId
+      - fileName
+      - lastModified
+      - sizeBytes
+      properties:
+        archiveFileName:
+          type: string
+        archiveType:
+          $ref: '#/components/schemas/sourcefile.ArchiveType'
+        blobKey:
+          type: string
+        controlFile:
+          $ref: '#/components/schemas/sourcefile.ControlFile'
+        discoveredAt:
+          type: string
+        discoveredRank:
+          type: integer
+        duckDbBatchKey:
+          type: string
+        duckDbTable:
+          type: string
+        endpointId:
+          type: integer
+        fileName:
+          type: string
+        isArchive:
+          type: boolean
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
+        lastModified:
+          type: string
+        shardBatchKey:
+          type: string
+        sizeBytes:
+          type: integer
+    sourcefile.ControlFile:
+      type: object
+      properties:
+        blobKey:
+          type: string
+        fileName:
+          type: string
+        lastModified:
+          type: string
+        sizeBytes:
+          type: integer
     sourcefile.ArchiveType:
       type: string
       enum:
@@ -490,6 +541,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/sourcefile.WriteModel'
+    sourcefile.BulkPatchModel:
+      type: object
+      required:
+      - endpointId
+      - ids
+      properties:
+        endpointId:
+          type: integer
+        ids:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+        isProcessed:
+          type: boolean
+        isStaged:
+          type: boolean
     sourcefile.ListResponse:
       type: object
       properties:
@@ -514,17 +582,17 @@ components:
           type: string
         sizeBytes:
           type: integer
-    sourcefile.ControlFile:
+    responses.ErrorResponse:
       type: object
       properties:
-        blobKey:
-          type: string
-        fileName:
-          type: string
-        lastModified:
-          type: string
-        sizeBytes:
+        code:
           type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     sourcefile.ReadModel:
       type: object
       properties:
@@ -566,74 +634,6 @@ components:
           type: string
         sizeBytes:
           type: integer
-    sourcefile.WriteModel:
-      type: object
-      required:
-      - endpointId
-      - fileName
-      - lastModified
-      - sizeBytes
-      properties:
-        archiveFileName:
-          type: string
-        archiveType:
-          $ref: '#/components/schemas/sourcefile.ArchiveType'
-        blobKey:
-          type: string
-        controlFile:
-          $ref: '#/components/schemas/sourcefile.ControlFile'
-        discoveredAt:
-          type: string
-        discoveredRank:
-          type: integer
-        duckDbBatchKey:
-          type: string
-        duckDbTable:
-          type: string
-        endpointId:
-          type: integer
-        fileName:
-          type: string
-        isArchive:
-          type: boolean
-        isProcessed:
-          type: boolean
-        isStaged:
-          type: boolean
-        lastModified:
-          type: string
-        shardBatchKey:
-          type: string
-        sizeBytes:
-          type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    sourcefile.BulkPatchModel:
-      type: object
-      required:
-      - endpointId
-      - ids
-      properties:
-        endpointId:
-          type: integer
-        ids:
-          type: array
-          minItems: 1
-          items:
-            type: integer
-        isProcessed:
-          type: boolean
-        isStaged:
-          type: boolean
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

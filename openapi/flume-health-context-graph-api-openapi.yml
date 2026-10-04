@@ -163,6 +163,38 @@ paths:
       - BearerAuth: []
 components:
   schemas:
+    graph.QueryMeta:
+      type: object
+      properties:
+        rowCount:
+          type: integer
+        took:
+          type: string
+        truncated:
+          type: boolean
+    knowledgestore.SearchResult:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties: {}
+        score:
+          type: number
+    graph.SearchMeta:
+      type: object
+      properties:
+        mode:
+          type: string
+        resultCount:
+          type: integer
+        took:
+          type: string
     graph.StatusResponse:
       type: object
       properties:
@@ -181,58 +213,6 @@ components:
       properties:
         took:
           type: string
-    graph.SearchMeta:
-      type: object
-      properties:
-        mode:
-          type: string
-        resultCount:
-          type: integer
-        took:
-          type: string
-    graph.SearchResponse:
-      type: object
-      properties:
-        _meta:
-          $ref: '#/components/schemas/graph.SearchMeta'
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgestore.SearchResult'
-    knowledgestore.SearchResult:
-      type: object
-      properties:
-        fqn:
-          type: string
-        label:
-          type: string
-        name:
-          type: string
-        properties:
-          type: object
-          additionalProperties: {}
-        score:
-          type: number
-    graph.QueryMeta:
-      type: object
-      properties:
-        rowCount:
-          type: integer
-        took:
-          type: string
-        truncated:
-          type: boolean
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     graph.QueryResponse:
       type: object
       properties:
@@ -247,6 +227,26 @@ components:
           items:
             type: object
             additionalProperties: {}
+    graph.SearchResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.SearchMeta'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.SearchResult'
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     graph.QueryRequest:
       type: object
       required:

@@ -302,6 +302,71 @@ paths:
         required: true
 components:
   schemas:
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    transaction.Step:
+      type: object
+      properties:
+        endTime:
+          type: string
+        error:
+          type: string
+        errorLogBlobKey:
+          type: string
+        file:
+          $ref: '#/components/schemas/transaction.FileDetail'
+        logBlobKey:
+          type: string
+        logs:
+          type: string
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        watermark:
+          type: string
+        watermarkBlobKey:
+          type: string
+    transaction.ListReadModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/transaction.ReadModel'
     transaction.Trigger:
       type: string
       enum:
@@ -312,6 +377,77 @@ components:
       - TriggerManual
       - TriggerSchedule
       - TriggerSubsequent
+    transaction.Steps:
+      type: object
+      properties:
+        extract:
+          $ref: '#/components/schemas/transaction.Step'
+        load:
+          $ref: '#/components/schemas/transaction.Step'
+        transform:
+          $ref: '#/components/schemas/transaction.Step'
+    transaction.FileDetail:
+      type: object
+      properties:
+        archiveFileName:
+          type: string
+        compressedFilesFound:
+          type: array
+          items:
+            type: string
+        downloadDurationMillis:
+          type: integer
+        lastModifiedTime:
+          type: string
+        name:
+          type: string
+        recordsIn:
+          type: integer
+        recordsOut:
+          type: integer
+        retrievalTime:
+          type: string
+        sizeBytes:
+          type: integer
+        uploadDurationMillis:
+          type: integer
+    transaction.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        durationMillis:
+          type: integer
+        endTime:
+          type: string
+        endpointId:
+          type: integer
+        groupIds:
+          type: array
+          items:
+            type: string
+        id:
+          type: integer
+        maxMemoryMB:
+          type: integer
+        operation:
+          $ref: '#/components/schemas/transaction.Operation'
+        shardBatchKey:
+          type: string
+        shardId:
+          type: integer
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        steps:
+          $ref: '#/components/schemas/transaction.Steps'
+        trigger:
+          $ref: '#/components/schemas/transaction.Trigger'
+        triggeredBy:
+          type: string
+        workerId:
+          type: string
     transaction.Operation:
       type: string
       enum:
@@ -355,142 +491,6 @@ components:
         trigger:
           $ref: '#/components/schemas/transaction.Trigger'
         workerId:
-          type: string
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
-    transaction.Step:
-      type: object
-      properties:
-        endTime:
-          type: string
-        error:
-          type: string
-        errorLogBlobKey:
-          type: string
-        file:
-          $ref: '#/components/schemas/transaction.FileDetail'
-        logBlobKey:
-          type: string
-        logs:
-          type: string
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        watermark:
-          type: string
-        watermarkBlobKey:
-          type: string
-    transaction.ListReadModel:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/transaction.ReadModel'
-    transaction.ReadModel:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        durationMillis:
-          type: integer
-        endTime:
-          type: string
-        endpointId:
-          type: integer
-        groupIds:
-          type: array
-          items:
-            type: string
-        id:
-          type: integer
-        maxMemoryMB:
-          type: integer
-        operation:
-          $ref: '#/components/schemas/transaction.Operation'
-        shardBatchKey:
-          type: string
-        shardId:
-          type: integer
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        steps:
-          $ref: '#/components/schemas/transaction.Steps'
-        trigger:
-          $ref: '#/components/schemas/transaction.Trigger'
-        triggeredBy:
-          type: string
-        workerId:
-          type: string
-    transaction.Steps:
-      type: object
-      properties:
-        extract:
-          $ref: '#/components/schemas/transaction.Step'
-        load:
-          $ref: '#/components/schemas/transaction.Step'
-        transform:
-          $ref: '#/components/schemas/transaction.Step'
-    transaction.FileDetail:
-      type: object
-      properties:
-        archiveFileName:
-          type: string
-        compressedFilesFound:
-          type: array
-          items:
-            type: string
-        downloadDurationMillis:
-          type: integer
-        lastModifiedTime:
-          type: string
-        name:
-          type: string
-        recordsIn:
-          type: integer
-        recordsOut:
-          type: integer
-        retrievalTime:
-          type: string
-        sizeBytes:
-          type: integer
-        uploadDurationMillis:
-          type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
           type: string
   securitySchemes:
     OAuth2Implicit:

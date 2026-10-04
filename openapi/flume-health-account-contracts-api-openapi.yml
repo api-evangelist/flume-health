@@ -271,15 +271,29 @@ paths:
         required: true
 components:
   schemas:
-    accountcontract.ListResponse:
+    accountcontract.UpdateModel:
       type: object
       properties:
-        accountContracts:
-          type: array
-          items:
-            $ref: '#/components/schemas/accountcontract.ReadModel'
-        nextPageToken:
-          type: string
+        adminNotes:
+          type:
+          - string
+          - 'null'
+        contractSince:
+          type:
+          - string
+          - 'null'
+        contractUntil:
+          type:
+          - string
+          - 'null'
+        revenue:
+          type:
+          - number
+          - 'null'
+        totalAllocatedRows:
+          type:
+          - integer
+          - 'null'
     accountcontract.ReadModel:
       type: object
       properties:
@@ -325,29 +339,15 @@ components:
             type: string
         message:
           type: string
-    accountcontract.UpdateModel:
+    accountcontract.ListResponse:
       type: object
       properties:
-        adminNotes:
-          type:
-          - string
-          - 'null'
-        contractSince:
-          type:
-          - string
-          - 'null'
-        contractUntil:
-          type:
-          - string
-          - 'null'
-        revenue:
-          type:
-          - number
-          - 'null'
-        totalAllocatedRows:
-          type:
-          - integer
-          - 'null'
+        accountContracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/accountcontract.ReadModel'
+        nextPageToken:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

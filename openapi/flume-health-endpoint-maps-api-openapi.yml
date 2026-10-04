@@ -159,23 +159,6 @@ paths:
         - email
 components:
   schemas:
-    endpointmap.ReadModel:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        fieldType:
-          $ref: '#/components/schemas/endpointmap.FieldType'
-        id:
-          type: integer
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.MapVersion'
-        name:
-          type: string
-        ordinal:
-          type: integer
     user.ReadModel:
       type: object
       properties:
@@ -207,15 +190,6 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
-    endpointmap.ListResponse:
-      type: object
-      properties:
-        endpointMaps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.ReadModel'
-        nextPageToken:
-          type: string
     endpointmap.FieldType:
       type: string
       enum:
@@ -230,6 +204,45 @@ components:
       - FieldTypeApi
       - FieldTypeDatabase
       - FieldTypeFlumeLakehouse
+    endpointmap.MapVersion:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        id:
+          type: integer
+        map:
+          type: string
+        version:
+          type: integer
+    endpointmap.ListResponse:
+      type: object
+      properties:
+        endpointMaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.ReadModel'
+        nextPageToken:
+          type: string
+    endpointmap.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        fieldType:
+          $ref: '#/components/schemas/endpointmap.FieldType'
+        id:
+          type: integer
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.MapVersion'
+        name:
+          type: string
+        ordinal:
+          type: integer
     responses.ErrorResponse:
       type: object
       properties:
@@ -253,19 +266,6 @@ components:
       - RoleAdmin
       - RoleEditor
       - RoleViewer
-    endpointmap.MapVersion:
-      type: object
-      properties:
-        createdAt:
-          type: string
-        createdBy:
-          $ref: '#/components/schemas/user.ReadModel'
-        id:
-          type: integer
-        map:
-          type: string
-        version:
-          type: integer
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

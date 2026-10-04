@@ -481,44 +481,6 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/user.Role'
-    user.QueryEngineGrantRequest:
-      type: object
-      required:
-      - duration_hours
-      - reason
-      properties:
-        duration_hours:
-          type: integer
-          maximum: 24
-          minimum: 1
-        reason:
-          type: string
-    user.QueryEngineGrantResponse:
-      type: object
-      properties:
-        expiresAt:
-          type: string
-        message:
-          type: string
-        reason:
-          type: string
-        userId:
-          type: integer
-    user.SelfUser:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        aiEnabled:
-          type: boolean
-        email:
-          type: string
-        isAccessGranter:
-          type: boolean
-        receiveEmailAlerts:
-          type: boolean
-        role:
-          $ref: '#/components/schemas/user.Role'
     user.ListModel:
       type: object
       properties:
@@ -528,11 +490,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user.ReadModel'
-    user.SelfUserPatchModel:
-      type: object
-      properties:
-        receiveEmailAlerts:
-          type: boolean
     user.ReadModel:
       type: object
       properties:
@@ -564,6 +521,38 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
+    user.SelfUserPatchModel:
+      type: object
+      properties:
+        receiveEmailAlerts:
+          type: boolean
+    user.SelfUser:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        isAccessGranter:
+          type: boolean
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+    user.QueryEngineGrantRequest:
+      type: object
+      required:
+      - duration_hours
+      - reason
+      properties:
+        duration_hours:
+          type: integer
+          maximum: 24
+          minimum: 1
+        reason:
+          type: string
     responses.ErrorResponse:
       type: object
       properties:
@@ -587,6 +576,17 @@ components:
       - RoleAdmin
       - RoleEditor
       - RoleViewer
+    user.QueryEngineGrantResponse:
+      type: object
+      properties:
+        expiresAt:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        userId:
+          type: integer
   securitySchemes:
     OAuth2Implicit:
       type: oauth2
