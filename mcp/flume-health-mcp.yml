@@ -64,3 +64,21 @@ x-evidence:
   url: https://auth.flumehealth.com/.well-known/oauth-authorization-server
   method: GET
   http_status: 200
+rfc9728:
+  endpoint: https://console.flumehealth.com/api/v1/context/mcp
+  metadata_url: https://console.flumehealth.com/.well-known/oauth-protected-resource
+  discovered_via: WWW-Authenticate resource_metadata on an anonymous POST initialize
+  fetched: '2026-09-25'
+  http_status: 200
+  content_type: application/json
+  document:
+    resource: https://console.flumehealth.com/api/v1/context/mcp
+    authorization_servers:
+    - https://auth.flumehealth.com
+    scopes_supported:
+    - openid
+    - profile
+    - email
+    - offline_access
+    bearer_methods_supported:
+    - header
