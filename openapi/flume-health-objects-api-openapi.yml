@@ -612,13 +612,13 @@ paths:
         required: true
 components:
   schemas:
-    objectinstance.BulkWriteModel:
+    objectinstance.CustomValue:
       type: object
       properties:
-        instances:
-          type: array
-          items:
-            $ref: '#/components/schemas/objectinstance.WriteModel'
+        key:
+          type: string
+        value:
+          type: string
     object.CanonicalColumn:
       type: object
       required:
@@ -669,13 +669,66 @@ components:
       - DataTypeHmClaimsExtended
       - DataTypeHmProvidersExtended
       - DataTypeStrings
-    objectinstance.ObjectSummary:
+    objectinstance.ListResponse:
       type: object
       properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.ReadModel'
+        nextPageToken:
+          type: string
+    object.ReadModel:
+      type: object
+      required:
+      - canonicalColumns
+      - name
+      properties:
+        canonicalColumns:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.CanonicalColumn'
         id:
           type: integer
         name:
           type: string
+        numInstances:
+          type: integer
+    objectinstance.ReadModel:
+      type: object
+      required:
+      - canonicalValue
+      - connectionIds
+      - jobIds
+      - name
+      properties:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        id:
+          type: integer
+        jobIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        name:
+          type: string
+        object:
+          $ref: '#/components/schemas/objectinstance.ObjectSummary'
+    objectinstance.BulkWriteModel:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectinstance.WriteModel'
     object.WriteModel:
       type: object
       required:
@@ -688,6 +741,52 @@ components:
             $ref: '#/components/schemas/object.CanonicalColumn'
         name:
           type: string
+    objectinstance.ObjectSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    objectinstance.CustomValuesByConnection:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/objectinstance.CustomValue'
+    objectinstance.WriteModel:
+      type: object
+      required:
+      - canonicalValue
+      - connectionIds
+      - jobIds
+      - name
+      properties:
+        canonicalValue:
+          type: string
+        connectionCustomValues:
+          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
+        connectionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        jobIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+        name:
+          type: string
+    object.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/object.ReadModel'
     responses.ErrorResponse:
       type: object
       properties:
@@ -727,105 +826,6 @@ components:
             type: integer
         name:
           type: string
-    objectinstance.ListResponse:
-      type: object
-      properties:
-        instances:
-          type: array
-          items:
-            $ref: '#/components/schemas/objectinstance.ReadModel'
-        nextPageToken:
-          type: string
-    object.ListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        objects:
-          type: array
-          items:
-            $ref: '#/components/schemas/object.ReadModel'
-    objectinstance.WriteModel:
-      type: object
-      required:
-      - canonicalValue
-      - connectionIds
-      - jobIds
-      - name
-      properties:
-        canonicalValue:
-          type: string
-        connectionCustomValues:
-          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
-        connectionIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        jobIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        name:
-          type: string
-    objectinstance.CustomValuesByConnection:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/objectinstance.CustomValue'
-    objectinstance.CustomValue:
-      type: object
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-    objectinstance.ReadModel:
-      type: object
-      required:
-      - canonicalValue
-      - connectionIds
-      - jobIds
-      - name
-      properties:
-        canonicalValue:
-          type: string
-        connectionCustomValues:
-          $ref: '#/components/schemas/objectinstance.CustomValuesByConnection'
-        connectionIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        id:
-          type: integer
-        jobIds:
-          type: array
-          uniqueItems: true
-          items:
-            type: integer
-        name:
-          type: string
-        object:
-          $ref: '#/components/schemas/objectinstance.ObjectSummary'
-    object.ReadModel:
-      type: object
-      required:
-      - canonicalColumns
-      - name
-      properties:
-        canonicalColumns:
-          type: array
-          items:
-            $ref: '#/components/schemas/object.CanonicalColumn'
-        id:
-          type: integer
-        name:
-          type: string
-        numInstances:
-          type: integer
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

@@ -58,17 +58,6 @@ paths:
         - email
 components:
   schemas:
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     telemetry.ReadModel:
       type: object
       properties:
@@ -84,6 +73,17 @@ components:
           type: integer
         transactionSuccessRate:
           type: number
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

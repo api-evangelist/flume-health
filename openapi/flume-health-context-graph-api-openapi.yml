@@ -163,15 +163,33 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    graph.QueryMeta:
+    graph.QueryResponse:
       type: object
       properties:
-        rowCount:
+        _meta:
+          $ref: '#/components/schemas/graph.QueryMeta'
+        columns:
+          type: array
+          items:
+            type: string
+        results:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+    graph.StatusResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.Meta'
+        edgeCount:
           type: integer
-        took:
+        lastLoaded:
           type: string
-        truncated:
-          type: boolean
+        nodeCount:
+          type: integer
+        status:
+          type: string
     knowledgestore.SearchResult:
       type: object
       properties:
@@ -195,38 +213,18 @@ components:
           type: integer
         took:
           type: string
-    graph.StatusResponse:
+    graph.QueryRequest:
       type: object
+      required:
+      - cypher
       properties:
-        _meta:
-          $ref: '#/components/schemas/graph.Meta'
-        edgeCount:
-          type: integer
-        lastLoaded:
-          type: string
-        nodeCount:
-          type: integer
-        status:
+        cypher:
           type: string
     graph.Meta:
       type: object
       properties:
         took:
           type: string
-    graph.QueryResponse:
-      type: object
-      properties:
-        _meta:
-          $ref: '#/components/schemas/graph.QueryMeta'
-        columns:
-          type: array
-          items:
-            type: string
-        results:
-          type: array
-          items:
-            type: object
-            additionalProperties: {}
     graph.SearchResponse:
       type: object
       properties:
@@ -247,13 +245,15 @@ components:
             type: string
         message:
           type: string
-    graph.QueryRequest:
+    graph.QueryMeta:
       type: object
-      required:
-      - cypher
       properties:
-        cypher:
+        rowCount:
+          type: integer
+        took:
           type: string
+        truncated:
+          type: boolean
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

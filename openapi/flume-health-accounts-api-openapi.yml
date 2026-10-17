@@ -471,6 +471,68 @@ paths:
         - email
 components:
   schemas:
+    secret.ApiCloudCredSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+    account.ReadModel:
+      type: object
+      properties:
+        blobConfig:
+          $ref: '#/components/schemas/account.BlobConfig'
+        createTime:
+          type: string
+        id:
+          description: System-set properties
+          type: integer
+        isDisabled:
+          type: boolean
+        name:
+          type: string
+        restrictMapAccess:
+          type: boolean
+    account.UpdateModel:
+      type: object
+      properties:
+        blobConfig:
+          $ref: '#/components/schemas/account.BlobConfig'
+        isDisabled:
+          type: boolean
+        name:
+          type: string
+          minLength: 1
+        restrictMapAccess:
+          type: boolean
+    account.AccountConfigColors:
+      type: object
+      properties:
+        primary:
+          type: string
+        secondary:
+          type: string
+        tertiary:
+          type: string
+    account.ListResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/account.ReadModel'
+        nextPageToken:
+          type: string
+    account.UpdateAccountConfigModel:
+      type: object
+      properties:
+        colors:
+          $ref: '#/components/schemas/account.AccountConfigColors'
+        favicon:
+          type: string
+        logo:
+          type: string
     account.BlobConfig:
       type: object
       properties:
@@ -513,18 +575,6 @@ components:
           minLength: 1
         restrictMapAccess:
           type: boolean
-    account.UpdateModel:
-      type: object
-      properties:
-        blobConfig:
-          $ref: '#/components/schemas/account.BlobConfig'
-        isDisabled:
-          type: boolean
-        name:
-          type: string
-          minLength: 1
-        restrictMapAccess:
-          type: boolean
     cloudstoragecredentials.CredentialType:
       type: string
       enum:
@@ -541,28 +591,6 @@ components:
       - CredentialTypeAzureSharedKey
       - CredentialTypeAzureSharedAccessSignature
       - CredentialTypeAzureConnectionString
-    account.UpdateAccountConfigModel:
-      type: object
-      properties:
-        colors:
-          $ref: '#/components/schemas/account.AccountConfigColors'
-        favicon:
-          type: string
-        logo:
-          type: string
-    account.ListResponse:
-      type: object
-      properties:
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/account.ReadModel'
-        nextPageToken:
-          type: string
-    cloudstoragecredentials.CloudStorageCredentials:
-      type: object
-      additionalProperties:
-        type: string
     responses.ErrorResponse:
       type: object
       properties:
@@ -574,38 +602,10 @@ components:
             type: string
         message:
           type: string
-    account.ReadModel:
+    cloudstoragecredentials.CloudStorageCredentials:
       type: object
-      properties:
-        blobConfig:
-          $ref: '#/components/schemas/account.BlobConfig'
-        createTime:
-          type: string
-        id:
-          description: System-set properties
-          type: integer
-        isDisabled:
-          type: boolean
-        name:
-          type: string
-        restrictMapAccess:
-          type: boolean
-    secret.ApiCloudCredSecret:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
-    account.AccountConfigColors:
-      type: object
-      properties:
-        primary:
-          type: string
-        secondary:
-          type: string
-        tertiary:
-          type: string
+      additionalProperties:
+        type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

@@ -324,17 +324,34 @@ components:
       - StateFailedValidation
       - StateCancelled
       - StateFailedMissingSourceFile
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
+    transaction.Operation:
+      type: string
+      enum:
+      - SourceMap
+      - SourceTransfer
+      - SourceExtract
+      - SourceMapBatchLoad
+      - SourceMapBatchProcess
+      - DestinationMap
+      - DestinationTransfer
+      x-enum-varnames:
+      - OperationSourceMap
+      - OperationSourceTransfer
+      - OperationSourceExtract
+      - OperationSourceMapBatchLoad
+      - OperationSourceMapBatchProcess
+      - OperationDestinationMap
+      - OperationDestinationTransfer
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
     transaction.Step:
       type: object
       properties:
@@ -367,16 +384,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/transaction.ReadModel'
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
     transaction.Steps:
       type: object
       properties:
@@ -386,31 +393,6 @@ components:
           $ref: '#/components/schemas/transaction.Step'
         transform:
           $ref: '#/components/schemas/transaction.Step'
-    transaction.FileDetail:
-      type: object
-      properties:
-        archiveFileName:
-          type: string
-        compressedFilesFound:
-          type: array
-          items:
-            type: string
-        downloadDurationMillis:
-          type: integer
-        lastModifiedTime:
-          type: string
-        name:
-          type: string
-        recordsIn:
-          type: integer
-        recordsOut:
-          type: integer
-        retrievalTime:
-          type: string
-        sizeBytes:
-          type: integer
-        uploadDurationMillis:
-          type: integer
     transaction.ReadModel:
       type: object
       properties:
@@ -448,24 +430,31 @@ components:
           type: string
         workerId:
           type: string
-    transaction.Operation:
-      type: string
-      enum:
-      - SourceMap
-      - SourceTransfer
-      - SourceExtract
-      - SourceMapBatchLoad
-      - SourceMapBatchProcess
-      - DestinationMap
-      - DestinationTransfer
-      x-enum-varnames:
-      - OperationSourceMap
-      - OperationSourceTransfer
-      - OperationSourceExtract
-      - OperationSourceMapBatchLoad
-      - OperationSourceMapBatchProcess
-      - OperationDestinationMap
-      - OperationDestinationTransfer
+    transaction.FileDetail:
+      type: object
+      properties:
+        archiveFileName:
+          type: string
+        compressedFilesFound:
+          type: array
+          items:
+            type: string
+        downloadDurationMillis:
+          type: integer
+        lastModifiedTime:
+          type: string
+        name:
+          type: string
+        recordsIn:
+          type: integer
+        recordsOut:
+          type: integer
+        retrievalTime:
+          type: string
+        sizeBytes:
+          type: integer
+        uploadDurationMillis:
+          type: integer
     transaction.WriteModel:
       type: object
       required:
@@ -491,6 +480,17 @@ components:
         trigger:
           $ref: '#/components/schemas/transaction.Trigger'
         workerId:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
   securitySchemes:
     OAuth2Implicit:

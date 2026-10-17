@@ -459,37 +459,18 @@ paths:
         - email
 components:
   schemas:
-    user.WriteModel:
+    user.QueryEngineGrantRequest:
       type: object
       required:
-      - active
-      - email
-      - firstName
-      - lastName
-      - role
+      - duration_hours
+      - reason
       properties:
-        active:
-          description: pointer so we can distinguish between false and not set
-          type: boolean
-        aiEnabled:
-          type: boolean
-        email:
+        duration_hours:
+          type: integer
+          maximum: 24
+          minimum: 1
+        reason:
           type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        role:
-          $ref: '#/components/schemas/user.Role'
-    user.ListModel:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/user.ReadModel'
     user.ReadModel:
       type: object
       properties:
@@ -521,6 +502,71 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
+    user.ListModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/user.ReadModel'
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    user.WriteModel:
+      type: object
+      required:
+      - active
+      - email
+      - firstName
+      - lastName
+      - role
+      properties:
+        active:
+          description: pointer so we can distinguish between false and not set
+          type: boolean
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          $ref: '#/components/schemas/user.Role'
+    user.QueryEngineGrantResponse:
+      type: object
+      properties:
+        expiresAt:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        userId:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     user.SelfUserPatchModel:
       type: object
       properties:
@@ -541,52 +587,6 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/user.Role'
-    user.QueryEngineGrantRequest:
-      type: object
-      required:
-      - duration_hours
-      - reason
-      properties:
-        duration_hours:
-          type: integer
-          maximum: 24
-          minimum: 1
-        reason:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    user.Role:
-      type: string
-      enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
-      x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
-    user.QueryEngineGrantResponse:
-      type: object
-      properties:
-        expiresAt:
-          type: string
-        message:
-          type: string
-        reason:
-          type: string
-        userId:
-          type: integer
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

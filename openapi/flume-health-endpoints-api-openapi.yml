@@ -1775,7 +1775,7 @@ paths:
         - email
 components:
   schemas:
-    database.ReadModel:
+    database.WriteModel:
       type: object
       properties:
         database:
@@ -1796,126 +1796,154 @@ components:
           type: integer
         protocol:
           type: string
-        secretName:
+        secret:
           type: string
         secretType:
           $ref: '#/components/schemas/secret.SecretType'
         username:
           type: string
-    snowflake.UpdateModel:
+    datatypes.Field:
       type: object
       properties:
-        account:
-          type:
-          - string
-          - 'null'
-        database:
-          type:
-          - string
-          - 'null'
-        defaultSchema:
-          type:
-          - string
-          - 'null'
-        fields:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/snowflake.Field'
-        host:
-          type:
-          - string
-          - 'null'
-        port:
-          description: not in frontend
-          type:
-          - integer
-          - 'null'
-        role:
-          type:
-          - string
-          - 'null'
-        secret:
-          type:
-          - string
-          - 'null'
+        column:
+          type: string
+        deprecated:
+          type: boolean
+        fieldType:
+          $ref: '#/components/schemas/datatypes.FieldType'
+        name:
+          type: string
+    api.ReadModel:
+      type: object
+      properties:
+        map:
+          type: string
+        secretName:
+          type: string
         secretType:
-          allOf:
-          - $ref: '#/components/schemas/secret.SecretType'
-        stage:
-          type:
-          - string
-          - 'null'
-        table:
-          type:
-          - string
-          - 'null'
-        username:
-          type:
-          - string
-          - 'null'
-        warehouse:
-          type:
-          - string
-          - 'null'
-    cloudstorage.UpdateModel:
+          $ref: '#/components/schemas/secret.SecretType'
+    endpoint.DataType:
+      type: string
+      enum:
+      - Accumulators
+      - Authorizations
+      - Bytes
+      - Eligibility
+      - Groups
+      - MedicalClaimServiceLines
+      - Providers
+      - RxClaimServiceLines
+      - MedicalAndRxClaimLines
+      - Test
+      - TransactionMetadata
+      - Generic
+      - RecordLevelMetadata
+      - PlanNetworks
+      - ProviderNetworkDirectory
+      - HmClaimsExtended
+      - HmProvidersExtended
+      - Strings
+      x-enum-varnames:
+      - DataTypeAccumulators
+      - DataTypeAuthorizations
+      - DataTypeBytes
+      - DataTypeEligibility
+      - DataTypeGroups
+      - DataTypeMedicalClaimServiceLines
+      - DataTypeProviders
+      - DataTypeRxClaimServiceLines
+      - DataTypeMedicalAndRxClaimLines
+      - DataTypeTest
+      - DataTypeTransactionMetadata
+      - DataTypeGeneric
+      - DataTypeRecordLevelMetadata
+      - DataTypePlanNetworks
+      - DataTypeProviderNetworkDirectory
+      - DataTypeHmClaimsExtended
+      - DataTypeHmProvidersExtended
+      - DataTypeStrings
+    secret.ApiEncryptionSecret:
+      type: object
+      properties:
+        passphrase:
+          $ref: '#/components/schemas/secret.ApiSecret'
+        privateKey:
+          $ref: '#/components/schemas/secret.ApiSecret'
+    cloudstorage.ReadModel:
       type: object
       properties:
         bucketName:
-          type:
-          - string
-          - 'null'
+          type: string
         bucketPath:
-          type:
-          - string
-          - 'null'
+          type: string
         credentialType:
-          allOf:
-          - $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
-        credentials:
-          allOf:
-          - $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+          $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
         deleteAfterPickup:
-          type:
-          - boolean
-          - 'null'
+          type: boolean
         encryption:
-          allOf:
-          - $ref: '#/components/schemas/encryption.UpdateModel'
+          $ref: '#/components/schemas/encryption.ReadModel'
+        secretName:
+          type: string
         sortDescending:
-          type:
-          - boolean
-          - 'null'
+          type: boolean
         sortingMethod:
-          allOf:
-          - $ref: '#/components/schemas/sorting.Method'
-    endpoint.Operation:
-      type: string
-      enum:
-      - Map
-      - Transfer
-      x-enum-varnames:
-      - OperationMap
-      - OperationTransfer
-    duckdb.File:
-      type: object
-      required:
-      - tableName
-      properties:
-        fileNamingConvention:
-          type: string
-        tableName:
-          type: string
-    endpoint.LambdaList:
+          $ref: '#/components/schemas/sorting.Method'
+    snowflake.WriteModel:
       type: object
       properties:
-        lambdas:
+        account:
+          type: string
+        database:
+          type: string
+        defaultSchema:
+          type: string
+        fields:
           type: array
           items:
-            $ref: '#/components/schemas/endpoint.LambdaResponse'
+            $ref: '#/components/schemas/snowflake.Field'
+        host:
+          type: string
+        port:
+          description: not in frontend
+          type: integer
+        role:
+          type: string
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        stage:
+          type: string
+        table:
+          type: string
+        username:
+          type: string
+        warehouse:
+          type: string
+    endpoint.ListResponse:
+      type: object
+      properties:
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.ReadModel'
         nextPageToken:
           type: string
+    flumelakehousecredentials.FlumeLakehouseCredentials:
+      type: object
+      properties:
+        catalogConfigs:
+          type: array
+          items:
+            $ref: '#/components/schemas/flumelakehousecredentials.CatalogConfig'
+    endpoint.EndpointType:
+      type: string
+      enum:
+      - Destination
+      - Source
+      x-enum-varnames:
+      - EndpointTypeDestination
+      - EndpointTypeSource
     endpoint.WriteModel:
       type: object
       required:
@@ -1987,14 +2015,236 @@ components:
           minimum: 1
         workerSize:
           $ref: '#/components/schemas/endpoint.WorkerSize'
-    secret.SecretType:
+    cloudstoragecredentials.CredentialType:
       type: string
       enum:
-      - Password
-      - PrivateKey
+      - AwsStatic
+      - AwsWebIdentity
+      - GcpServiceAccount
+      - AzureSharedKey
+      - AzureSharedAccessSignature
+      - AzureConnectionString
       x-enum-varnames:
-      - SecretTypePassword
-      - SecretTypePrivateKey
+      - CredentialTypeAwsStatic
+      - CredentialTypeAwsWebIdentity
+      - CredentialTypeGcpServiceAccount
+      - CredentialTypeAzureSharedKey
+      - CredentialTypeAzureSharedAccessSignature
+      - CredentialTypeAzureConnectionString
+    flumelakehouse.WriteModel:
+      type: object
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
+        credentials:
+          $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
+    encryption.UpdateModel:
+      type: object
+      properties:
+        method:
+          allOf:
+          - $ref: '#/components/schemas/encryption.Method'
+        passphrase:
+          type:
+          - string
+          - 'null'
+        privateKey:
+          type:
+          - string
+          - 'null'
+        publicKey:
+          type:
+          - string
+          - 'null'
+    flumelakehouse.ReadModel:
+      type: object
+      properties:
+        credentialType:
+          $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
+        secretName:
+          type: string
+    endpoint.LambdaList:
+      type: object
+      properties:
+        lambdas:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.LambdaResponse'
+        nextPageToken:
+          type: string
+    database.DatabaseMap:
+      type: object
+      properties:
+        map:
+          type: string
+        name:
+          type: string
+        ordinal:
+          type: integer
+    endpoint.TransactionSummary:
+      type: object
+      properties:
+        endTime:
+          type: string
+        id:
+          type: integer
+        maxMemoryMb:
+          type: integer
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+    flumelakehousecredentials.CatalogConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          description: postgresql, sqlserver, iceberg
+          type: string
+    sftp.WriteModel:
+      type: object
+      properties:
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.WriteModel'
+        host:
+          type: string
+        hostKeyAlgorithm:
+          type: string
+        keyExchange:
+          type: string
+        path:
+          type: string
+        port:
+          type: integer
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        serverCipher:
+          type: string
+        serverPublicKey:
+          type: string
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+        username:
+          type: string
+    snowflake.Field:
+      type: object
+      required:
+      - name
+      - type
+      properties:
+        name:
+          type: string
+        primaryKey:
+          type: boolean
+        type:
+          type: string
+    flitclient.IngestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        rowsInserted:
+          type: integer
+        success:
+          type: boolean
+    endpoint.Field:
+      type: object
+      properties:
+        length:
+          type: integer
+        name:
+          type: string
+        start:
+          type: integer
+    endpoint.State:
+      type: string
+      enum:
+      - Idle
+      - Running
+      - Error
+      - Stopped
+      x-enum-varnames:
+      - StateIdle
+      - StateRunning
+      - StateError
+      - StateStopped
+    database.ReadModel:
+      type: object
+      properties:
+        database:
+          type: string
+        engine:
+          $ref: '#/components/schemas/database.Engine'
+        host:
+          type: string
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/database.DatabaseMap'
+        orderBy:
+          type: string
+        pageSize:
+          type: integer
+        port:
+          type: integer
+        protocol:
+          type: string
+        secretName:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        username:
+          type: string
+    sftp.ReadModel:
+      type: object
+      properties:
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.ReadModel'
+        host:
+          type: string
+        hostKeyAlgorithm:
+          type: string
+        keyExchange:
+          type: string
+        path:
+          type: string
+        port:
+          type: integer
+        secretName:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+        serverCipher:
+          type: string
+        serverPublicKey:
+          type: string
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+        username:
+          type: string
     endpoint.File:
       type: object
       properties:
@@ -2033,808 +2283,6 @@ components:
           type: integer
         type:
           $ref: '#/components/schemas/endpoint.FileType'
-    endpoint.ConnectionName:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-    secret.ApiEncryptionSecret:
-      type: object
-      properties:
-        passphrase:
-          $ref: '#/components/schemas/secret.ApiSecret'
-        privateKey:
-          $ref: '#/components/schemas/secret.ApiSecret'
-    database.Engine:
-      type: string
-      enum:
-      - PostgreSQL
-      - MicrosoftSQLServer2019
-      - MicrosoftSQLServer2022
-      - Oracle
-      x-enum-varnames:
-      - EnginePostgreSQL
-      - EngineMicrosoftSQLServer2019
-      - EngineMicrosoftSQLServer2022
-      - EngineOracle
-    datatypes.DataTypes:
-      type: object
-      properties:
-        dataTypes:
-          type: array
-          items:
-            $ref: '#/components/schemas/datatypes.DataType'
-    cloudstoragecredentials.CloudStorageCredentials:
-      type: object
-      additionalProperties:
-        type: string
-    encryption.Method:
-      type: string
-      enum:
-      - None
-      - PGP
-      x-enum-varnames:
-      - MethodNone
-      - MethodPGP
-    encryption.ReadModel:
-      type: object
-      properties:
-        method:
-          $ref: '#/components/schemas/encryption.Method'
-        passphraseSecretName:
-          description: Used for Source Endpoint Decryption
-          type: string
-        privateKeySecretName:
-          description: Used for Source Endpoint Decryption
-          type: string
-        publicKey:
-          description: Used for Destination Endpoint Decryption
-          type: string
-    datatypes.Field:
-      type: object
-      properties:
-        column:
-          type: string
-        deprecated:
-          type: boolean
-        fieldType:
-          $ref: '#/components/schemas/datatypes.FieldType'
-        name:
-          type: string
-    endpoint.Protocol:
-      type: string
-      enum:
-      - SFTP
-      - Snowflake
-      - API
-      - FlumeTransactions
-      - FlumeRecordMetadata
-      - Database
-      - CloudStorage
-      - FlumeLakehouse
-      x-enum-varnames:
-      - ProtocolSftp
-      - ProtocolSnowflake
-      - ProtocolApi
-      - ProtocolFlumeTransactions
-      - ProtocolFlumeRecordMetadata
-      - ProtocolDatabase
-      - ProtocolCloudStorage
-      - ProtocolFlumeLakehouse
-    endpoint.LambdaResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-    flitclient.WriteResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        rowsAffected:
-          type: integer
-        success:
-          type: boolean
-    endpoint.EndpointType:
-      type: string
-      enum:
-      - Destination
-      - Source
-      x-enum-varnames:
-      - EndpointTypeDestination
-      - EndpointTypeSource
-    endpoint.RecentTransactions:
-      type: object
-      properties:
-        last:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-        lastFinished:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-        lastFinishedOp:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-        lastSuccessful:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-        lastSuccessfulNonExtract:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-        lastVisible:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-    flumelakehousecredentials.CredentialType:
-      type: string
-      enum:
-      - AwsStatic
-      - AwsWebIdentity
-      - GcpServiceAccount
-      - AzureSharedKey
-      - AzureSharedAccessSignature
-      - AzureConnectionString
-      x-enum-varnames:
-      - CredentialTypeAwsStatic
-      - CredentialTypeAwsWebIdentity
-      - CredentialTypeGcpServiceAccount
-      - CredentialTypeAzureSharedKey
-      - CredentialTypeAzureSharedAccessSignature
-      - CredentialTypeAzureConnectionString
-    flumelakehouse.UpdateModel:
-      type: object
-      properties:
-        credentialType:
-          allOf:
-          - $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
-        credentials:
-          allOf:
-          - $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
-        maps:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
-    encryption.WriteModel:
-      type: object
-      properties:
-        method:
-          $ref: '#/components/schemas/encryption.Method'
-        passphrase:
-          description: Used for Source Endpoint Decryption
-          type: string
-        privateKey:
-          description: Used for Source Endpoint Decryption
-          type: string
-        publicKey:
-          description: Used for Destination Endpoint Decryption
-          type: string
-    endpoint.QueryEndpointRequest:
-      type: object
-      properties:
-        sql:
-          type: string
-    api.WriteModel:
-      type: object
-      properties:
-        map:
-          type: string
-        secret:
-          type: string
-        secretType:
-          $ref: '#/components/schemas/secret.SecretType'
-    endpoint.Field:
-      type: object
-      properties:
-        length:
-          type: integer
-        name:
-          type: string
-        start:
-          type: integer
-    api.ReadModel:
-      type: object
-      properties:
-        map:
-          type: string
-        secretName:
-          type: string
-        secretType:
-          $ref: '#/components/schemas/secret.SecretType'
-    flitclient.IngestResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        rowsInserted:
-          type: integer
-        success:
-          type: boolean
-    cloudstoragecredentials.CredentialType:
-      type: string
-      enum:
-      - AwsStatic
-      - AwsWebIdentity
-      - GcpServiceAccount
-      - AzureSharedKey
-      - AzureSharedAccessSignature
-      - AzureConnectionString
-      x-enum-varnames:
-      - CredentialTypeAwsStatic
-      - CredentialTypeAwsWebIdentity
-      - CredentialTypeGcpServiceAccount
-      - CredentialTypeAzureSharedKey
-      - CredentialTypeAzureSharedAccessSignature
-      - CredentialTypeAzureConnectionString
-    flumelakehousecredentials.CatalogConfig:
-      type: object
-      properties:
-        name:
-          type: string
-        properties:
-          type: object
-          additionalProperties:
-            type: string
-        type:
-          description: postgresql, sqlserver, iceberg
-          type: string
-    endpoint.ReadModel:
-      type: object
-      required:
-      - dataType
-      - name
-      - operation
-      - type
-      properties:
-        accountId:
-          type: integer
-        aiEnabled:
-          type: boolean
-        api:
-          $ref: '#/components/schemas/api.ReadModel'
-        archived:
-          type: boolean
-        cloudStorage:
-          $ref: '#/components/schemas/cloudstorage.ReadModel'
-        connection:
-          $ref: '#/components/schemas/endpoint.ConnectionName'
-        controlFile:
-          $ref: '#/components/schemas/endpoint.File'
-        created:
-          type: string
-        dataType:
-          $ref: '#/components/schemas/endpoint.DataType'
-        database:
-          $ref: '#/components/schemas/database.ReadModel'
-        description:
-          type: string
-        file:
-          $ref: '#/components/schemas/endpoint.File'
-        fileSchedule:
-          type: string
-        flumeLakehouse:
-          $ref: '#/components/schemas/flumelakehouse.ReadModel'
-        hasControlFile:
-          type: boolean
-        id:
-          type: integer
-        incrementalRecords:
-          type: boolean
-        lastTransaction:
-          $ref: '#/components/schemas/endpoint.TransactionSummary'
-        lookbackModifiedBy:
-          $ref: '#/components/schemas/endpoint.LookbackModifiedByUser'
-        lookbackUnit:
-          $ref: '#/components/schemas/endpoint.LoopbackUnit'
-        lookbackValue:
-          type: integer
-        missingExpectedSourceFile:
-          type: boolean
-        name:
-          type: string
-        nextTransaction:
-          type: string
-        operation:
-          $ref: '#/components/schemas/endpoint.Operation'
-        protocol:
-          $ref: '#/components/schemas/endpoint.Protocol'
-        recentTransactions:
-          $ref: '#/components/schemas/endpoint.RecentTransactions'
-        recordDestinationId:
-          description: if Protocol is FlumeRecordMetadata, the destination ID whose metadata to use
-          type: integer
-        schedule:
-          type: string
-        sftp:
-          $ref: '#/components/schemas/sftp.ReadModel'
-        shardKeyRegex:
-          type: string
-        sharded:
-          type: boolean
-        snowflake:
-          $ref: '#/components/schemas/snowflake.ReadModel'
-        state:
-          $ref: '#/components/schemas/endpoint.State'
-        supplementalDataTypes:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpoint.DataType'
-        type:
-          $ref: '#/components/schemas/endpoint.EndpointType'
-        updated:
-          type: string
-        workerMemoryGb:
-          type: integer
-          minimum: 1
-        workerSize:
-          $ref: '#/components/schemas/endpoint.WorkerSize'
-    datatypes.DataType:
-      type: object
-      properties:
-        fields:
-          type: array
-          items:
-            $ref: '#/components/schemas/datatypes.Field'
-        name:
-          type: string
-        type:
-          $ref: '#/components/schemas/endpoint.DataType'
-    database.DatabaseMap:
-      type: object
-      properties:
-        map:
-          type: string
-        name:
-          type: string
-        ordinal:
-          type: integer
-    secret.ApiFlumeLakehouseSecret:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
-    sorting.Method:
-      type: string
-      enum:
-      - Default
-      - FileName
-      - LastModified
-      x-enum-varnames:
-      - MethodDefault
-      - MethodFileName
-      - MethodLastModified
-    secret.ApiCloudCredSecret:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
-    snowflake.Field:
-      type: object
-      required:
-      - name
-      - type
-      properties:
-        name:
-          type: string
-        primaryKey:
-          type: boolean
-        type:
-          type: string
-    cloudstorage.WriteModel:
-      type: object
-      properties:
-        bucketName:
-          type: string
-        bucketPath:
-          type: string
-        credentialType:
-          $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
-        credentials:
-          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
-        deleteAfterPickup:
-          type: boolean
-        encryption:
-          $ref: '#/components/schemas/encryption.WriteModel'
-        sortDescending:
-          type: boolean
-        sortingMethod:
-          $ref: '#/components/schemas/sorting.Method'
-    cloudstorage.ReadModel:
-      type: object
-      properties:
-        bucketName:
-          type: string
-        bucketPath:
-          type: string
-        credentialType:
-          $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
-        deleteAfterPickup:
-          type: boolean
-        encryption:
-          $ref: '#/components/schemas/encryption.ReadModel'
-        secretName:
-          type: string
-        sortDescending:
-          type: boolean
-        sortingMethod:
-          $ref: '#/components/schemas/sorting.Method'
-    secret.ApiSecret:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-    sftp.UpdateModel:
-      type: object
-      properties:
-        deleteAfterPickup:
-          type:
-          - boolean
-          - 'null'
-        encryption:
-          $ref: '#/components/schemas/encryption.UpdateModel'
-        host:
-          type:
-          - string
-          - 'null'
-        hostKeyAlgorithm:
-          type:
-          - string
-          - 'null'
-        keyExchange:
-          type:
-          - string
-          - 'null'
-        path:
-          type:
-          - string
-          - 'null'
-        port:
-          type:
-          - integer
-          - 'null'
-        secret:
-          type:
-          - string
-          - 'null'
-        secretType:
-          allOf:
-          - $ref: '#/components/schemas/secret.SecretType'
-        serverCipher:
-          type:
-          - string
-          - 'null'
-        serverPublicKey:
-          type:
-          - string
-          - 'null'
-        sortDescending:
-          type:
-          - boolean
-          - 'null'
-        sortingMethod:
-          allOf:
-          - $ref: '#/components/schemas/sorting.Method'
-        username:
-          type:
-          - string
-          - 'null'
-    database.UpdateModel:
-      type: object
-      properties:
-        database:
-          type:
-          - string
-          - 'null'
-        engine:
-          allOf:
-          - $ref: '#/components/schemas/database.Engine'
-        host:
-          type:
-          - string
-          - 'null'
-        maps:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/database.DatabaseMap'
-        orderBy:
-          type:
-          - string
-          - 'null'
-        pageSize:
-          type:
-          - integer
-          - 'null'
-        port:
-          type:
-          - integer
-          - 'null'
-        protocol:
-          type:
-          - string
-          - 'null'
-        secret:
-          type:
-          - string
-          - 'null'
-        secretType:
-          allOf:
-          - $ref: '#/components/schemas/secret.SecretType'
-        username:
-          type:
-          - string
-          - 'null'
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
-    snowflake.WriteModel:
-      type: object
-      properties:
-        account:
-          type: string
-        database:
-          type: string
-        defaultSchema:
-          type: string
-        fields:
-          type: array
-          items:
-            $ref: '#/components/schemas/snowflake.Field'
-        host:
-          type: string
-        port:
-          description: not in frontend
-          type: integer
-        role:
-          type: string
-        secret:
-          type: string
-        secretType:
-          $ref: '#/components/schemas/secret.SecretType'
-        stage:
-          type: string
-        table:
-          type: string
-        username:
-          type: string
-        warehouse:
-          type: string
-    sftp.WriteModel:
-      type: object
-      properties:
-        deleteAfterPickup:
-          type: boolean
-        encryption:
-          $ref: '#/components/schemas/encryption.WriteModel'
-        host:
-          type: string
-        hostKeyAlgorithm:
-          type: string
-        keyExchange:
-          type: string
-        path:
-          type: string
-        port:
-          type: integer
-        secret:
-          type: string
-        secretType:
-          $ref: '#/components/schemas/secret.SecretType'
-        serverCipher:
-          type: string
-        serverPublicKey:
-          type: string
-        sortDescending:
-          type: boolean
-        sortingMethod:
-          $ref: '#/components/schemas/sorting.Method'
-        username:
-          type: string
-    endpoint.LookbackModifiedByUser:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        email:
-          type: string
-        id:
-          type: integer
-    endpoint.TransactionSummary:
-      type: object
-      properties:
-        endTime:
-          type: string
-        id:
-          type: integer
-        maxMemoryMb:
-          type: integer
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-    api.UpdateModel:
-      type: object
-      properties:
-        map:
-          type:
-          - string
-          - 'null'
-        secret:
-          type:
-          - string
-          - 'null'
-        secretType:
-          allOf:
-          - $ref: '#/components/schemas/secret.SecretType'
-    flumelakehousecredentials.FlumeLakehouseCredentials:
-      type: object
-      properties:
-        catalogConfigs:
-          type: array
-          items:
-            $ref: '#/components/schemas/flumelakehousecredentials.CatalogConfig'
-    endpoint.MapType:
-      type: string
-      enum:
-      - SQL
-      - Python
-      - DuckDB
-      x-enum-varnames:
-      - MapTypeSql
-      - MapTypePython
-      - MapTypeDuckDB
-    endpoint.FileFilterType:
-      type: string
-      enum:
-      - StartsWith
-      - EndsWith
-      - Contains
-      - Regex
-      x-enum-varnames:
-      - FileFilterTypeStartsWith
-      - FileFilterTypeEndsWith
-      - FileFilterTypeContains
-      - FileFilterTypeRegex
-    datatypes.FieldType:
-      type: object
-      properties:
-        name:
-          type: string
-        options:
-          type: array
-          items:
-            type: string
-        type:
-          type: string
-    flumelakehouse.ReadModel:
-      type: object
-      properties:
-        credentialType:
-          $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
-        secretName:
-          type: string
-    endpoint.WorkerSize:
-      type: string
-      enum:
-      - small
-      - medium
-      - large
-      - xlarge
-      - max
-      x-enum-varnames:
-      - WorkerSizeSmall
-      - WorkerSizeMedium
-      - WorkerSizeLarge
-      - WorkerSizeXLarge
-      - WorkerSizeMax
-    flumelakehouse.WriteModel:
-      type: object
-      properties:
-        credentialType:
-          $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
-        credentials:
-          $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
-    endpoint.FileUpdate:
-      type: object
-      properties:
-        duckDb:
-          allOf:
-          - $ref: '#/components/schemas/duckdb.Config'
-        fields:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/endpoint.Field'
-        filterPattern:
-          type:
-          - string
-          - 'null'
-        filterType:
-          allOf:
-          - $ref: '#/components/schemas/endpoint.FileFilterType'
-        headerRow:
-          type:
-          - integer
-          - 'null'
-        headerless:
-          type:
-          - boolean
-          - 'null'
-        map:
-          type:
-          - string
-          - 'null'
-        mapType:
-          allOf:
-          - $ref: '#/components/schemas/endpoint.MapType'
-        nameTemplate:
-          type:
-          - string
-          - 'null'
-        recordStartRow:
-          type:
-          - integer
-          - 'null'
-        skipLinesBottom:
-          type:
-          - boolean
-          - 'null'
-        skipLinesTop:
-          type:
-          - boolean
-          - 'null'
-        trailerRowCount:
-          type:
-          - integer
-          - 'null'
-        type:
-          allOf:
-          - $ref: '#/components/schemas/endpoint.FileType'
-    endpoint.State:
-      type: string
-      enum:
-      - Idle
-      - Running
-      - Error
-      - Stopped
-      x-enum-varnames:
-      - StateIdle
-      - StateRunning
-      - StateError
-      - StateStopped
     endpoint.FileType:
       type: string
       enum:
@@ -2847,108 +2295,36 @@ components:
       - FileTypePsv
       - FileTypeTsv
       - FileTypeFixedWidth
-    sftp.ReadModel:
-      type: object
-      properties:
-        deleteAfterPickup:
-          type: boolean
-        encryption:
-          $ref: '#/components/schemas/encryption.ReadModel'
-        host:
-          type: string
-        hostKeyAlgorithm:
-          type: string
-        keyExchange:
-          type: string
-        path:
-          type: string
-        port:
-          type: integer
-        secretName:
-          type: string
-        secretType:
-          $ref: '#/components/schemas/secret.SecretType'
-        serverCipher:
-          type: string
-        serverPublicKey:
-          type: string
-        sortDescending:
-          type: boolean
-        sortingMethod:
-          $ref: '#/components/schemas/sorting.Method'
-        username:
-          type: string
-    encryption.UpdateModel:
-      type: object
-      properties:
-        method:
-          allOf:
-          - $ref: '#/components/schemas/encryption.Method'
-        passphrase:
-          type:
-          - string
-          - 'null'
-        privateKey:
-          type:
-          - string
-          - 'null'
-        publicKey:
-          type:
-          - string
-          - 'null'
-    database.WriteModel:
-      type: object
-      properties:
-        database:
-          type: string
-        engine:
-          $ref: '#/components/schemas/database.Engine'
-        host:
-          type: string
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/database.DatabaseMap'
-        orderBy:
-          type: string
-        pageSize:
-          type: integer
-        port:
-          type: integer
-        protocol:
-          type: string
-        secret:
-          type: string
-        secretType:
-          $ref: '#/components/schemas/secret.SecretType'
-        username:
-          type: string
-    endpoint.ListResponse:
-      type: object
-      properties:
-        endpoints:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpoint.ReadModel'
-        nextPageToken:
-          type: string
-    endpoint.LoopbackUnit:
+    encryption.Method:
       type: string
       enum:
-      - minutes
-      - hours
+      - None
+      - PGP
       x-enum-varnames:
-      - LoopbackUnitMinutes
-      - LoopbackUnitHours
-    flumelakehouse.FlumeLakehouseMap:
+      - MethodNone
+      - MethodPGP
+    cloudstoragecredentials.CloudStorageCredentials:
       type: object
-      properties:
-        map:
-          type: string
-        name:
-          type: string
-        ordinal:
-          type: integer
+      additionalProperties:
+        type: string
+    sorting.Method:
+      type: string
+      enum:
+      - Default
+      - FileName
+      - LastModified
+      x-enum-varnames:
+      - MethodDefault
+      - MethodFileName
+      - MethodLastModified
+    secret.SecretType:
+      type: string
+      enum:
+      - Password
+      - PrivateKey
+      x-enum-varnames:
+      - SecretTypePassword
+      - SecretTypePrivateKey
     endpoint.UpdateModel:
       type: object
       properties:
@@ -3058,6 +2434,521 @@ components:
         workerSize:
           allOf:
           - $ref: '#/components/schemas/endpoint.WorkerSize'
+    sftp.UpdateModel:
+      type: object
+      properties:
+        deleteAfterPickup:
+          type:
+          - boolean
+          - 'null'
+        encryption:
+          $ref: '#/components/schemas/encryption.UpdateModel'
+        host:
+          type:
+          - string
+          - 'null'
+        hostKeyAlgorithm:
+          type:
+          - string
+          - 'null'
+        keyExchange:
+          type:
+          - string
+          - 'null'
+        path:
+          type:
+          - string
+          - 'null'
+        port:
+          type:
+          - integer
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+        serverCipher:
+          type:
+          - string
+          - 'null'
+        serverPublicKey:
+          type:
+          - string
+          - 'null'
+        sortDescending:
+          type:
+          - boolean
+          - 'null'
+        sortingMethod:
+          allOf:
+          - $ref: '#/components/schemas/sorting.Method'
+        username:
+          type:
+          - string
+          - 'null'
+    snowflake.UpdateModel:
+      type: object
+      properties:
+        account:
+          type:
+          - string
+          - 'null'
+        database:
+          type:
+          - string
+          - 'null'
+        defaultSchema:
+          type:
+          - string
+          - 'null'
+        fields:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/snowflake.Field'
+        host:
+          type:
+          - string
+          - 'null'
+        port:
+          description: not in frontend
+          type:
+          - integer
+          - 'null'
+        role:
+          type:
+          - string
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+        stage:
+          type:
+          - string
+          - 'null'
+        table:
+          type:
+          - string
+          - 'null'
+        username:
+          type:
+          - string
+          - 'null'
+        warehouse:
+          type:
+          - string
+          - 'null'
+    endpoint.Operation:
+      type: string
+      enum:
+      - Map
+      - Transfer
+      x-enum-varnames:
+      - OperationMap
+      - OperationTransfer
+    endpoint.ReadModel:
+      type: object
+      required:
+      - dataType
+      - name
+      - operation
+      - type
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        api:
+          $ref: '#/components/schemas/api.ReadModel'
+        archived:
+          type: boolean
+        cloudStorage:
+          $ref: '#/components/schemas/cloudstorage.ReadModel'
+        connection:
+          $ref: '#/components/schemas/endpoint.ConnectionName'
+        controlFile:
+          $ref: '#/components/schemas/endpoint.File'
+        created:
+          type: string
+        dataType:
+          $ref: '#/components/schemas/endpoint.DataType'
+        database:
+          $ref: '#/components/schemas/database.ReadModel'
+        description:
+          type: string
+        file:
+          $ref: '#/components/schemas/endpoint.File'
+        fileSchedule:
+          type: string
+        flumeLakehouse:
+          $ref: '#/components/schemas/flumelakehouse.ReadModel'
+        hasControlFile:
+          type: boolean
+        id:
+          type: integer
+        incrementalRecords:
+          type: boolean
+        lastTransaction:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lookbackModifiedBy:
+          $ref: '#/components/schemas/endpoint.LookbackModifiedByUser'
+        lookbackUnit:
+          $ref: '#/components/schemas/endpoint.LoopbackUnit'
+        lookbackValue:
+          type: integer
+        missingExpectedSourceFile:
+          type: boolean
+        name:
+          type: string
+        nextTransaction:
+          type: string
+        operation:
+          $ref: '#/components/schemas/endpoint.Operation'
+        protocol:
+          $ref: '#/components/schemas/endpoint.Protocol'
+        recentTransactions:
+          $ref: '#/components/schemas/endpoint.RecentTransactions'
+        recordDestinationId:
+          description: if Protocol is FlumeRecordMetadata, the destination ID whose metadata to use
+          type: integer
+        schedule:
+          type: string
+        sftp:
+          $ref: '#/components/schemas/sftp.ReadModel'
+        shardKeyRegex:
+          type: string
+        sharded:
+          type: boolean
+        snowflake:
+          $ref: '#/components/schemas/snowflake.ReadModel'
+        state:
+          $ref: '#/components/schemas/endpoint.State'
+        supplementalDataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint.DataType'
+        type:
+          $ref: '#/components/schemas/endpoint.EndpointType'
+        updated:
+          type: string
+        workerMemoryGb:
+          type: integer
+          minimum: 1
+        workerSize:
+          $ref: '#/components/schemas/endpoint.WorkerSize'
+    endpoint.WorkerSize:
+      type: string
+      enum:
+      - small
+      - medium
+      - large
+      - xlarge
+      - max
+      x-enum-varnames:
+      - WorkerSizeSmall
+      - WorkerSizeMedium
+      - WorkerSizeLarge
+      - WorkerSizeXLarge
+      - WorkerSizeMax
+    endpoint.Protocol:
+      type: string
+      enum:
+      - SFTP
+      - Snowflake
+      - API
+      - FlumeTransactions
+      - FlumeRecordMetadata
+      - Database
+      - CloudStorage
+      - FlumeLakehouse
+      x-enum-varnames:
+      - ProtocolSftp
+      - ProtocolSnowflake
+      - ProtocolApi
+      - ProtocolFlumeTransactions
+      - ProtocolFlumeRecordMetadata
+      - ProtocolDatabase
+      - ProtocolCloudStorage
+      - ProtocolFlumeLakehouse
+    endpoint.LoopbackUnit:
+      type: string
+      enum:
+      - minutes
+      - hours
+      x-enum-varnames:
+      - LoopbackUnitMinutes
+      - LoopbackUnitHours
+    endpoint.FileUpdate:
+      type: object
+      properties:
+        duckDb:
+          allOf:
+          - $ref: '#/components/schemas/duckdb.Config'
+        fields:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/endpoint.Field'
+        filterPattern:
+          type:
+          - string
+          - 'null'
+        filterType:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.FileFilterType'
+        headerRow:
+          type:
+          - integer
+          - 'null'
+        headerless:
+          type:
+          - boolean
+          - 'null'
+        map:
+          type:
+          - string
+          - 'null'
+        mapType:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.MapType'
+        nameTemplate:
+          type:
+          - string
+          - 'null'
+        recordStartRow:
+          type:
+          - integer
+          - 'null'
+        skipLinesBottom:
+          type:
+          - boolean
+          - 'null'
+        skipLinesTop:
+          type:
+          - boolean
+          - 'null'
+        trailerRowCount:
+          type:
+          - integer
+          - 'null'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/endpoint.FileType'
+    database.UpdateModel:
+      type: object
+      properties:
+        database:
+          type:
+          - string
+          - 'null'
+        engine:
+          allOf:
+          - $ref: '#/components/schemas/database.Engine'
+        host:
+          type:
+          - string
+          - 'null'
+        maps:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/database.DatabaseMap'
+        orderBy:
+          type:
+          - string
+          - 'null'
+        pageSize:
+          type:
+          - integer
+          - 'null'
+        port:
+          type:
+          - integer
+          - 'null'
+        protocol:
+          type:
+          - string
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+        username:
+          type:
+          - string
+          - 'null'
+    flumelakehouse.UpdateModel:
+      type: object
+      properties:
+        credentialType:
+          allOf:
+          - $ref: '#/components/schemas/flumelakehousecredentials.CredentialType'
+        credentials:
+          allOf:
+          - $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
+        maps:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/flumelakehouse.FlumeLakehouseMap'
+    endpoint.FileFilterType:
+      type: string
+      enum:
+      - StartsWith
+      - EndsWith
+      - Contains
+      - Regex
+      x-enum-varnames:
+      - FileFilterTypeStartsWith
+      - FileFilterTypeEndsWith
+      - FileFilterTypeContains
+      - FileFilterTypeRegex
+    secret.ApiCloudCredSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+    duckdb.File:
+      type: object
+      required:
+      - tableName
+      properties:
+        fileNamingConvention:
+          type: string
+        tableName:
+          type: string
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    datatypes.DataTypes:
+      type: object
+      properties:
+        dataTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/datatypes.DataType'
+    database.Engine:
+      type: string
+      enum:
+      - PostgreSQL
+      - MicrosoftSQLServer2019
+      - MicrosoftSQLServer2022
+      - Oracle
+      x-enum-varnames:
+      - EnginePostgreSQL
+      - EngineMicrosoftSQLServer2019
+      - EngineMicrosoftSQLServer2022
+      - EngineOracle
+    secret.ApiFlumeLakehouseSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/flumelakehousecredentials.FlumeLakehouseCredentials'
+    flumelakehouse.FlumeLakehouseMap:
+      type: object
+      properties:
+        map:
+          type: string
+        name:
+          type: string
+        ordinal:
+          type: integer
+    endpoint.ConnectionName:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    duckdb.Config:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/duckdb.File'
+    endpoint.LookbackModifiedByUser:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        email:
+          type: string
+        id:
+          type: integer
+    endpoint.QueryEndpointRequest:
+      type: object
+      properties:
+        sql:
+          type: string
+    cloudstorage.UpdateModel:
+      type: object
+      properties:
+        bucketName:
+          type:
+          - string
+          - 'null'
+        bucketPath:
+          type:
+          - string
+          - 'null'
+        credentialType:
+          allOf:
+          - $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
+        credentials:
+          allOf:
+          - $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+        deleteAfterPickup:
+          type:
+          - boolean
+          - 'null'
+        encryption:
+          allOf:
+          - $ref: '#/components/schemas/encryption.UpdateModel'
+        sortDescending:
+          type:
+          - boolean
+          - 'null'
+        sortingMethod:
+          allOf:
+          - $ref: '#/components/schemas/sorting.Method'
     responses.ErrorResponse:
       type: object
       properties:
@@ -3069,46 +2960,136 @@ components:
             type: string
         message:
           type: string
-    endpoint.DataType:
-      type: string
-      enum:
-      - Accumulators
-      - Authorizations
-      - Bytes
-      - Eligibility
-      - Groups
-      - MedicalClaimServiceLines
-      - Providers
-      - RxClaimServiceLines
-      - MedicalAndRxClaimLines
-      - Test
-      - TransactionMetadata
-      - Generic
-      - RecordLevelMetadata
-      - PlanNetworks
-      - ProviderNetworkDirectory
-      - HmClaimsExtended
-      - HmProvidersExtended
-      - Strings
-      x-enum-varnames:
-      - DataTypeAccumulators
-      - DataTypeAuthorizations
-      - DataTypeBytes
-      - DataTypeEligibility
-      - DataTypeGroups
-      - DataTypeMedicalClaimServiceLines
-      - DataTypeProviders
-      - DataTypeRxClaimServiceLines
-      - DataTypeMedicalAndRxClaimLines
-      - DataTypeTest
-      - DataTypeTransactionMetadata
-      - DataTypeGeneric
-      - DataTypeRecordLevelMetadata
-      - DataTypePlanNetworks
-      - DataTypeProviderNetworkDirectory
-      - DataTypeHmClaimsExtended
-      - DataTypeHmProvidersExtended
-      - DataTypeStrings
+    encryption.WriteModel:
+      type: object
+      properties:
+        method:
+          $ref: '#/components/schemas/encryption.Method'
+        passphrase:
+          description: Used for Source Endpoint Decryption
+          type: string
+        privateKey:
+          description: Used for Source Endpoint Decryption
+          type: string
+        publicKey:
+          description: Used for Destination Endpoint Decryption
+          type: string
+    encryption.ReadModel:
+      type: object
+      properties:
+        method:
+          $ref: '#/components/schemas/encryption.Method'
+        passphraseSecretName:
+          description: Used for Source Endpoint Decryption
+          type: string
+        privateKeySecretName:
+          description: Used for Source Endpoint Decryption
+          type: string
+        publicKey:
+          description: Used for Destination Endpoint Decryption
+          type: string
+    endpoint.LambdaResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    datatypes.FieldType:
+      type: object
+      properties:
+        name:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+    flitclient.WriteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        rowsAffected:
+          type: integer
+        success:
+          type: boolean
+    api.WriteModel:
+      type: object
+      properties:
+        map:
+          type: string
+        secret:
+          type: string
+        secretType:
+          $ref: '#/components/schemas/secret.SecretType'
+    datatypes.DataType:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/datatypes.Field'
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/endpoint.DataType'
+    api.UpdateModel:
+      type: object
+      properties:
+        map:
+          type:
+          - string
+          - 'null'
+        secret:
+          type:
+          - string
+          - 'null'
+        secretType:
+          allOf:
+          - $ref: '#/components/schemas/secret.SecretType'
+    endpoint.RecentTransactions:
+      type: object
+      properties:
+        last:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastFinished:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastFinishedOp:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastSuccessful:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastSuccessfulNonExtract:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+        lastVisible:
+          $ref: '#/components/schemas/endpoint.TransactionSummary'
+    cloudstorage.WriteModel:
+      type: object
+      properties:
+        bucketName:
+          type: string
+        bucketPath:
+          type: string
+        credentialType:
+          $ref: '#/components/schemas/cloudstoragecredentials.CredentialType'
+        credentials:
+          $ref: '#/components/schemas/cloudstoragecredentials.CloudStorageCredentials'
+        deleteAfterPickup:
+          type: boolean
+        encryption:
+          $ref: '#/components/schemas/encryption.WriteModel'
+        sortDescending:
+          type: boolean
+        sortingMethod:
+          $ref: '#/components/schemas/sorting.Method'
+    secret.ApiSecret:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
     snowflake.ReadModel:
       type: object
       properties:
@@ -3141,13 +3122,32 @@ components:
           type: string
         warehouse:
           type: string
-    duckdb.Config:
-      type: object
-      properties:
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/duckdb.File'
+    flumelakehousecredentials.CredentialType:
+      type: string
+      enum:
+      - AwsStatic
+      - AwsWebIdentity
+      - GcpServiceAccount
+      - AzureSharedKey
+      - AzureSharedAccessSignature
+      - AzureConnectionString
+      x-enum-varnames:
+      - CredentialTypeAwsStatic
+      - CredentialTypeAwsWebIdentity
+      - CredentialTypeGcpServiceAccount
+      - CredentialTypeAzureSharedKey
+      - CredentialTypeAzureSharedAccessSignature
+      - CredentialTypeAzureConnectionString
+    endpoint.MapType:
+      type: string
+      enum:
+      - SQL
+      - Python
+      - DuckDB
+      x-enum-varnames:
+      - MapTypeSql
+      - MapTypePython
+      - MapTypeDuckDB
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

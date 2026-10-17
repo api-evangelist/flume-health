@@ -199,39 +199,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/workersize.ReadModel'
-    workersize.ReadModel:
-      type: object
-      properties:
-        cpuLimit:
-          type: integer
-        id:
-          type: integer
-        label:
-          $ref: '#/components/schemas/endpoint.WorkerSize'
-        memoryLimit:
-          type: integer
-    workersize.UpdateModel:
-      type: object
-      properties:
-        cpuLimit:
-          type:
-          - integer
-          - 'null'
-        memoryLimit:
-          type:
-          - integer
-          - 'null'
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     endpoint.WorkerSize:
       type: string
       enum:
@@ -246,6 +213,39 @@ components:
       - WorkerSizeLarge
       - WorkerSizeXLarge
       - WorkerSizeMax
+    workersize.ReadModel:
+      type: object
+      properties:
+        cpuLimit:
+          type: integer
+        id:
+          type: integer
+        label:
+          $ref: '#/components/schemas/endpoint.WorkerSize'
+        memoryLimit:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    workersize.UpdateModel:
+      type: object
+      properties:
+        cpuLimit:
+          type:
+          - integer
+          - 'null'
+        memoryLimit:
+          type:
+          - integer
+          - 'null'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

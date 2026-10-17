@@ -190,20 +190,6 @@ components:
           $ref: '#/components/schemas/user.Role'
         updated:
           type: string
-    endpointmap.FieldType:
-      type: string
-      enum:
-      - File
-      - ControlFile
-      - API
-      - Database
-      - FlumeLakehouse
-      x-enum-varnames:
-      - FieldTypeFile
-      - FieldTypeControlFile
-      - FieldTypeApi
-      - FieldTypeDatabase
-      - FieldTypeFlumeLakehouse
     endpointmap.MapVersion:
       type: object
       properties:
@@ -217,15 +203,6 @@ components:
           type: string
         version:
           type: integer
-    endpointmap.ListResponse:
-      type: object
-      properties:
-        endpointMaps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.ReadModel'
-        nextPageToken:
-          type: string
     endpointmap.ReadModel:
       type: object
       properties:
@@ -243,17 +220,6 @@ components:
           type: string
         ordinal:
           type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     user.Role:
       type: string
       enum:
@@ -266,6 +232,40 @@ components:
       - RoleAdmin
       - RoleEditor
       - RoleViewer
+    endpointmap.FieldType:
+      type: string
+      enum:
+      - File
+      - ControlFile
+      - API
+      - Database
+      - FlumeLakehouse
+      x-enum-varnames:
+      - FieldTypeFile
+      - FieldTypeControlFile
+      - FieldTypeApi
+      - FieldTypeDatabase
+      - FieldTypeFlumeLakehouse
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    endpointmap.ListResponse:
+      type: object
+      properties:
+        endpointMaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.ReadModel'
+        nextPageToken:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2
