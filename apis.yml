@@ -77,11 +77,12 @@ tags_raw:
 - interoperability
 apis:
 - name: Flume Context MCP Server
-  description: A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp.
-    It is protected by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401
-    with a WWW-Authenticate Bearer challenge and a resource_metadata pointer to unauthenticated callers,
-    so the live tool list requires an authenticated introspection. Discovered by probe; Flume publishes
-    no MCP documentation page.
+  description: >-
+    A remote Model Context Protocol endpoint served by the Flume Console at /api/v1/context/mcp. It is
+    protected by OAuth 2.0 and advertises RFC 9728 protected-resource metadata, returning a 401 with a
+    WWW-Authenticate Bearer challenge and a resource_metadata pointer to unauthenticated callers, so the
+    live tool list requires an authenticated introspection. Discovered by probe; Flume publishes no MCP
+    documentation page.
   humanURL: https://www.flumehealth.com/developers
   baseURL: https://console.flumehealth.com/api/v1/context/mcp
   tags:
@@ -608,6 +609,67 @@ apis:
     url: data-model/flume-health-data-model.yml
   - type: RateLimits
     url: rate-limits/flume-health-rate-limits.yml
+- aid: flume-health:flume-health-account-access-api
+  name: Flume Health Account Access API
+  description: The Account Access API from Flume Health — 4 operation(s) for account access.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - Account Access
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-account-access-api-openapi.yml
+- aid: flume-health:flume-health-budget-api
+  name: Flume Health Budget API
+  description: The Budget API from Flume Health — 3 operation(s) for budget.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - Budget
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-budget-api-openapi.yml
+- aid: flume-health:flume-health-context-conversations-api
+  name: Flume Health Context Conversations API
+  description: >-
+    The Context Conversations API from Flume Health — 8 operation(s) for context conversations.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - Context Conversations
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-context-conversations-api-openapi.yml
+- aid: flume-health:flume-health-context-grants-api
+  name: Flume Health Context Grants API
+  description: The Context Grants API from Flume Health — 2 operation(s) for context grants.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - Context Grants
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-context-grants-api-openapi.yml
+- aid: flume-health:flume-health-context-workspaces-api
+  name: Flume Health Context Workspaces API
+  description: The Context Workspaces API from Flume Health — 13 operation(s) for context workspaces.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - Context Workspaces
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-context-workspaces-api-openapi.yml
+- aid: flume-health:flume-health-knowledge-api
+  name: Flume Health Knowledge API
+  description: The knowledge API from Flume Health — 3 operation(s) for knowledge.
+  humanURL: https://www.flumehealth.com/developers
+  baseURL: https://console.flumehealth.com/api/v1/context/mcp
+  tags:
+  - knowledge
+  properties:
+  - type: OpenAPI
+    url: openapi/flume-health-knowledge-api-openapi.yml
 common:
 - type: CapabilityMap
   url: capabilities/flume-health-capability-edges.yml

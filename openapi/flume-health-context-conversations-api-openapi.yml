@@ -1,0 +1,585 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please contact us.
+
+
+    Redoc | Swagger - Try It'
+  title: Flume Console Context Conversations API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Context Conversations
+paths:
+  /api/v1/context/conversations/{id}/checkpoint:
+    get:
+      description: Returns the "summary through message K" compaction checkpoint for a conversation, letting a resume skip the Haiku recompute (FL-30802). 404 when the conversation has no checkpoint — the client maps 404 to "no checkpoint" and resumes normally. The summary is customer conversation content and is read only from the account's own bucket-resident storage. account_id is derived from the request context, never sent by the client.
+      tags:
+      - Context Conversations
+      summary: Get a conversation's compaction checkpoint
+      operationId: getConversationCheckpoint
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.CheckpointModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    put:
+      description: Writes (upserts) the compaction checkpoint for a conversation (FL-30802). The summary is customer conversation content and is written only to the account's own bucket-resident storage — never shared cross-customer storage. One checkpoint per conversation; a later write replaces the earlier one. 404 when the conversation does not belong to the caller, or when the account has no bucket-resident storage to hold it (the client treats 404 as "not persisted" and continues). account_id is derived from the request context, never sent by the client.
+      tags:
+      - Context Conversations
+      summary: Save a conversation's compaction checkpoint
+      operationId: putConversationCheckpoint
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversation.CheckpointModel'
+        description: Checkpoint to persist
+        required: true
+  /api/v1/context/conversations/{id}/lock:
+    get:
+      description: Returns who currently holds the conversation's lock (FL-31452), or an empty holder when it is free. Visible to the owner and to anyone else the manager admits.
+      tags:
+      - Context Conversations
+      summary: Get a conversation's one-holder lock state
+      operationId: getConversationLock
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.LockState'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/conversations/{id}/lock:answerTakeover:
+    post:
+      description: The holder hands the seat to the requester (handOver true) or keeps it (false; the request stays with the answer "kept") (FL-31670). 409 when the caller is not the holder or there is no open request.
+      tags:
+      - Context Conversations
+      summary: Answer a takeover request
+      operationId: answerConversationLockTakeover
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.LockState'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversation.AnswerTakeoverRequest'
+        description: The holder's answer
+        required: true
+  /api/v1/context/conversations/{id}/lock:cancelTakeover:
+    post:
+      description: Clears the caller's open request for the seat (FL-31670). 409 when the caller has no open request.
+      tags:
+      - Context Conversations
+      summary: Withdraw a takeover request
+      operationId: cancelConversationLockTakeover
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.LockState'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/conversations/{id}/lock:claim:
+    post:
+      description: 'Makes the caller the conversation''s holder (FL-31452, spec-e9-projects.md "Concurrency, v1"). Succeeds when the lock is free or the existing hold has lapsed; 409 when someone else holds an unexpired claim. A holder re-claiming their own lock extends it — this is also how a client heartbeats to keep an active hold. The optional body {"activity": true} says the holder just sent or typed, which moves the seat''s active time; a renewal without it does not. An empty body is the same as {"activity": false}.'
+      tags:
+      - Context Conversations
+      summary: Claim a conversation's one-holder lock
+      operationId: claimConversationLock
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.LockState'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversation.ClaimLockRequest'
+        description: Optional activity flag
+  /api/v1/context/conversations/{id}/lock:release:
+    post:
+      description: Clears the caller's hold on the conversation, if it is currently theirs (FL-31452). 409 when it is not — already released, or expired and taken over by someone else.
+      tags:
+      - Context Conversations
+      summary: Release a conversation's one-holder lock
+      operationId: releaseConversationLock
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/conversations/{id}/lock:requestTakeover:
+    post:
+      description: Records the caller's request for a seat held by someone else (FL-31670). 409 when the seat is free or the caller's own, or when the holder kept the seat against this caller less than five minutes ago.
+      tags:
+      - Context Conversations
+      summary: Ask the holder for the seat
+      operationId: requestConversationLockTakeover
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.LockState'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/conversations/{id}/lock:takeOver:
+    post:
+      description: Makes the caller the holder when the seat is free or lapsed, or when its holder has had no send or keystroke for five minutes (FL-31670). 409 when the holder is active.
+      tags:
+      - Context Conversations
+      summary: Take the seat from an idle holder
+      operationId: takeOverConversationLock
+      parameters:
+      - description: Conversation id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversation.LockState'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    conversation.TurnState:
+      type: object
+      properties:
+        conversationId:
+          type: string
+        endTime:
+          type: string
+        memberId:
+          type: string
+        phase:
+          type: string
+        stalled:
+          type: boolean
+        startTime:
+          type: string
+        state:
+          type: string
+        step:
+          type: integer
+        stepTime:
+          type: string
+        stopReason:
+          type: string
+        workspaceId:
+          type: string
+    conversation.TakeoverRequest:
+      type: object
+      properties:
+        answer:
+          type: string
+        answerTime:
+          type: string
+        requestTime:
+          type: string
+        requesterMemberId:
+          type: string
+        requesterUserId:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    conversation.CheckpointModel:
+      type: object
+      required:
+      - summary
+      - throughMessageId
+      properties:
+        containedPhi:
+          description: 'ContainedPHI is TRUE when any message folded into the summary touched PHI.
+
+            A boolean flag only — never the content that made it true.'
+          type: boolean
+        createdAt:
+          description: CreatedAt is the ISO-8601 time the checkpoint was written, for provenance.
+          type: string
+          maxLength: 64
+        model:
+          description: Model is the model that produced the summary, for provenance.
+          type: string
+          maxLength: 128
+        summary:
+          description: 'Summary of every message up to and including ThroughMessageID (message K).
+
+            Customer content — bucket-resident only.'
+          type: string
+          maxLength: 256000
+        throughMessageId:
+          description: ThroughMessageID is the id of the newest message folded into Summary.
+          type: string
+          maxLength: 128
+        tier:
+          description: Tier is the compaction tier that produced the checkpoint (2 for a summary).
+          type: integer
+    conversation.ClaimLockRequest:
+      type: object
+      properties:
+        activity:
+          description: Activity says the holder just sent or typed.
+          type: boolean
+    conversation.AnswerTakeoverRequest:
+      type: object
+      required:
+      - handOver
+      properties:
+        handOver:
+          description: HandOver gives the seat to the requester; false keeps it.
+          type: boolean
+    conversation.LockState:
+      type: object
+      properties:
+        holderActiveTime:
+          type: string
+        holderClaimTime:
+          type: string
+        holderExpireTime:
+          type: string
+        holderIdle:
+          type: boolean
+        holderMemberId:
+          type: string
+        holderUserId:
+          type: string
+        takeoverRequest:
+          description: 'TakeoverRequest is another user''s ask for the seat. Nil when nobody has
+
+            asked. Only one request is held at a time.'
+          allOf:
+          - $ref: '#/components/schemas/conversation.TakeoverRequest'
+        turn:
+          description: 'Turn is the turn running in the conversation (FL-32030), so a member
+
+            watching the chat sees "Running · step N". Nil when no turn has run in
+
+            a workspace, or when the last one ended or expired.'
+          allOf:
+          - $ref: '#/components/schemas/conversation.TurnState'
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

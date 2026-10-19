@@ -799,7 +799,7 @@ paths:
         in: query
         schema:
           type: string
-      - description: Filter by requester (me, all)
+      - description: 'Which sessions: me (default), approvable (pending sessions you may approve), all (every session in the account; SystemAdmin or account Admin only). Anything else is 400.'
         name: requester
         in: query
         schema:
@@ -826,6 +826,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/discovery.SessionListResponse'
+        '400':
+          description: unknown requester value or malformed query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
         '403':
           description: Forbidden
           content:
@@ -1374,71 +1380,152 @@ paths:
         required: true
 components:
   schemas:
-    discovery.SessionLaunchRequest:
-      description: Record of a single AI CLI tool launch under a subscription_access session.
+    discovery.SessionRevokeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.ExtractionCreateRequest:
+      type: object
+      required:
+      - connectionId
+      - params
+      - sessionId
+      properties:
+        connectionId:
+          description: Must be in session's grants
+          type: integer
+        extractionType:
+          description: 'Default: sql_query'
+          allOf:
+          - $ref: '#/components/schemas/discovery.ExtractionType'
+        maxRows:
+          description: Override connection default
+          type: integer
+        params:
+          type: object
+          additionalProperties: {}
+        sessionId:
+          type: string
+    discovery.SessionStatus:
+      type: string
+      enum:
+      - pending
+      - approved
+      - denied
+      - expired
+      - revoked
+      - cancelled
+      - extension_pending
+      x-enum-varnames:
+      - SessionStatusPending
+      - SessionStatusApproved
+      - SessionStatusDenied
+      - SessionStatusExpired
+      - SessionStatusRevoked
+      - SessionStatusCancelled
+      - SessionStatusExtensionPending
+    discovery.SessionExtendRequest:
+      type: object
+      required:
+      - expireTime
+      - reason
+      properties:
+        expireTime:
+          description: New expiration time (must be after current expires_at)
+          type: string
+        reason:
+          description: Reason for requesting extension
+          type: string
+    discovery.ConnectionWriteModel:
+      type: object
+      required:
+      - connectionConfig
+      - connectionType
+      - name
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties
+          type: boolean
+        connectionConfig:
+          type: object
+          additionalProperties: {}
+        connectionType:
+          $ref: '#/components/schemas/discovery.ConnectionType'
+        defaultRowLimit:
+          type: integer
+        description:
+          type: string
+        maxResultBytes:
+          description: Per-connection byte limit
+          type: integer
+        name:
+          type: string
+        secretValue:
+          description: Written to Secret Manager, not stored
+          type: string
+        timeoutSeconds:
+          type: integer
+        workspaceOnly:
+          description: 'WorkspaceOnly locks the connection to the workspaces it is attached to.
+
+            Only an account admin may set it (FL-31882).'
+          type: boolean
+    discovery.SessionLaunchResponse:
+      description: A recorded AI CLI tool launch under a subscription_access session.
       type: object
       properties:
         cliVersion:
-          description: Version string of the CLI binary. Required; capped at 64 characters.
+          description: Version of the CLI binary.
           type: string
           example: 0.1.42
         cwd:
-          description: Working directory the tool was launched from. Optional; capped at 1024 characters.
+          description: Working directory the tool was launched from.
           type: string
           example: /Users/dev/project
+        id:
+          description: Server-generated unique identifier for this launch record (UUID).
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        sessionId:
+          description: The subscription_access session this launch was recorded under.
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        startTime:
+          description: When the launch was recorded (RFC3339).
+          type: string
+          example: '2024-12-31T23:59:59Z'
         tool:
-          description: AI CLI tool being launched. Must be exactly "claude" or "codex".
+          description: AI CLI tool that was launched.
           type: string
           enum:
           - claude
           - codex
           example: claude
-    discovery.ConnectionType:
-      type: string
-      enum:
-      - database
-      - lakehouse
-      x-enum-varnames:
-      - ConnectionTypeDatabase
-      - ConnectionTypeLakehouse
-    discovery.ConnectionTestResult:
+    discovery.ConnectionListResponse:
       type: object
       properties:
-        errorMessage:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.ConnectionReadModel'
+        nextPageToken:
           type: string
-        latencyMs:
-          type: integer
-        success:
-          type: boolean
-    discovery.ApproverReadModel:
+    discovery.SessionApproveRequest:
       type: object
       properties:
-        accountId:
-          type: integer
-        accountName:
+        comment:
           type: string
-        active:
-          type: boolean
-        canGrantApprovers:
-          type: boolean
-        createdAt:
+        expireTime:
+          description: 'The expiry the approver sets (RFC3339, in the future). Required to
+
+            approve an account_access grant (DEC-040, FL-32116), where the approver
+
+            sets the length and the requester''s expireTime is only a proposal.
+
+            Refused for every other grant type.'
           type: string
-        email:
-          type: string
-        grantReason:
-          type: string
-        grantedBy:
-          type: string
-        id:
-          type: integer
-        revokeReason:
-          type: string
-        revokedAt:
-          type: string
-        revokedBy:
-          type: string
-        updatedAt:
-          type: string
+          example: '2026-10-12T18:00:00Z'
     discovery.SessionCreateRequest:
       description: Request to create a PAM session for database access or approver delegation.
       type: object
@@ -1488,11 +1575,16 @@ components:
 
             time-boxed grant to run AI CLI tools off the LLM gateway — no connection
 
-            scope, no recipient, born approved, capped at 24h). Default: data_access'
+            scope, no recipient, born approved, capped at 24h), or "workspace_access"
+
+            (open one workspace''s artifacts without membership — needs workspaceId
+
+            and a second person''s approval). Default: data_access'
           enum:
           - data_access
           - approver_access
           - subscription_access
+          - workspace_access
           allOf:
           - $ref: '#/components/schemas/discovery.GrantType'
           example: data_access
@@ -1504,6 +1596,41 @@ components:
           description: 'For approver_access grants: email of user to grant approver rights to'
           type: string
           example: newapprover@example.com
+        workspaceId:
+          description: 'For workspace_access grants: the workspace to open. Required for that
+
+            grant type and refused for every other.'
+          type: string
+          example: 01928f6e-7a3b-7c41-9a2e-3f5d8b1c2e4a
+    discovery.SessionCancelRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.ApproverCreateRequest:
+      type: object
+      required:
+      - email
+      properties:
+        accountId:
+          description: 'Optional: scope to specific account. If nil, approver has no account restriction.'
+          type: integer
+        canGrantApprovers:
+          description: 'Default: false'
+          type: boolean
+        email:
+          type: string
+        reason:
+          type: string
+    discovery.SessionListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.SessionReadModel'
     discovery.ConnectionReadModel:
       type: object
       properties:
@@ -1539,28 +1666,69 @@ components:
           type: integer
         updatedAt:
           type: string
-    discovery.ExtractionCreateRequest:
+        workspaceOnly:
+          description: 'WorkspaceOnly is true when the connection answers only inside the
+
+            workspaces it is attached to (FL-31882, pkg/managers/connectionlock).'
+          type: boolean
+    discovery.SessionLaunchRequest:
+      description: Record of a single AI CLI tool launch under a subscription_access session.
       type: object
-      required:
-      - connectionId
-      - params
-      - sessionId
       properties:
-        connectionId:
-          description: Must be in session's grants
+        cliVersion:
+          description: Version string of the CLI binary. Required; capped at 64 characters.
+          type: string
+          example: 0.1.42
+        cwd:
+          description: Working directory the tool was launched from. Optional; capped at 1024 characters.
+          type: string
+          example: /Users/dev/project
+        tool:
+          description: AI CLI tool being launched. Must be exactly "claude" or "codex".
+          type: string
+          enum:
+          - claude
+          - codex
+          example: claude
+    discovery.ConnectionTestResult:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+        latencyMs:
           type: integer
-        extractionType:
-          description: 'Default: sql_query'
-          allOf:
-          - $ref: '#/components/schemas/discovery.ExtractionType'
-        maxRows:
-          description: Override connection default
-          type: integer
-        params:
+        success:
+          type: boolean
+    discovery.ConnectionPatchModel:
+      type: object
+      properties:
+        allowAnalysisMode:
+          description: Reduced exfiltration penalties
+          type: boolean
+        connectionConfig:
           type: object
           additionalProperties: {}
-        sessionId:
+        defaultRowLimit:
+          type: integer
+        description:
           type: string
+        enabled:
+          type: boolean
+        maxResultBytes:
+          description: Per-connection byte limit
+          type: integer
+        name:
+          type: string
+        secretValue:
+          description: Updates Secret Manager
+          type: string
+        timeoutSeconds:
+          type: integer
+        workspaceOnly:
+          description: 'WorkspaceOnly sets or clears the workspace-only lock. Only an account
+
+            admin may send it (FL-31882).'
+          type: boolean
     discovery.ExtractionListResponse:
       type: object
       properties:
@@ -1570,81 +1738,222 @@ components:
             $ref: '#/components/schemas/discovery.ExtractionReadModel'
         nextPageToken:
           type: string
-    discovery.ConnectionWriteModel:
+    discovery.ExtractionReadModel:
       type: object
-      required:
-      - connectionConfig
-      - connectionType
-      - name
       properties:
-        allowAnalysisMode:
-          description: Reduced exfiltration penalties
-          type: boolean
-        connectionConfig:
+        bytesReturned:
+          type: integer
+        connectionId:
+          type: integer
+        createdAt:
+          type: string
+        errorMessage:
+          type: string
+        executionMs:
+          type: integer
+        exfiltrationScore:
+          type: number
+        extractionType:
+          $ref: '#/components/schemas/discovery.ExtractionType'
+        id:
+          type: string
+        params:
           type: object
           additionalProperties: {}
-        connectionType:
-          $ref: '#/components/schemas/discovery.ConnectionType'
-        defaultRowLimit:
+        requesterEmail:
+          type: string
+        resultLocation:
+          type: string
+        rowCount:
           type: integer
-        description:
-          type: string
-        maxResultBytes:
-          description: Per-connection byte limit
-          type: integer
-        name:
-          type: string
-        secretValue:
-          description: Written to Secret Manager, not stored
-          type: string
-        timeoutSeconds:
-          type: integer
-    discovery.ApproverCreateRequest:
-      type: object
-      required:
-      - email
-      properties:
-        accountId:
-          description: 'Optional: scope to specific account. If nil, approver has no account restriction.'
-          type: integer
-        canGrantApprovers:
-          description: 'Default: false'
-          type: boolean
-        email:
-          type: string
-        reason:
-          type: string
-    discovery.SessionLaunchResponse:
-      description: A recorded AI CLI tool launch under a subscription_access session.
-      type: object
-      properties:
-        cliVersion:
-          description: Version of the CLI binary.
-          type: string
-          example: 0.1.42
-        cwd:
-          description: Working directory the tool was launched from.
-          type: string
-          example: /Users/dev/project
-        id:
-          description: Server-generated unique identifier for this launch record (UUID).
-          type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
         sessionId:
-          description: The subscription_access session this launch was recorded under.
           type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-        startTime:
-          description: When the launch was recorded (RFC3339).
+        sql:
+          type: string
+        status:
+          $ref: '#/components/schemas/discovery.ExtractionStatus'
+        workspaceId:
+          description: 'WorkspaceID is set, and SessionID is empty, for a workspace totals
+
+            query that membership admitted without a session (FL-31883).'
+          type: string
+    discovery.SessionReadModel:
+      description: PAM session granting time-limited access to database connections.
+      type: object
+      properties:
+        approvalComment:
+          description: Optional comment from the approver
+          type: string
+        approvedAt:
+          description: When this session was approved
+          type: string
+        approverEmail:
+          description: Email of the approver who approved/denied this request
+          type: string
+          example: admin@example.com
+        canGrantApproverAccess:
+          description: 'If true and grantType is "approver_access", this approver can grant approver access to others.
+
+            Only the root approver can set this to true.'
+          type: boolean
+          example: false
+        createdAt:
+          description: When this session request was created
+          type: string
+        denialReason:
+          description: Reason given if the session was denied
+          type: string
+        expireTime:
+          description: 'User-requested expiration time (RFC3339 format). Set by requester in SessionCreateRequest.
+
+            On approval, this value is typically copied to ExpiresAt (which is the enforced expiration).'
           type: string
           example: '2024-12-31T23:59:59Z'
-        tool:
-          description: AI CLI tool that was launched.
+        expiresAt:
+          description: 'Actual enforced expiration time. Set on approval (typically = ExpireTime, but approver may adjust).
+
+            This is the authoritative expiration used for session validity checks.'
           type: string
+        grantAllConnections:
+          description: 'Wildcard scope: when true, this data_access session covers every enabled
+
+            connection in its account at query time (resolved live, so connections
+
+            added after approval are automatically covered). Applicable only
+
+            when grantType=data_access.'
+          type: boolean
+          example: false
+        grantType:
+          description: 'Type of access granted: "data_access" (execute queries), "approver_access"
+
+            (approve sessions), "subscription_access" (self-attested, off-gateway
+
+            AI CLI grant with no connection scope), "workspace_access" (open one
+
+            workspace''s artifacts without membership), or "account_access" (a Flume
+
+            SystemAdmin acts inside one customer account).'
           enum:
-          - claude
-          - codex
-          example: claude
+          - data_access
+          - approver_access
+          - subscription_access
+          - workspace_access
+          - account_access
+          allOf:
+          - $ref: '#/components/schemas/discovery.GrantType'
+          example: data_access
+        grants:
+          description: 'Connections this session grants access to. Omitted from the JSON
+
+            payload when GrantAllConnections is true (the slice is nil and
+
+            `omitempty` drops it) — clients should treat a missing `grants`
+
+            field as "no explicit grants" and rely on `grantAllConnections`
+
+            to know whether the wildcard scope applies.'
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.SessionGrantReadModel'
+        id:
+          description: Unique identifier for this session (UUID format)
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        reason:
+          description: Business justification for requesting access
+          type: string
+          example: Need to investigate claim processing issue
+        recipientEmail:
+          description: 'For approver_access grants: the email of the user receiving approver rights.
+
+            Distinguishes requester (granter) from recipient (grantee) in the delegation chain.'
+          type: string
+          example: newapprover@example.com
+        requesterEmail:
+          description: Email of the user who requested this session
+          type: string
+          example: user@example.com
+        revokedAt:
+          description: When this session was manually revoked (if applicable)
+          type: string
+        revokedBy:
+          description: Email of user who revoked the session
+          type: string
+        status:
+          description: 'Current status: pending, approved, denied, expired, revoked, cancelled, or extension_pending'
+          enum:
+          - pending
+          - approved
+          - denied
+          - expired
+          - revoked
+          - cancelled
+          - extension_pending
+          allOf:
+          - $ref: '#/components/schemas/discovery.SessionStatus'
+          example: approved
+        updatedAt:
+          description: When this session was last updated
+          type: string
+        workspaceId:
+          description: 'For workspace_access grants: the workspace the grant opens.'
+          type: string
+          example: 01928f6e-7a3b-7c41-9a2e-3f5d8b1c2e4a
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    discovery.ExtractionStatus:
+      type: string
+      enum:
+      - pending
+      - running
+      - success
+      - failed
+      - blocked
+      - timeout
+      x-enum-varnames:
+      - ExtractionStatusPending
+      - ExtractionStatusRunning
+      - ExtractionStatusSuccess
+      - ExtractionStatusFailed
+      - ExtractionStatusBlocked
+      - ExtractionStatusTimeout
+    discovery.ApproverRevokeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.GrantType:
+      type: string
+      enum:
+      - data_access
+      - approver_access
+      - subscription_access
+      - workspace_access
+      - account_access
+      x-enum-varnames:
+      - GrantTypeDataAccess
+      - GrantTypeApproverAccess
+      - GrantTypeSubscriptionAccess
+      - GrantTypeWorkspaceAccess
+      - GrantTypeAccountAccess
+    discovery.ConnectionType:
+      type: string
+      enum:
+      - database
+      - lakehouse
+      x-enum-varnames:
+      - ConnectionTypeDatabase
+      - ConnectionTypeLakehouse
     discovery.ApproverListResponse:
       type: object
       properties:
@@ -1697,10 +2006,10 @@ components:
           type: string
         status:
           $ref: '#/components/schemas/discovery.ExtractionStatus'
-    discovery.ApproverRevokeRequest:
-      type: object
-      properties:
-        reason:
+        workspaceId:
+          description: 'WorkspaceID is set, and SessionID is empty, for a workspace totals
+
+            query that membership admitted without a session (FL-31883).'
           type: string
     discovery.SessionGrantReadModel:
       type: object
@@ -1715,15 +2024,6 @@ components:
       - sql_query
       x-enum-varnames:
       - ExtractionTypeSQLQuery
-    discovery.SessionListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        sessions:
-          type: array
-          items:
-            $ref: '#/components/schemas/discovery.SessionReadModel'
     discovery.SessionGrantRequest:
       description: Approver creates a pre-approved PAM session for another user.
       type: object
@@ -1789,275 +2089,41 @@ components:
             the email being correct.'
           type: string
           example: newuser@example.com
-    discovery.SessionCancelRequest:
-      type: object
-      properties:
-        reason:
-          type: string
-    discovery.SessionReadModel:
-      description: PAM session granting time-limited access to database connections.
-      type: object
-      properties:
-        approvalComment:
-          description: Optional comment from the approver
-          type: string
-        approvedAt:
-          description: When this session was approved
-          type: string
-        approverEmail:
-          description: Email of the approver who approved/denied this request
-          type: string
-          example: admin@example.com
-        canGrantApproverAccess:
-          description: 'If true and grantType is "approver_access", this approver can grant approver access to others.
-
-            Only the root approver can set this to true.'
-          type: boolean
-          example: false
-        createdAt:
-          description: When this session request was created
-          type: string
-        denialReason:
-          description: Reason given if the session was denied
-          type: string
-        expireTime:
-          description: 'User-requested expiration time (RFC3339 format). Set by requester in SessionCreateRequest.
-
-            On approval, this value is typically copied to ExpiresAt (which is the enforced expiration).'
-          type: string
-          example: '2024-12-31T23:59:59Z'
-        expiresAt:
-          description: 'Actual enforced expiration time. Set on approval (typically = ExpireTime, but approver may adjust).
-
-            This is the authoritative expiration used for session validity checks.'
-          type: string
-        grantAllConnections:
-          description: 'Wildcard scope: when true, this data_access session covers every enabled
-
-            connection in its account at query time (resolved live, so connections
-
-            added after approval are automatically covered). Applicable only
-
-            when grantType=data_access.'
-          type: boolean
-          example: false
-        grantType:
-          description: 'Type of access granted: "data_access" (execute queries), "approver_access"
-
-            (approve sessions), or "subscription_access" (self-attested, off-gateway
-
-            AI CLI grant with no connection scope).'
-          enum:
-          - data_access
-          - approver_access
-          - subscription_access
-          allOf:
-          - $ref: '#/components/schemas/discovery.GrantType'
-          example: data_access
-        grants:
-          description: 'Connections this session grants access to. Omitted from the JSON
-
-            payload when GrantAllConnections is true (the slice is nil and
-
-            `omitempty` drops it) — clients should treat a missing `grants`
-
-            field as "no explicit grants" and rely on `grantAllConnections`
-
-            to know whether the wildcard scope applies.'
-          type: array
-          items:
-            $ref: '#/components/schemas/discovery.SessionGrantReadModel'
-        id:
-          description: Unique identifier for this session (UUID format)
-          type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-        reason:
-          description: Business justification for requesting access
-          type: string
-          example: Need to investigate claim processing issue
-        recipientEmail:
-          description: 'For approver_access grants: the email of the user receiving approver rights.
-
-            Distinguishes requester (granter) from recipient (grantee) in the delegation chain.'
-          type: string
-          example: newapprover@example.com
-        requesterEmail:
-          description: Email of the user who requested this session
-          type: string
-          example: user@example.com
-        revokedAt:
-          description: When this session was manually revoked (if applicable)
-          type: string
-        revokedBy:
-          description: Email of user who revoked the session
-          type: string
-        status:
-          description: 'Current status: pending, approved, denied, expired, revoked, cancelled, or extension_pending'
-          enum:
-          - pending
-          - approved
-          - denied
-          - expired
-          - revoked
-          - cancelled
-          - extension_pending
-          allOf:
-          - $ref: '#/components/schemas/discovery.SessionStatus'
-          example: approved
-        updatedAt:
-          description: When this session was last updated
-          type: string
-    discovery.ExtractionStatus:
-      type: string
-      enum:
-      - pending
-      - running
-      - success
-      - failed
-      - blocked
-      - timeout
-      x-enum-varnames:
-      - ExtractionStatusPending
-      - ExtractionStatusRunning
-      - ExtractionStatusSuccess
-      - ExtractionStatusFailed
-      - ExtractionStatusBlocked
-      - ExtractionStatusTimeout
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    discovery.GrantType:
-      type: string
-      enum:
-      - data_access
-      - approver_access
-      - subscription_access
-      x-enum-varnames:
-      - GrantTypeDataAccess
-      - GrantTypeApproverAccess
-      - GrantTypeSubscriptionAccess
-    discovery.ConnectionPatchModel:
-      type: object
-      properties:
-        allowAnalysisMode:
-          description: Reduced exfiltration penalties
-          type: boolean
-        connectionConfig:
-          type: object
-          additionalProperties: {}
-        defaultRowLimit:
-          type: integer
-        description:
-          type: string
-        enabled:
-          type: boolean
-        maxResultBytes:
-          description: Per-connection byte limit
-          type: integer
-        name:
-          type: string
-        secretValue:
-          description: Updates Secret Manager
-          type: string
-        timeoutSeconds:
-          type: integer
-    discovery.SessionStatus:
-      type: string
-      enum:
-      - pending
-      - approved
-      - denied
-      - expired
-      - revoked
-      - cancelled
-      - extension_pending
-      x-enum-varnames:
-      - SessionStatusPending
-      - SessionStatusApproved
-      - SessionStatusDenied
-      - SessionStatusExpired
-      - SessionStatusRevoked
-      - SessionStatusCancelled
-      - SessionStatusExtensionPending
-    discovery.SessionApproveRequest:
-      type: object
-      properties:
-        comment:
-          type: string
-    discovery.SessionExtendRequest:
-      type: object
-      required:
-      - expireTime
-      - reason
-      properties:
-        expireTime:
-          description: New expiration time (must be after current expires_at)
-          type: string
-        reason:
-          description: Reason for requesting extension
-          type: string
-    discovery.ConnectionListResponse:
-      type: object
-      properties:
-        connections:
-          type: array
-          items:
-            $ref: '#/components/schemas/discovery.ConnectionReadModel'
-        nextPageToken:
-          type: string
-    discovery.SessionRevokeRequest:
-      type: object
-      properties:
-        reason:
-          type: string
-    discovery.ExtractionReadModel:
-      type: object
-      properties:
-        bytesReturned:
-          type: integer
-        connectionId:
-          type: integer
-        createdAt:
-          type: string
-        errorMessage:
-          type: string
-        executionMs:
-          type: integer
-        exfiltrationScore:
-          type: number
-        extractionType:
-          $ref: '#/components/schemas/discovery.ExtractionType'
-        id:
-          type: string
-        params:
-          type: object
-          additionalProperties: {}
-        requesterEmail:
-          type: string
-        resultLocation:
-          type: string
-        rowCount:
-          type: integer
-        sessionId:
-          type: string
-        sql:
-          type: string
-        status:
-          $ref: '#/components/schemas/discovery.ExtractionStatus'
     discovery.SessionDenyRequest:
       type: object
       required:
       - reason
       properties:
         reason:
+          type: string
+    discovery.ApproverReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        accountName:
+          type: string
+        active:
+          type: boolean
+        canGrantApprovers:
+          type: boolean
+        createdAt:
+          type: string
+        email:
+          type: string
+        grantReason:
+          type: string
+        grantedBy:
+          type: string
+        id:
+          type: integer
+        revokeReason:
+          type: string
+        revokedAt:
+          type: string
+        revokedBy:
+          type: string
+        updatedAt:
           type: string
   securitySchemes:
     OAuth2Implicit:

@@ -190,15 +190,6 @@ paths:
         required: true
 components:
   schemas:
-    workersize.ListResponse:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        workerSizes:
-          type: array
-          items:
-            $ref: '#/components/schemas/workersize.ReadModel'
     endpoint.WorkerSize:
       type: string
       enum:
@@ -213,17 +204,6 @@ components:
       - WorkerSizeLarge
       - WorkerSizeXLarge
       - WorkerSizeMax
-    workersize.ReadModel:
-      type: object
-      properties:
-        cpuLimit:
-          type: integer
-        id:
-          type: integer
-        label:
-          $ref: '#/components/schemas/endpoint.WorkerSize'
-        memoryLimit:
-          type: integer
     responses.ErrorResponse:
       type: object
       properties:
@@ -235,6 +215,17 @@ components:
             type: string
         message:
           type: string
+    workersize.ReadModel:
+      type: object
+      properties:
+        cpuLimit:
+          type: integer
+        id:
+          type: integer
+        label:
+          $ref: '#/components/schemas/endpoint.WorkerSize'
+        memoryLimit:
+          type: integer
     workersize.UpdateModel:
       type: object
       properties:
@@ -246,6 +237,15 @@ components:
           type:
           - integer
           - 'null'
+    workersize.ListResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        workerSizes:
+          type: array
+          items:
+            $ref: '#/components/schemas/workersize.ReadModel'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

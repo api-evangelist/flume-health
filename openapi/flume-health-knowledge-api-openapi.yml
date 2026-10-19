@@ -1,0 +1,199 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please contact us.
+
+
+    Redoc | Swagger - Try It'
+  title: Flume Console Knowledge API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Knowledge
+paths:
+  /api/v1/context/knowledge:export:
+    get:
+      description: Exports the account's knowledge. `format=wiki` returns a zip of static, self-linked HTML pages with a manifest.json at the root, curator-only (it hands out the whole corpus as a file). `format=markdown` returns a zip of an Open Knowledge Format v0.2 bundle (a folder per area with an index.md, one markdown file per entry with frontmatter, bundle-relative links, manifest.json at the root); it is gated by the knowledge read/inject flag plus the staff gate, the same funnel search and injection use, since every account user who can engage with knowledge may read it (curators alone may still edit, promote or decline). Entries governed as PHI are withheld and counted in the X-Knowledge-Wiki-Withheld header and the manifest. `include` widens the default active-only export with `superseded` and/or `archived`. A missing or unknown `format` is a 400 that names the accepted values; an empty corpus on `format=markdown` is a 400 failed_precondition.
+      tags:
+      - Knowledge
+      summary: Export knowledge in a named format
+      operationId: exportKnowledge
+      parameters:
+      - description: 'export format: wiki, markdown'
+        name: format
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: 'comma-separated: superseded, archived'
+        name: include
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: format missing or unknown, include carries a value other than superseded/archived, or (markdown only) failed_precondition on an empty corpus
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '422':
+          description: 'limit_exceeded: the corpus is above an export ceiling; the message names it and the include= narrowing'
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+  /api/v1/context/knowledge:export-wiki:
+    get:
+      description: 'Returns a zip of static, self-linked HTML pages: a generated root, one page per section (an ontology entry that files other entries), one page per entry, and one page per attached estate object (schema only). Curator-only. Entries governed as PHI are withheld and counted in the X-Knowledge-Wiki-Withheld header. `include` widens the default active-only export with `superseded` and/or `archived`.'
+      tags:
+      - Knowledge
+      summary: 'Deprecated: use knowledge:export'
+      operationId: exportKnowledgeWiki
+      deprecated: true
+      parameters:
+      - description: 'comma-separated: superseded, archived'
+        name: include
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad Request
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '422':
+          description: 'limit_exceeded: the corpus is above an export ceiling; the message names it and the include= narrowing'
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+  /api/v1/context/knowledge:optimize-indices:
+    post:
+      description: 'Folds appended and rewritten fragments back into the graph datasets'' indices. Does NOT compact and does NOT prune: it adds, changes, deletes and relocates no row, alters no schema, and moves nothing outside the account''s own bucket, which is why it is exposed where the erasure sweep''s irreversible steps are not. Use it when a warehouse''s index has fallen behind its data — the state every compact-only sweep produced before FL-30982, because context-db compacts with remap_options None and rewritten fragments drop out of index coverage unless the same sweep re-optimizes. Takes no body. Returns context-db''s maintenance report. 409 when context-db defers because a scan is actively writing the datasets; retry once ingest is quiet.'
+      tags:
+      - Knowledge
+      summary: Re-index the account's graph warehouse
+      operationId: optimizeKnowledgeIndices
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/knowledge.OptimizeIndicesResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+components:
+  schemas:
+    knowledge.OptimizeIndicesResponse:
+      type: object
+      properties:
+        complete:
+          description: 'Complete is true only when every discovered dataset was re-indexed. Unlike the
+
+            erasure sweep''s field of the same name, a false here has no compliance meaning
+
+            — it is a latency statement.'
+          type: boolean
+        datasets_total:
+          description: 'DatasetsTotal is how many Lance datasets under the account''s warehouse were
+
+            attempted.'
+          type: integer
+        detail:
+          description: Detail spells out what Complete implies, so the field cannot be read alone.
+          type: string
+        duration_ms:
+          description: 'DurationMs is context-db''s own measure of the run. On a badly-lagged warehouse
+
+            this is the number worth capturing — it is what says whether the operation fits
+
+            inside context-db''s 300s ceiling on this estate.'
+          type: integer
+        failed_datasets:
+          description: 'FailedDatasets names the datasets that could not be re-indexed. Those keep
+
+            scanning until a later run succeeds.'
+          type: array
+          items:
+            type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

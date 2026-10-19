@@ -1,0 +1,517 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please contact us.
+
+
+    Redoc | Swagger - Try It'
+  title: Flume Console Account Access API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Account Access
+paths:
+  /api/v1/accountAccessGrants:
+    get:
+      description: Lists account_access grants across accounts. requester=me (default) returns the caller's own requests. requester=approvable returns other people's pending requests on accounts the caller may approve for. At most 200 rows, newest first. SystemAdmin only.
+      tags:
+      - Account Access
+      summary: List account access grants
+      operationId: listAccountAccessGrants
+      parameters:
+      - description: me (default) or approvable
+        name: requester
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.AccountAccessGrantListResponse'
+        '400':
+          description: unknown requester value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+    post:
+      description: 'A Flume SystemAdmin asks to act inside one customer account (DEC-040). The account comes from the body; X-Flume-Account-ID is not read. The grant starts pending. A second person who is an approver for that account approves it and sets the expiry; the requester never approves their own grant. The grant does not gate entry: a SystemAdmin enters any account by role (FL-32223). While the grant is in force, requests that name the account with X-Flume-Account-ID (REST or MCP) or account_id (MCP) carry the grant on their scope, and each use is recorded before the request is served. SystemAdmin only.'
+      tags:
+      - Account Access
+      summary: Request an account access grant
+      operationId: requestAccountAccessGrant
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.AccountAccessGrantReadModel'
+        '400':
+          description: own account, missing reason, or an expiry in the past
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: the caller is not a SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: no such account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.AccountAccessCreateRequest'
+        description: The account, the reason and a proposed expiry
+        required: true
+  /api/v1/accountAccessGrants/{id}:approve:
+    post:
+      description: 'Approves a pending account_access grant. The caller must be the root approver, a global approver, or an approver on the grant''s account, and must not be the requester (no exception for the root approver). expireTime is required: the approver sets the grant''s expiry.'
+      tags:
+      - Account Access
+      summary: Approve an account access grant
+      operationId: approveAccountAccessGrant
+      parameters:
+      - description: Grant (session) id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.AccountAccessGrantReadModel'
+        '400':
+          description: missing or past expireTime, or the grant is not pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: not an approver for the account, or the requester
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionApproveRequest'
+        description: expireTime (required) and an optional comment
+        required: true
+  /api/v1/accountAccessGrants/{id}:deny:
+    post:
+      description: Denies a pending account_access grant. An approver for the account denies it; the requester may withdraw their own request.
+      tags:
+      - Account Access
+      summary: Deny an account access grant
+      operationId: denyAccountAccessGrant
+      parameters:
+      - description: Grant (session) id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.AccountAccessGrantReadModel'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionDenyRequest'
+        description: Reason
+        required: true
+  /api/v1/accountAccessGrants/{id}:revoke:
+    post:
+      description: Ends an account_access grant now. The requester or an approver for the account may revoke it. Requests after the revoke no longer carry the grant. This does not end the SystemAdmin's access to the account, which comes from the role (FL-32223).
+      tags:
+      - Account Access
+      summary: Revoke an account access grant
+      operationId: revokeAccountAccessGrant
+      parameters:
+      - description: Grant (session) id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discovery.AccountAccessGrantReadModel'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discovery.SessionRevokeRequest'
+        description: Optional reason
+components:
+  schemas:
+    discovery.SessionRevokeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    discovery.SessionStatus:
+      type: string
+      enum:
+      - pending
+      - approved
+      - denied
+      - expired
+      - revoked
+      - cancelled
+      - extension_pending
+      x-enum-varnames:
+      - SessionStatusPending
+      - SessionStatusApproved
+      - SessionStatusDenied
+      - SessionStatusExpired
+      - SessionStatusRevoked
+      - SessionStatusCancelled
+      - SessionStatusExtensionPending
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    discovery.SessionGrantReadModel:
+      type: object
+      properties:
+        connectionId:
+          type: integer
+        connectionName:
+          type: string
+    discovery.AccountAccessCreateRequest:
+      description: Request to act inside one customer account for a limited time.
+      type: object
+      required:
+      - accountId
+      - expireTime
+      - reason
+      properties:
+        accountId:
+          description: The account to act inside. Must not be the caller's own account.
+          type: integer
+          example: 42
+        expireTime:
+          description: 'The expiry the requester proposes (RFC3339, in the future). The
+
+            approver sets the enforced expiry at approval.'
+          type: string
+          example: '2026-10-12T18:00:00Z'
+        reason:
+          description: Why the caller needs to act inside the account. The approver reads it.
+          type: string
+          example: Investigate a failed trade for a support ticket
+    discovery.GrantType:
+      type: string
+      enum:
+      - data_access
+      - approver_access
+      - subscription_access
+      - workspace_access
+      - account_access
+      x-enum-varnames:
+      - GrantTypeDataAccess
+      - GrantTypeApproverAccess
+      - GrantTypeSubscriptionAccess
+      - GrantTypeWorkspaceAccess
+      - GrantTypeAccountAccess
+    discovery.AccountAccessGrantListResponse:
+      description: account_access grants, newest first.
+      type: object
+      properties:
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.AccountAccessGrantReadModel'
+    discovery.AccountAccessGrantReadModel:
+      description: An account_access grant and the account it opens.
+      type: object
+      properties:
+        accountId:
+          description: The account the grant opens.
+          type: integer
+          example: 42
+        approvalComment:
+          description: Optional comment from the approver
+          type: string
+        approvedAt:
+          description: When this session was approved
+          type: string
+        approverEmail:
+          description: Email of the approver who approved/denied this request
+          type: string
+          example: admin@example.com
+        canGrantApproverAccess:
+          description: 'If true and grantType is "approver_access", this approver can grant approver access to others.
+
+            Only the root approver can set this to true.'
+          type: boolean
+          example: false
+        createdAt:
+          description: When this session request was created
+          type: string
+        denialReason:
+          description: Reason given if the session was denied
+          type: string
+        expireTime:
+          description: 'User-requested expiration time (RFC3339 format). Set by requester in SessionCreateRequest.
+
+            On approval, this value is typically copied to ExpiresAt (which is the enforced expiration).'
+          type: string
+          example: '2024-12-31T23:59:59Z'
+        expiresAt:
+          description: 'Actual enforced expiration time. Set on approval (typically = ExpireTime, but approver may adjust).
+
+            This is the authoritative expiration used for session validity checks.'
+          type: string
+        grantAllConnections:
+          description: 'Wildcard scope: when true, this data_access session covers every enabled
+
+            connection in its account at query time (resolved live, so connections
+
+            added after approval are automatically covered). Applicable only
+
+            when grantType=data_access.'
+          type: boolean
+          example: false
+        grantType:
+          description: 'Type of access granted: "data_access" (execute queries), "approver_access"
+
+            (approve sessions), "subscription_access" (self-attested, off-gateway
+
+            AI CLI grant with no connection scope), "workspace_access" (open one
+
+            workspace''s artifacts without membership), or "account_access" (a Flume
+
+            SystemAdmin acts inside one customer account).'
+          enum:
+          - data_access
+          - approver_access
+          - subscription_access
+          - workspace_access
+          - account_access
+          allOf:
+          - $ref: '#/components/schemas/discovery.GrantType'
+          example: data_access
+        grants:
+          description: 'Connections this session grants access to. Omitted from the JSON
+
+            payload when GrantAllConnections is true (the slice is nil and
+
+            `omitempty` drops it) — clients should treat a missing `grants`
+
+            field as "no explicit grants" and rely on `grantAllConnections`
+
+            to know whether the wildcard scope applies.'
+          type: array
+          items:
+            $ref: '#/components/schemas/discovery.SessionGrantReadModel'
+        id:
+          description: Unique identifier for this session (UUID format)
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        reason:
+          description: Business justification for requesting access
+          type: string
+          example: Need to investigate claim processing issue
+        recipientEmail:
+          description: 'For approver_access grants: the email of the user receiving approver rights.
+
+            Distinguishes requester (granter) from recipient (grantee) in the delegation chain.'
+          type: string
+          example: newapprover@example.com
+        requesterEmail:
+          description: Email of the user who requested this session
+          type: string
+          example: user@example.com
+        revokedAt:
+          description: When this session was manually revoked (if applicable)
+          type: string
+        revokedBy:
+          description: Email of user who revoked the session
+          type: string
+        status:
+          description: 'Current status: pending, approved, denied, expired, revoked, cancelled, or extension_pending'
+          enum:
+          - pending
+          - approved
+          - denied
+          - expired
+          - revoked
+          - cancelled
+          - extension_pending
+          allOf:
+          - $ref: '#/components/schemas/discovery.SessionStatus'
+          example: approved
+        updatedAt:
+          description: When this session was last updated
+          type: string
+        workspaceId:
+          description: 'For workspace_access grants: the workspace the grant opens.'
+          type: string
+          example: 01928f6e-7a3b-7c41-9a2e-3f5d8b1c2e4a
+    discovery.SessionDenyRequest:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+    discovery.SessionApproveRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+        expireTime:
+          description: 'The expiry the approver sets (RFC3339, in the future). Required to
+
+            approve an account_access grant (DEC-040, FL-32116), where the approver
+
+            sets the length and the requester''s expireTime is only a proposal.
+
+            Refused for every other grant type.'
+          type: string
+          example: '2026-10-12T18:00:00Z'
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

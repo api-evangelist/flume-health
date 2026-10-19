@@ -190,47 +190,6 @@ paths:
         - email
 components:
   schemas:
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
-    endpoint.State:
-      type: string
-      enum:
-      - Idle
-      - Running
-      - Error
-      - Stopped
-      x-enum-varnames:
-      - StateIdle
-      - StateRunning
-      - StateError
-      - StateStopped
-    shard.WriteModel:
-      type: object
-      required:
-      - key
-      properties:
-        key:
-          type: string
     transaction.Operation:
       type: string
       enum:
@@ -249,72 +208,27 @@ components:
       - OperationSourceMapBatchProcess
       - OperationDestinationMap
       - OperationDestinationTransfer
-    transaction.ListReadModel:
+    shard.ReadModel:
       type: object
+      required:
+      - key
       properties:
-        nextPageToken:
-          type: string
-        transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/transaction.ReadModel'
-    shard.TransactionSummary:
-      type: object
-      properties:
-        endTime:
-          type: string
+        accountId:
+          type: integer
+        endpointId:
+          type: integer
         id:
           type: integer
-        startTime:
+        key:
           type: string
+        lastTransaction:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        nextTransaction:
+          type: string
+        recentTransactions:
+          $ref: '#/components/schemas/shard.RecentTransactions'
         state:
-          $ref: '#/components/schemas/transaction.State'
-    transaction.Step:
-      type: object
-      properties:
-        endTime:
-          type: string
-        error:
-          type: string
-        errorLogBlobKey:
-          type: string
-        file:
-          $ref: '#/components/schemas/transaction.FileDetail'
-        logBlobKey:
-          type: string
-        logs:
-          type: string
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        watermark:
-          type: string
-        watermarkBlobKey:
-          type: string
-    shard.RecentTransactions:
-      type: object
-      properties:
-        last:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastFinished:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastFinishedOp:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastSuccessful:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        lastVisible:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
+          $ref: '#/components/schemas/endpoint.State'
     transaction.Steps:
       type: object
       properties:
@@ -361,6 +275,17 @@ components:
           type: string
         workerId:
           type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     transaction.FileDetail:
       type: object
       properties:
@@ -386,38 +311,83 @@ components:
           type: integer
         uploadDurationMillis:
           type: integer
-    responses.ErrorResponse:
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    transaction.ListReadModel:
       type: object
       properties:
-        code:
-          type: integer
-        details:
+        nextPageToken:
+          type: string
+        transactions:
           type: array
           items:
-            type: string
-        message:
-          type: string
-    shard.ReadModel:
+            $ref: '#/components/schemas/transaction.ReadModel'
+    transaction.Step:
       type: object
-      required:
-      - key
       properties:
-        accountId:
-          type: integer
-        endpointId:
-          type: integer
-        id:
-          type: integer
-        key:
+        endTime:
           type: string
-        lastTransaction:
-          $ref: '#/components/schemas/shard.TransactionSummary'
-        nextTransaction:
+        error:
           type: string
-        recentTransactions:
-          $ref: '#/components/schemas/shard.RecentTransactions'
+        errorLogBlobKey:
+          type: string
+        file:
+          $ref: '#/components/schemas/transaction.FileDetail'
+        logBlobKey:
+          type: string
+        logs:
+          type: string
+        startTime:
+          type: string
         state:
-          $ref: '#/components/schemas/endpoint.State'
+          $ref: '#/components/schemas/transaction.State'
+        watermark:
+          type: string
+        watermarkBlobKey:
+          type: string
+    shard.RecentTransactions:
+      type: object
+      properties:
+        last:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastFinished:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastFinishedOp:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastSuccessful:
+          $ref: '#/components/schemas/shard.TransactionSummary'
+        lastVisible:
+          $ref: '#/components/schemas/shard.TransactionSummary'
     shard.BulkWriteModel:
       type: object
       properties:
@@ -425,6 +395,36 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/shard.WriteModel'
+    shard.WriteModel:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          type: string
+    endpoint.State:
+      type: string
+      enum:
+      - Idle
+      - Running
+      - Error
+      - Stopped
+      x-enum-varnames:
+      - StateIdle
+      - StateRunning
+      - StateError
+      - StateStopped
+    shard.TransactionSummary:
+      type: object
+      properties:
+        endTime:
+          type: string
+        id:
+          type: integer
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

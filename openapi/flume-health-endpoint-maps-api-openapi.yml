@@ -159,6 +159,83 @@ paths:
         - email
 components:
   schemas:
+    endpointmap.MapVersion:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        id:
+          type: integer
+        map:
+          type: string
+        version:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    endpointmap.FieldType:
+      type: string
+      enum:
+      - File
+      - ControlFile
+      - API
+      - Database
+      - FlumeLakehouse
+      x-enum-varnames:
+      - FieldTypeFile
+      - FieldTypeControlFile
+      - FieldTypeApi
+      - FieldTypeDatabase
+      - FieldTypeFlumeLakehouse
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    endpointmap.ReadModel:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        fieldType:
+          $ref: '#/components/schemas/endpointmap.FieldType'
+        id:
+          type: integer
+        maps:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpointmap.MapVersion'
+        name:
+          type: string
+        ordinal:
+          type: integer
+    knowledgestore.Sensitivity:
+      type: string
+      enum:
+      - none
+      - phi_adjacent
+      - phi_bearing
+      x-enum-varnames:
+      - SensitivityNone
+      - SensitivityPHIAdjacent
+      - SensitivityPHIBearing
     user.ReadModel:
       type: object
       properties:
@@ -188,74 +265,15 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/user.Role'
+        sensitivityCeiling:
+          description: 'SensitivityCeiling is the most restrictive PHI classification this user
+
+            may see (FL-31456). Read-only here — set only via
+
+            PUT /api/v1/users/{id}/sensitivity-ceiling (SystemAdmin only).'
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.Sensitivity'
         updated:
-          type: string
-    endpointmap.MapVersion:
-      type: object
-      properties:
-        createdAt:
-          type: string
-        createdBy:
-          $ref: '#/components/schemas/user.ReadModel'
-        id:
-          type: integer
-        map:
-          type: string
-        version:
-          type: integer
-    endpointmap.ReadModel:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        fieldType:
-          $ref: '#/components/schemas/endpointmap.FieldType'
-        id:
-          type: integer
-        maps:
-          type: array
-          items:
-            $ref: '#/components/schemas/endpointmap.MapVersion'
-        name:
-          type: string
-        ordinal:
-          type: integer
-    user.Role:
-      type: string
-      enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
-      x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
-    endpointmap.FieldType:
-      type: string
-      enum:
-      - File
-      - ControlFile
-      - API
-      - Database
-      - FlumeLakehouse
-      x-enum-varnames:
-      - FieldTypeFile
-      - FieldTypeControlFile
-      - FieldTypeApi
-      - FieldTypeDatabase
-      - FieldTypeFlumeLakehouse
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
           type: string
     endpointmap.ListResponse:
       type: object

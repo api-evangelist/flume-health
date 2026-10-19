@@ -1,0 +1,413 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please contact us.
+
+
+    Redoc | Swagger - Try It'
+  title: Flume Console Budget API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Budget
+paths:
+  /api/v1/budgetPolicies:
+    get:
+      description: Lists the account cap and each person's cap, in id order (FL-29985). Account Admins only; a SystemAdmin reads. filter is scope = "account", scope = "user" or userId = .
+      tags:
+      - Budget
+      summary: List the account's usage caps
+      operationId: listBudgetPolicies
+      parameters:
+      - description: scope = \
+        name: filter
+        in: query
+        schema:
+          type: string
+      - description: 1 to 100, default 25
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      - description: nextPageToken of the previous page
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/budgetmanager.ListPoliciesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/budgetPolicies/{policy}:
+    get:
+      description: Reads the account cap ("account") or one person's cap ("user-") (FL-29985). Account Admins only. 404 when the cap is not set.
+      tags:
+      - Budget
+      summary: Read one usage cap
+      operationId: getBudgetPolicy
+      parameters:
+      - description: account or user-<user id>
+        name: policy
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/budgetmanager.BudgetPolicy'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    delete:
+      description: Removes the account cap or one person's cap (FL-29985). A person with no cap of their own is capped by the account cap alone. The reason travels in the body, not the URL, so it stays out of access logs. The change is recorded like an update. Account Admins only; Flume staff inside a customer account are refused. 404 when the cap is not set.
+      tags:
+      - Budget
+      summary: Remove a usage cap
+      operationId: deleteBudgetPolicy
+      parameters:
+      - description: account or user-<user id>
+        name: policy
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/budget.DeletePolicyBody'
+        description: The reason
+        required: true
+    patch:
+      description: Sets the account cap or one person's cap, in USD, and creates it when it is not set (FL-29985). A person's cap cannot be above the account cap. The change is recorded with who, when, on whom, the old and new limit and the reason, in the same transaction; a failed record refuses the change. Account Admins only; Flume staff inside a customer account are refused. updateMask, when given, must be monthlyLimitUsd.
+      tags:
+      - Budget
+      summary: Set a usage cap
+      operationId: updateBudgetPolicy
+      parameters:
+      - description: account or user-<user id>
+        name: policy
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: monthlyLimitUsd
+        name: updateMask
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/budgetmanager.BudgetPolicy'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/budget.UpdatePolicyBody'
+        description: The new limit and the reason
+        required: true
+  /api/v1/budgetPolicyChanges:
+    get:
+      description: 'Lists every cap change, newest first: who, when, on whom, the old and new limit and the reason (FL-29985). Account Admins only; a SystemAdmin reads. filter is userId = .'
+      tags:
+      - Budget
+      summary: List the record of usage cap changes
+      operationId: listBudgetPolicyChanges
+      parameters:
+      - description: userId = <id>
+        name: filter
+        in: query
+        schema:
+          type: string
+      - description: 1 to 100, default 25
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      - description: nextPageToken of the previous page
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/budgetmanager.ListPolicyChangesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    budget.DeletePolicyBody:
+      type: object
+      properties:
+        reason:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    budget.UpdatePolicyBody:
+      type: object
+      properties:
+        monthlyLimitUsd:
+          type: number
+        reason:
+          type: string
+    budgetmanager.ListPolicyChangesResponse:
+      type: object
+      properties:
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/budgetmanager.BudgetPolicyChange'
+        nextPageToken:
+          type: string
+    budgetmanager.ListPoliciesResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/budgetmanager.BudgetPolicy'
+    budgetmanager.BudgetPolicy:
+      type: object
+      properties:
+        monthlyLimitMicros:
+          type: integer
+        monthlyLimitUsd:
+          type: number
+        name:
+          description: 'Name is the policy id: "account" or "user-<user id>".'
+          type: string
+        scope:
+          type: string
+          enum:
+          - account
+          - user
+        updateTime:
+          type: string
+        updatedByUserId:
+          type: integer
+        userId:
+          type: integer
+    budgetmanager.BudgetPolicyChange:
+      type: object
+      properties:
+        changeTime:
+          type: string
+        changedByUserId:
+          type: integer
+        id:
+          type: string
+        newLimitMicros:
+          type: integer
+        newLimitUsd:
+          type: number
+        oldLimitMicros:
+          type: integer
+        oldLimitUsd:
+          type: number
+        policy:
+          type: string
+        reason:
+          type: string
+        scope:
+          type: string
+          enum:
+          - account
+          - user
+        userId:
+          type: integer
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

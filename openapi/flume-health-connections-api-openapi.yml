@@ -263,38 +263,10 @@ paths:
         required: true
 components:
   schemas:
-    connection.ReadModel:
-      type: object
-      required:
-      - name
-      properties:
-        created:
-          type: string
-        customColumns:
-          type: array
-          items:
-            type: string
-        id:
-          type: integer
-        logo:
-          type: string
-        name:
-          type: string
     connection.WriteModel:
       type: object
       required:
       - name
-      properties:
-        customColumns:
-          type: array
-          items:
-            type: string
-        logo:
-          type: string
-        name:
-          type: string
-    connection.PatchModel:
-      type: object
       properties:
         customColumns:
           type: array
@@ -323,6 +295,34 @@ components:
           items:
             type: string
         message:
+          type: string
+    connection.PatchModel:
+      type: object
+      properties:
+        customColumns:
+          type: array
+          items:
+            type: string
+        logo:
+          type: string
+        name:
+          type: string
+    connection.ReadModel:
+      type: object
+      required:
+      - name
+      properties:
+        created:
+          type: string
+        customColumns:
+          type: array
+          items:
+            type: string
+        id:
+          type: integer
+        logo:
+          type: string
+        name:
           type: string
   securitySchemes:
     OAuth2Implicit:

@@ -47,9 +47,375 @@ paths:
                 $ref: '#/components/schemas/responses.ErrorResponse'
       security:
       - BearerAuth: []
+  /api/v1/context/graph/anchor:
+    get:
+      description: Reports whether the :Account anchor exists in the authenticated account's graph. Writes nothing. An account with a knowledge capability enabled and state "missing" is the alertable "flags on, anchor missing" condition — ambient knowledge retrieval returns nothing in that state while every other surface reports success.
+      tags:
+      - Context Graph
+      summary: Report the account's retrieval anchor
+      operationId: getGraphAccountAnchor
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.AnchorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: a foreign vertex occupies the reserved anchor fqn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: Creates the :Account anchor in the authenticated account's graph if it is absent, and verifies it with a control read. Idempotent — an account that already has the anchor is read and not written. This is the repair path for an account whose flags were enabled before automatic provisioning existed, or whose provisioning failed.
+      tags:
+      - Context Graph
+      summary: Provision the account's retrieval anchor
+      operationId: ensureGraphAccountAnchor
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.AnchorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: a foreign vertex occupies the reserved anchor fqn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '502':
+          description: context-db accepted the upsert but the anchor is not readable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/graph/estate:
+    get:
+      description: Returns the whole account's scanned estate — every Server/Database/Schema/Table/View/StoredProcedure/Procedure/SSIS* vertex, with parent links, plus a Connection and Schema derived from each node's ancestry — in one response. Replaces the ~11 concurrent POST graph:query calls the schema tree used to fire per label (FL-31940, measured 2.6s cold / 1.6s warm on the largest account at the time, against a 2s target). The account comes from request context only. Honours If-None-Match with 304 against the ETag; the same ETag is returned as the ETag response header. truncated reports that the account has more estate nodes than one read covers — the client should treat the tree as partial, not retry.
+      tags:
+      - Context Graph
+      summary: Get the account's estate graph
+      operationId: getGraphEstate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.EstateGraphResponse'
+        '304':
+          description: the estate is unchanged since the If-None-Match etag
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/graph/reconcile:
+    get:
+      description: 'Runs every named check (storage, grants, dataset, anchor, flags, domains, indexes) against the authenticated account''s knowledge graph and reports what each would do — present, created, repaired, or unsupported, with a reason. Writes nothing. A never-provisioned account typically reports grants as created (a POST would apply the backend identity''s missing rows) and everything downstream — dataset, anchor, flags, indexes — as unsupported, blocked by grants: reads and writes against context-db need the same grants, so this action cannot check further until they exist. knowledge_staff_only is reported only while the account''s capabilities are not yet live — once live, it drops out of the checked set entirely (its absence may be a deliberate release) and so out of the drift summary too. Includes a top-level drift summary (indexes always excluded — see the field''s own doc). The domains check on GET is a dry run: it forecasts counts from the rules and from earlier model answers and calls no model. Also reports a counts-only knowledge census: entries per kind and status, ontology entries with and without children, and entries whose kind is outside the built-in set. An ontology entry with children is drift of type "section kind is ontology". SystemAdmin only.'
+      tags:
+      - Context Graph
+      summary: Report the account's graph drift
+      operationId: getGraphReconcile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.ReconcileResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: a foreign vertex occupies the reserved anchor fqn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: no backend identity configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '504':
+          description: exceeded its budget; re-run, every check is idempotent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: 'Runs every named check (storage, grants, dataset, anchor, flags, domains, indexes) and repairs what it can: creates an absent dataset and :Account anchor in one write, applies missing context-db grants, creates or fixes the knowledge flags flags selects, gives every Table vertex a data domain from names only (rules first, then the gateway model for tables the rules leave Unclassified) and reports per-table counts before and after, and re-indexes vertex ANN coverage. Idempotent for every check but indexes, which always reports repaired on a successful run (context-db carries no before/after coverage signal, so a call with nothing stale to fix reports the same as one that fixed something). An empty body is the SAFE default: on an account whose capabilities are not yet live it writes knowledge_staff_only before any capability flag, so a customer account never comes out open to its own users; on an account whose capabilities are already live it leaves knowledge_staff_only alone entirely, so an ordinary call can never re-restrict a customer account an operator deliberately released. Provisioning an empty account is not a special case: it is what this call does when every check starts absent. A check blocked by an earlier one (no storage bucket, grants not yet applied) reports unsupported and names the blocker rather than attempting a write context-db would refuse. account_id and accountId may NOT be set in the body; the account comes from request context only (X-Flume-Account-ID) and either spelling is rejected with 400. SystemAdmin only.'
+      tags:
+      - Context Graph
+      summary: Reconcile the account's knowledge graph
+      operationId: applyGraphReconcile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.ReconcileResponse'
+        '400':
+          description: unknown flags value, or account_id/accountId set in the body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: a foreign vertex occupies the reserved anchor fqn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: no backend identity configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '502':
+          description: context-db accepted the anchor upsert but the anchor is not readable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '504':
+          description: exceeded its budget; re-run, every check is idempotent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/graph.ReconcileRequest'
+        description: 'flags: default (safe, restricted), default-internal (no external users), or none; empty body means default'
+  /api/v1/context/graph/resolve:
+    post:
+      description: 'Mints or normalizes the estate FQN for each candidate (AD-12): repo://// from a git remote, normalizing ssh/https shape, a trailing .git, and host case to one address per repository; ticket://// from a ticket key, resolved against the caller''s account''s configured Jira site. Writes nothing. A repo candidate reads no account data at all; a ticket candidate reads the caller''s own account''s configured Jira tenant hostname and reflects it into a resolved fqn. Every authenticated role may call it. A candidate whose kind this resolver does not yet implement, or a ticket key with no Jira site configured for the account, comes back state "unsupported"; a candidate that does not parse as its kind''s shape (a git remote that matches none of the shapes git accepts, a key that is not PROJECT-NUMBER) comes back state "not_found". Neither is an error, and fqn is set if and only if state is "resolved" — this route never invents an address for a candidate it could not resolve. results is INDEX-ALIGNED with candidates: results[i] is always the outcome for candidates[i], and array position is the only supported way to correlate a result back to its candidate.'
+      tags:
+      - Context Graph
+      summary: Mint estate addresses for candidates
+      operationId: resolveGraphAddresses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.ResolveResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/graph.ResolveRequest'
+        description: Candidates to resolve
+        required: true
+  /api/v1/context/graph/table-domain:
+    put:
+      description: 'Sets a curator''s data domain on one Table vertex in the authenticated account''s graph, or clears it when domain is empty. The override survives rescans. The domain must be one of the closed vocabulary. Names only: no row data is read or written. Curators only.'
+      tags:
+      - Context Graph
+      summary: Override a table's data domain
+      operationId: setGraphTableDomain
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.TableDomainResponse'
+        '400':
+          description: missing fqn or a domain outside the vocabulary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires a curator
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: no Table vertex at that fqn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: table domains are not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/graph.TableDomainRequest'
+        description: fqn and domain
+        required: true
   /api/v1/context/graph:query:
     post:
-      description: Runs a read-only Cypher query against the account's knowledge graph
+      description: Runs a read-only Cypher query against the account's knowledge graph. The account comes from request context only; account_id and accountId may NOT be set in the body — either spelling is rejected with 400.
       tags:
       - Context Graph
       summary: Execute a Cypher query
@@ -62,13 +428,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/graph.QueryResponse'
         '400':
-          description: Bad Request
+          description: invalid query, or account_id/accountId set in the body
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/responses.ErrorResponse'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: no graph data loaded for this account
           content:
             application/json:
               schema:
@@ -161,8 +533,236 @@ paths:
                 $ref: '#/components/schemas/responses.ErrorResponse'
       security:
       - BearerAuth: []
+    post:
+      description: 'Returns the governed ambient knowledge index for a chat turn (FS-82): the anchor + semantic channels, scope-filtered and reciprocal-rank-fused, projected to compact pointers {id, title, hook, source_ref, score}. The account comes from request context only; account_id and accountId may NOT be set in the body — either spelling is rejected with 400. The anchor channel runs over the supplied anchors PLUS mentioned-entity anchors the server derives from the query — estate entities named in prose by the query string (FL-30820). The derivation reads query and nothing else; send an anchor for every entity you want anchored, because a paraphrased or embedding-optimized query derives fewer. At least one of query or anchors is required; top_k, when supplied, must be an integer between 1 and 1000 — the SAME request-shape validation the MCP graph-search index view enforces. This surface serves the INDEX view only (compact pointers, no bodies); view=full is rejected here with 400 because full corpus bodies are served by neither surface yet — MCP graph-search view=full runs the estate+knowledge search, a different gate and shape, not the governed index with bodies. Selection and scope governance are the resolver''s. A knowledge-empty account, a restricted visitor, and an account with the read/inject capability off all return a byte-identical empty index (same body, headers, and status), and that empty index carries a stable constant etag — the same value for every account and every empty path — so an etag is ALWAYS present on a 200 and the empty case caches and 304s like any other. A shown-audit row is written only when the gateway stamped a turn identity onto the request; a non-gateway call writes none and says so via the X-Knowledge-Shown-Audit: not-recorded header. Honours If-None-Match with 304 against the etag; the etag is also returned as the ETag response header.'
+      tags:
+      - Context Graph
+      summary: Retrieve the governed knowledge index
+      operationId: searchGraphIndex
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph.GraphSearchIndexResponse'
+        '304':
+          description: the index is unchanged since the If-None-Match etag
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/graph.GraphSearchIndexRequest'
+        description: 'Turn signal: the user query and/or in-scope anchor FQNs'
+        required: true
 components:
   schemas:
+    graph.SearchResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.SearchMeta'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.SearchResult'
+    graphreconcile.State:
+      type: string
+      enum:
+      - present
+      - created
+      - repaired
+      - unsupported
+      x-enum-varnames:
+      - StatePresent
+      - StateCreated
+      - StateRepaired
+      - StateUnsupported
+    graph.GraphSearchIndexRequest:
+      type: object
+      properties:
+        anchors:
+          type: array
+          items:
+            type: string
+        conversation_id:
+          type: string
+        kinds:
+          type: array
+          items:
+            type: string
+        message_id:
+          type: string
+        query:
+          type: string
+        top_k:
+          type: integer
+        view:
+          type: string
+    knowledgestore.SearchResult:
+      type: object
+      properties:
+        fqn:
+          type: string
+        graph:
+          description: 'Graph names the graph the row came from: GraphAccount or GraphFlume. context-db
+
+            sets it on a merged search only; an empty value means the account graph.'
+          type: string
+        label:
+          type: string
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties: {}
+        scope:
+          description: 'Scope is the vertex''s promoted scope column, when context-db returns it.
+
+            The manager reads it to drop a workspace-scoped :Artifact hit (FL-32099),
+
+            whose scope is not in Properties.'
+          type: string
+        score:
+          type: number
+    graph.ReconcileResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.Meta'
+        accountId:
+          type: integer
+        anchor:
+          $ref: '#/components/schemas/graphreconcile.AnchorResult'
+        dataset:
+          $ref: '#/components/schemas/graphreconcile.DatasetResult'
+        domains:
+          description: Domains is the table-domains check. Nil when no backfiller is wired.
+          allOf:
+          - $ref: '#/components/schemas/graphreconcile.DomainsResult'
+        drift:
+          $ref: '#/components/schemas/graphreconcile.DriftSummary'
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/graphreconcile.FlagResult'
+        flumeKnowledge:
+          description: 'FlumeKnowledge is the Flume-owned entry check (FL-31894): which source
+
+            entries the graph misses, holds stale or must retire. Present only when a
+
+            seeder is wired and the earlier checks left the graph usable.'
+          allOf:
+          - $ref: '#/components/schemas/knowledgemanager.FlumeSeedReport'
+        grants:
+          $ref: '#/components/schemas/graphreconcile.GrantsResult'
+        graph:
+          $ref: '#/components/schemas/graphreconcile.GraphResult'
+        indexes:
+          $ref: '#/components/schemas/graphreconcile.IndexesResult'
+        knowledge:
+          description: 'Knowledge is the counts-only kind census (FL-31830). GET only, and only
+
+            when a census reader is wired and the earlier checks left the graph
+
+            readable.'
+          allOf:
+          - $ref: '#/components/schemas/knowledgemanager.KindCensus'
+        storage:
+          $ref: '#/components/schemas/graphreconcile.StorageResult'
+        workspaces:
+          description: 'Workspaces is the FL-31912 workspace rename check: `project` tuples
+
+            and scope values still stored, and on POST what was rewritten. Present
+
+            only when the check is wired.'
+          allOf:
+          - $ref: '#/components/schemas/graphreconcile.WorkspaceRenameResult'
+    graphreconcile.DomainsResult:
+      type: object
+      properties:
+        after:
+          description: 'After counts tables by the domain they hold once the backfill is done. On a
+
+            dry run it is a forecast from the rules and from earlier model answers; it
+
+            makes no model call.'
+          allOf:
+          - $ref: '#/components/schemas/tabledomain.Counts'
+        before:
+          description: Before counts tables by the domain stored now. Tables with none count as "(unset)".
+          allOf:
+          - $ref: '#/components/schemas/tabledomain.Counts'
+        changed:
+          description: Changed is how many tables need a write.
+          type: integer
+        modelAnswered:
+          description: ModelAnswered is how many of those the model gave a domain. Zero on a dry run.
+          type: integer
+        needsModel:
+          description: 'NeedsModel is how many tables the rules could not classify and no override
+
+            or earlier model answer covers. On a dry run they are forecast Unclassified.
+
+            It is always zero when no model fallback is wired: no run can change those
+
+            tables, so counting them would report drift that nothing can clear.'
+          type: integer
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+        tables:
+          description: Tables is how many Table vertices the account's graph holds.
+          type: integer
+        unclassifiedShare:
+          description: UnclassifiedShare is After's Unclassified count over Tables, 0 to 1.
+          type: number
+        written:
+          description: Written is how many tables this call wrote. It is zero on a dry run.
+          type: integer
+    graph.QueryMeta:
+      type: object
+      properties:
+        rowCount:
+          type: integer
+        took:
+          type: string
+        truncated:
+          type: boolean
+    graph.TableDomainRequest:
+      type: object
+      properties:
+        domain:
+          description: 'Domain is the curator''s choice from the closed vocabulary. Empty clears the
+
+            override and restores the classifier''s answer.'
+          type: string
+          example: Pharmacy
+        fqn:
+          description: FQN is the Table vertex's fqn.
+          type: string
+          example: server://host:5432/db/schema/table
     graph.QueryResponse:
       type: object
       properties:
@@ -177,6 +777,122 @@ components:
           items:
             type: object
             additionalProperties: {}
+    graphreconcile.FlagResult:
+      type: object
+      properties:
+        key:
+          type: string
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graph.SearchMeta:
+      type: object
+      properties:
+        mode:
+          type: string
+        resultCount:
+          type: integer
+        took:
+          type: string
+    graph.Meta:
+      type: object
+      properties:
+        took:
+          type: string
+    knowledgemanager.FlumeSeedItem:
+      type: object
+      properties:
+        action:
+          type: string
+        fqn:
+          type: string
+        installedVersion:
+          type: integer
+        key:
+          type: string
+        sourceVersion:
+          type: integer
+        state:
+          description: 'State is the state found. After a POST wrote the item, State is the state
+
+            the write reached (present or absent) and Action names the write.'
+          allOf:
+          - $ref: '#/components/schemas/knowledgemanager.FlumeSeedState'
+    graphreconcile.IndexesResult:
+      type: object
+      properties:
+        datasetsTotal:
+          type: integer
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graph.ResolveRequest:
+      type: object
+      required:
+      - candidates
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/graph.ResolveCandidate'
+    graph.ResolveCandidate:
+      type: object
+      required:
+      - kind
+      properties:
+        key:
+          type: string
+          example: FL-31259
+        kind:
+          type: string
+          example: repo
+        remote:
+          type: string
+          example: git@github.com:flume/context-db.git
+    graph.QueryRequest:
+      type: object
+      required:
+      - cypher
+      properties:
+        cypher:
+          type: string
+    graph.ResolveResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/graph.ResolveResultItem'
+    graph.EstateGraphResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.Meta'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/graph.EstateEdge'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/graph.EstateNode'
+        truncated:
+          type: boolean
+    tabledomain.Counts:
+      type: object
+      additionalProperties:
+        type: integer
+    graph.ReconcileRequest:
+      type: object
+      properties:
+        flags:
+          description: "Flags selects which knowledge flags this call manages:\n  - \"default\" (also the empty value): the AD-24 capability flags this\n    action manages (graphreconcile.FlagKeys), plus knowledge_staff_only\n    — written FIRST — but only while this account's capabilities are\n    not already live. A customer account reconciled for the first time\n    with an empty body comes out restricted to Flume staff, never open\n    to its own users by omission. Once capabilities ARE live,\n    knowledge_staff_only is left alone entirely: its absence there may\n    be a deliberate release (see its own doc — there is no \"false\" that\n    lifts it, only a DELETE), and an ordinary reconcile call must never\n    re-restrict a released account.\n  - \"default-internal\": FlagKeys' capability flags only, unconditionally\n    skipping knowledge_staff_only. For an account with NO external users\n    (Flume's own account is the example) — an explicit, named choice,\n    not something a caller falls into by leaving the field blank.\n  - \"none\": manage no flags at all — the escape hatch for a customer\n    account provisioned dark, ahead of its launch."
+          type: string
+          example: default
     graph.StatusResponse:
       type: object
       properties:
@@ -190,50 +906,34 @@ components:
           type: integer
         status:
           type: string
-    knowledgestore.SearchResult:
+    graphreconcile.GraphResult:
       type: object
       properties:
-        fqn:
-          type: string
-        label:
-          type: string
-        name:
-          type: string
-        properties:
-          type: object
-          additionalProperties: {}
-        score:
-          type: number
-    graph.SearchMeta:
-      type: object
-      properties:
-        mode:
-          type: string
-        resultCount:
+        edgeCount:
           type: integer
-        took:
+        nodeCount:
+          type: integer
+        status:
           type: string
-    graph.QueryRequest:
-      type: object
-      required:
-      - cypher
-      properties:
-        cypher:
-          type: string
-    graph.Meta:
+    knowledgestore.GrantRow:
       type: object
       properties:
-        took:
+        effect:
           type: string
-    graph.SearchResponse:
-      type: object
-      properties:
-        _meta:
-          $ref: '#/components/schemas/graph.SearchMeta'
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/knowledgestore.SearchResult'
+        expires_at:
+          type: string
+        granted_at:
+          type: string
+        granted_by:
+          type: string
+        identity:
+          type: string
+        permission:
+          type: string
+        resource_name:
+          type: string
+        resource_type:
+          type: string
     responses.ErrorResponse:
       type: object
       properties:
@@ -245,15 +945,266 @@ components:
             type: string
         message:
           type: string
-    graph.QueryMeta:
+    graph.EstateNode:
       type: object
       properties:
-        rowCount:
-          type: integer
-        took:
+        connection:
           type: string
+        domain:
+          type: string
+        fqn:
+          type: string
+        label:
+          type: string
+        name:
+          type: string
+        parentFqn:
+          type: string
+        schema:
+          type: string
+    graphreconcile.DriftSummary:
+      type: object
+      properties:
+        inSync:
+          type: boolean
+        outOfSync:
+          type: array
+          items:
+            type: string
+    graph.GraphSearchIndexResponse:
+      type: object
+      required:
+      - etag
+      - items
+      properties:
+        etag:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/graph.GraphSearchIndexItem'
+        top_k:
+          type: integer
         truncated:
           type: boolean
+    graphreconcile.StorageResult:
+      type: object
+      properties:
+        bucketConfigured:
+          type: boolean
+        dataUri:
+          type: string
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graphreconcile.WorkspaceRenameCounts:
+      type: object
+      properties:
+        legacyScopeEntries:
+          description: LegacyScopeEntries counts vertices whose stored scope is `project`.
+          type: integer
+        legacyTuples:
+          description: LegacyTuples counts tuples on "project:<id>" objects.
+          type: integer
+        legacyWorkspaces:
+          description: LegacyWorkspaces counts workspaces with at least one such tuple.
+          type: integer
+        truncated:
+          description: 'Truncated is true when the scope walk hit its page budget. The scope
+
+            count is then a lower bound.'
+          type: boolean
+    graph.TableDomainResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.Meta'
+        auto:
+          description: Auto is the classifier's own answer, kept whatever the override says.
+          type: string
+        domain:
+          description: Domain is the effective domain.
+          type: string
+        fqn:
+          type: string
+        source:
+          description: Source is "override", "rules" or "model".
+          type: string
+    knowledgemanager.KindCensus:
+      type: object
+      properties:
+        kinds:
+          description: Kinds is one row per kind and status, sorted by kind then status.
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.KindCount'
+        nodesScanned:
+          description: NodesScanned is every :Knowledge node this census read.
+          type: integer
+        ontologyWithChildren:
+          description: 'OntologyWithChildren counts `ontology` entries that at least one
+
+            :Knowledge entry files under with a :PART_OF edge. Each is a section
+
+            that FL-31834 must rewrite to `area`. The hierarchy''s root and Unfiled
+
+            singletons are left out of both ontology counts: every account that has
+
+            any knowledge has them, repairHierarchySingletons forces them back to
+
+            `ontology`, and counting them would report drift no POST can clear.'
+          type: integer
+        ontologyWithoutChildren:
+          description: 'OntologyWithoutChildren counts the other `ontology` entries, singletons
+
+            excluded.'
+          type: integer
+        outsideBuiltIn:
+          description: OutsideBuiltIn counts entries whose kind is not built in.
+          type: integer
+        truncated:
+          description: 'Truncated is true when the node scan hit its page budget or the edge
+
+            read hit its row ceiling. The counts are then a lower bound.'
+          type: boolean
+    knowledgemanager.FlumeSeedState:
+      type: string
+      enum:
+      - present
+      - missing
+      - stale
+      - retired
+      - absent
+      x-enum-varnames:
+      - FlumeSeedPresent
+      - FlumeSeedMissing
+      - FlumeSeedStale
+      - FlumeSeedRetired
+      - FlumeSeedAbsent
+    graphreconcile.DatasetResult:
+      type: object
+      properties:
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graph.AnchorResponse:
+      type: object
+      properties:
+        _meta:
+          $ref: '#/components/schemas/graph.Meta'
+        accountId:
+          description: AccountID is the account whose graph was inspected.
+          type: integer
+          example: 3
+        fqn:
+          description: FQN is the anchor vertex's fqn.
+          type: string
+          example: account
+        state:
+          description: State is "present", "created", or "missing".
+          type: string
+          example: present
+    graph.GraphSearchIndexItem:
+      type: object
+      properties:
+        hook:
+          type: string
+        id:
+          type: string
+        score:
+          type: number
+        source_ref:
+          type: string
+        title:
+          type: string
+    graph.ResolveResultItem:
+      type: object
+      required:
+      - fqn
+      - kind
+      - reason
+      - state
+      properties:
+        fqn:
+          type: string
+          example: repo://github.com/flume/context-db
+        kind:
+          type: string
+          example: repo
+        reason:
+          type: string
+        state:
+          type: string
+          example: resolved
+    knowledgemanager.FlumeSeedReport:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgemanager.FlumeSeedItem'
+        truncated:
+          description: 'Truncated is true when the scan hit its page budget. The report is then
+
+            a lower bound and an entry past the budget reads as missing.'
+          type: boolean
+    knowledgemanager.KindCount:
+      type: object
+      properties:
+        builtIn:
+          type: boolean
+        count:
+          type: integer
+        kind:
+          type: string
+        status:
+          type: string
+    graphreconcile.WorkspaceRenameResult:
+      type: object
+      properties:
+        after:
+          $ref: '#/components/schemas/graphreconcile.WorkspaceRenameCounts'
+        before:
+          $ref: '#/components/schemas/graphreconcile.WorkspaceRenameCounts'
+        reason:
+          type: string
+        rewrittenScopeEntries:
+          type: integer
+        rewrittenTuples:
+          type: integer
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graphreconcile.GrantsResult:
+      type: object
+      properties:
+        missing:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graphreconcile.AnchorResult:
+      type: object
+      properties:
+        fqn:
+          type: string
+        label:
+          type: string
+        reason:
+          type: string
+        state:
+          $ref: '#/components/schemas/graphreconcile.State'
+    graph.EstateEdge:
+      type: object
+      properties:
+        child:
+          type: string
+        parent:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

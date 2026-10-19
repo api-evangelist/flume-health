@@ -302,28 +302,6 @@ paths:
         required: true
 components:
   schemas:
-    transaction.State:
-      type: string
-      enum:
-      - Scheduled
-      - Running
-      - Succeeded
-      - SucceededNoOp
-      - FailedRecoverable
-      - FailedNonrecoverable
-      - FailedValidation
-      - Cancelled
-      - FailedMissingSourceFile
-      x-enum-varnames:
-      - StateScheduled
-      - StateRunning
-      - StateSucceeded
-      - StateSucceededNoOp
-      - StateFailedRecoverable
-      - StateFailedNonrecoverable
-      - StateFailedValidation
-      - StateCancelled
-      - StateFailedMissingSourceFile
     transaction.Operation:
       type: string
       enum:
@@ -342,48 +320,6 @@ components:
       - OperationSourceMapBatchProcess
       - OperationDestinationMap
       - OperationDestinationTransfer
-    transaction.Trigger:
-      type: string
-      enum:
-      - Manual
-      - Schedule
-      - Subsequent
-      x-enum-varnames:
-      - TriggerManual
-      - TriggerSchedule
-      - TriggerSubsequent
-    transaction.Step:
-      type: object
-      properties:
-        endTime:
-          type: string
-        error:
-          type: string
-        errorLogBlobKey:
-          type: string
-        file:
-          $ref: '#/components/schemas/transaction.FileDetail'
-        logBlobKey:
-          type: string
-        logs:
-          type: string
-        startTime:
-          type: string
-        state:
-          $ref: '#/components/schemas/transaction.State'
-        watermark:
-          type: string
-        watermarkBlobKey:
-          type: string
-    transaction.ListReadModel:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/transaction.ReadModel'
     transaction.Steps:
       type: object
       properties:
@@ -430,6 +366,17 @@ components:
           type: string
         workerId:
           type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
     transaction.FileDetail:
       type: object
       properties:
@@ -455,6 +402,70 @@ components:
           type: integer
         uploadDurationMillis:
           type: integer
+    transaction.Trigger:
+      type: string
+      enum:
+      - Manual
+      - Schedule
+      - Subsequent
+      x-enum-varnames:
+      - TriggerManual
+      - TriggerSchedule
+      - TriggerSubsequent
+    transaction.State:
+      type: string
+      enum:
+      - Scheduled
+      - Running
+      - Succeeded
+      - SucceededNoOp
+      - FailedRecoverable
+      - FailedNonrecoverable
+      - FailedValidation
+      - Cancelled
+      - FailedMissingSourceFile
+      x-enum-varnames:
+      - StateScheduled
+      - StateRunning
+      - StateSucceeded
+      - StateSucceededNoOp
+      - StateFailedRecoverable
+      - StateFailedNonrecoverable
+      - StateFailedValidation
+      - StateCancelled
+      - StateFailedMissingSourceFile
+    transaction.ListReadModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/transaction.ReadModel'
+    transaction.Step:
+      type: object
+      properties:
+        endTime:
+          type: string
+        error:
+          type: string
+        errorLogBlobKey:
+          type: string
+        file:
+          $ref: '#/components/schemas/transaction.FileDetail'
+        logBlobKey:
+          type: string
+        logs:
+          type: string
+        startTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/transaction.State'
+        watermark:
+          type: string
+        watermarkBlobKey:
+          type: string
     transaction.WriteModel:
       type: object
       required:
@@ -480,17 +491,6 @@ components:
         trigger:
           $ref: '#/components/schemas/transaction.Trigger'
         workerId:
-          type: string
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
           type: string
   securitySchemes:
     OAuth2Implicit:

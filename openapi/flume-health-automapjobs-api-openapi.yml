@@ -301,37 +301,113 @@ paths:
         - email
 components:
   schemas:
-    user.ReadModel:
+    automapjob.FieldStatus:
+      type: string
+      enum:
+      - Accepted
+      - Rejected
+      x-enum-varnames:
+      - FieldStatusAccepted
+      - FieldStatusRejected
+    automapjob.OutputsUpdate:
+      type: object
+      properties:
+        destination:
+          type:
+          - string
+          - 'null'
+        source:
+          type:
+          - string
+          - 'null'
+    automapjob.ReadModel:
       type: object
       properties:
         accountId:
           type: integer
-        active:
-          type: boolean
-        aiEnabled:
-          type: boolean
-        created:
+        createdBy:
+          $ref: '#/components/schemas/user.ReadModel'
+        endTime:
           type: string
-        email:
+        error:
           type: string
-        firstName:
+        explanation:
           type: string
-        id:
+        feedback:
+          type: string
+        fieldMappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/automapjob.FieldMapping'
+        jobId:
           type: integer
-        isAccessGranter:
-          type: boolean
-        lastName:
+        maps:
+          $ref: '#/components/schemas/automapjob.Maps'
+        outputs:
+          $ref: '#/components/schemas/automapjob.Outputs'
+        startTime:
           type: string
-        queryEngineAccessExpiresAt:
+        status:
+          $ref: '#/components/schemas/automapjob.Status'
+        version:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
-        queryEngineAccessReason:
+    automapjob.Maps:
+      type: object
+      properties:
+        destination:
           type: string
-        receiveEmailAlerts:
-          type: boolean
-        role:
-          $ref: '#/components/schemas/user.Role'
-        updated:
+        source:
           type: string
+    automapjob.Status:
+      type: string
+      enum:
+      - Queued
+      - Processing
+      - Failed
+      - Cancelled
+      - Success
+      x-enum-varnames:
+      - StatusQueued
+      - StatusProcessing
+      - StatusFailed
+      - StatusCancelled
+      - StatusSuccess
+    automapjob.FieldMappingUpdate:
+      type: object
+      properties:
+        confidenceLevel:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.ConfidenceLevel'
+        destination:
+          type:
+          - string
+          - 'null'
+        explanation:
+          type:
+          - string
+          - 'null'
+        feedback:
+          type:
+          - string
+          - 'null'
+        fieldStatus:
+          allOf:
+          - $ref: '#/components/schemas/automapjob.FieldStatus'
+        source:
+          type:
+          - string
+          - 'null'
     automapjob.UpdateModel:
       type: object
       properties:
@@ -370,7 +446,24 @@ components:
         status:
           allOf:
           - $ref: '#/components/schemas/automapjob.Status'
-    automapjob.OutputsUpdate:
+    automapjob.ConfidenceLevel:
+      type: string
+      enum:
+      - Low
+      - Medium
+      - High
+      x-enum-varnames:
+      - ConfidenceLevelLow
+      - ConfidenceLevelMedium
+      - ConfidenceLevelHigh
+    automapjob.Outputs:
+      type: object
+      properties:
+        destination:
+          type: string
+        source:
+          type: string
+    automapjob.MapsUpdate:
       type: object
       properties:
         destination:
@@ -381,16 +474,26 @@ components:
           type:
           - string
           - 'null'
-    responses.ErrorResponse:
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
+    automapjob.ListResponse:
       type: object
       properties:
-        code:
-          type: integer
-        details:
+        automapJobs:
           type: array
           items:
-            type: string
-        message:
+            $ref: '#/components/schemas/automapjob.ReadModel'
+        nextPageToken:
           type: string
     automapjob.FieldMapping:
       type: object
@@ -411,140 +514,55 @@ components:
           $ref: '#/components/schemas/automapjob.FieldStatus'
         source:
           type: string
-    automapjob.Maps:
-      type: object
-      properties:
-        destination:
-          type: string
-        source:
-          type: string
-    automapjob.ListResponse:
-      type: object
-      properties:
-        automapJobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/automapjob.ReadModel'
-        nextPageToken:
-          type: string
-    user.Role:
+    knowledgestore.Sensitivity:
       type: string
       enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
+      - none
+      - phi_adjacent
+      - phi_bearing
       x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
-    automapjob.Outputs:
-      type: object
-      properties:
-        destination:
-          type: string
-        source:
-          type: string
-    automapjob.ReadModel:
+      - SensitivityNone
+      - SensitivityPHIAdjacent
+      - SensitivityPHIBearing
+    user.ReadModel:
       type: object
       properties:
         accountId:
           type: integer
-        createdBy:
-          $ref: '#/components/schemas/user.ReadModel'
-        endTime:
+        active:
+          type: boolean
+        aiEnabled:
+          type: boolean
+        created:
           type: string
-        error:
+        email:
           type: string
-        explanation:
+        firstName:
           type: string
-        feedback:
-          type: string
-        fieldMappings:
-          type: array
-          items:
-            $ref: '#/components/schemas/automapjob.FieldMapping'
-        jobId:
+        id:
           type: integer
-        maps:
-          $ref: '#/components/schemas/automapjob.Maps'
-        outputs:
-          $ref: '#/components/schemas/automapjob.Outputs'
-        startTime:
+        isAccessGranter:
+          type: boolean
+        lastName:
           type: string
-        status:
-          $ref: '#/components/schemas/automapjob.Status'
-        version:
-          type: integer
-    automapjob.ConfidenceLevel:
-      type: string
-      enum:
-      - Low
-      - Medium
-      - High
-      x-enum-varnames:
-      - ConfidenceLevelLow
-      - ConfidenceLevelMedium
-      - ConfidenceLevelHigh
-    automapjob.FieldMappingUpdate:
-      type: object
-      properties:
-        confidenceLevel:
+        queryEngineAccessExpiresAt:
+          type: string
+        queryEngineAccessReason:
+          type: string
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+        sensitivityCeiling:
+          description: 'SensitivityCeiling is the most restrictive PHI classification this user
+
+            may see (FL-31456). Read-only here — set only via
+
+            PUT /api/v1/users/{id}/sensitivity-ceiling (SystemAdmin only).'
           allOf:
-          - $ref: '#/components/schemas/automapjob.ConfidenceLevel'
-        destination:
-          type:
-          - string
-          - 'null'
-        explanation:
-          type:
-          - string
-          - 'null'
-        feedback:
-          type:
-          - string
-          - 'null'
-        fieldStatus:
-          allOf:
-          - $ref: '#/components/schemas/automapjob.FieldStatus'
-        source:
-          type:
-          - string
-          - 'null'
-    automapjob.MapsUpdate:
-      type: object
-      properties:
-        destination:
-          type:
-          - string
-          - 'null'
-        source:
-          type:
-          - string
-          - 'null'
-    automapjob.Status:
-      type: string
-      enum:
-      - Queued
-      - Processing
-      - Failed
-      - Cancelled
-      - Success
-      x-enum-varnames:
-      - StatusQueued
-      - StatusProcessing
-      - StatusFailed
-      - StatusCancelled
-      - StatusSuccess
-    automapjob.FieldStatus:
-      type: string
-      enum:
-      - Accepted
-      - Rejected
-      x-enum-varnames:
-      - FieldStatusAccepted
-      - FieldStatusRejected
+          - $ref: '#/components/schemas/knowledgestore.Sensitivity'
+        updated:
+          type: string
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

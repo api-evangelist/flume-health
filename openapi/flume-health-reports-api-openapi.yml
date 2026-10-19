@@ -71,17 +71,6 @@ paths:
         - email
 components:
   schemas:
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     report.GroupsTradedLine:
       type: object
       properties:
@@ -92,6 +81,17 @@ components:
         month:
           type: string
         tradingPartner:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
   securitySchemes:
     OAuth2Implicit:

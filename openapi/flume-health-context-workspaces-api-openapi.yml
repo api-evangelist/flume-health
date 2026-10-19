@@ -1,0 +1,1579 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please contact us.
+
+
+    Redoc | Swagger - Try It'
+  title: Flume Console Context Workspaces API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Context Workspaces
+paths:
+  /api/v1/context/workspaces:
+    get:
+      description: Lists the workspaces the caller can open — those they are an engaged member of, plus every workspace on the account if they are an account curator (FL-31450). Archived workspaces are included and carry state ARCHIVED.
+      tags:
+      - Context Workspaces
+      summary: List workspaces
+      operationId: listWorkspaces
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Max rows to return (default 50, max 200)
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      - description: Opaque page token from a previous response
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace.listResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: Creates a workspace — a shared container for a group of people's conversations, artifacts, data and knowledge (FL-31450, E9). Requires membership on the account; the creator becomes the workspace's curator and approver. The id is server-minted and never changes; two workspaces may share a displayName.
+      tags:
+      - Context Workspaces
+      summary: Create a workspace
+      operationId: createWorkspace
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Workspace'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspace.createRequest'
+        description: Workspace to create
+        required: true
+  /api/v1/context/workspaces/{id}:
+    get:
+      description: Returns a workspace's displayName, description, state, members and counts (FL-31450). Requires reader on the workspace; a workspace the caller cannot read answers 404, indistinguishable from one that does not exist.
+      tags:
+      - Context Workspaces
+      summary: Get a workspace
+      operationId: getWorkspace
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Workspace'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    patch:
+      description: 'Renames, describes and/or sets the instructions of a workspace (FL-31450, FL-31666). Instructions are the assistant''s standing guidance for every chat in the workspace: at most 8,000 characters of plain text, "" clears them, and each change bumps instructionsVersion. state and archived cannot be set here — use :archive/:unarchive. updateMask restricts the update to the named field paths; absent, it defaults to the fields present in the body. A path that is not displayName, description or instructions is a 400 naming it (AIP-134), not a silently dropped field.'
+      tags:
+      - Context Workspaces
+      summary: Update a workspace
+      operationId: updateWorkspace
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Comma-separated field paths (displayName, description, instructions)
+        name: updateMask
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Workspace'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspace.updateRequest'
+        description: Fields to update
+        required: true
+  /api/v1/context/workspaces/{id}/activity:
+    get:
+      description: Returns when each part of the workspace last changed (chats, artifacts, details, members, data sources) and the turns running in its chats (FL-32030). The workspace page polls it and refetches only the panel whose time moved. The response carries an ETag; send it back in If-None-Match and an unchanged digest answers 304 with no body. A running turn is RUNNING in phase MODEL (the model is answering) or TOOLS (the client runs tools); stalled is set when it has made no progress for a while. Requires reader on the workspace; a workspace the caller cannot read answers 404.
+      tags:
+      - Context Workspaces
+      summary: Get a workspace's activity digest
+      operationId: getWorkspaceActivity
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: ETag of the digest the caller already holds
+        name: If-None-Match
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Activity'
+        '304':
+          description: The digest has not changed since the If-None-Match ETag
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: workspace activity is not available in this deployment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/workspaces/{id}/artifacts:
+    get:
+      description: Lists the artifacts in a workspace, newest first (FL-31600). Requires reader on the workspace, or a workspace_access session in force (FL-32020), which is audited. No role admits on its own; a workspace the caller cannot read answers 404.
+      tags:
+      - Context Workspaces
+      summary: List workspace artifacts
+      operationId: listWorkspaceArtifacts
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Max rows to return (default 50, max 200)
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      - description: Opaque page token from a previous response
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace.listArtifactsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: 'Adds an artifact to a workspace (FL-31600): either one already stored (contentHash, which the caller must be able to read on the knowledge route) or new content, stored in the account''s own artifact store. Requires proposer on the workspace. Body cap 1 MiB, so raw content up to about 760 KiB.'
+      tags:
+      - Context Workspaces
+      summary: Add an artifact to a workspace
+      operationId: addWorkspaceArtifact
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.WorkspaceArtifact'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspace.addArtifactRequest'
+        description: Artifact to add
+        required: true
+  /api/v1/context/workspaces/{id}/artifacts/{contentHash}:
+    delete:
+      description: Takes an artifact out of a workspace (FL-31600). The artifact itself is not erased. Requires proposer on the workspace.
+      tags:
+      - Context Workspaces
+      summary: Remove a workspace artifact
+      operationId: removeWorkspaceArtifact
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Artifact content hash
+        name: contentHash
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/workspaces/{id}/artifacts/{contentHash}/content:
+    get:
+      description: Returns the artifact's content with its stored media type (FL-31600). Requires reader on the workspace, a workspace_access session in force (audited), or being the person who added the artifact (FL-32020). The workspace must hold the artifact, and its classification must allow the caller; no role skips that.
+      tags:
+      - Context Workspaces
+      summary: Open a workspace artifact
+      operationId: openWorkspaceArtifact
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Artifact content hash
+        name: contentHash
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/workspaces/{id}/dataSources:
+    get:
+      description: 'Lists the account connections attached to a workspace (FL-31601). Each is a reference to a discovery connection, never a copy of it: name, type and state are read from the connection at request time, and no connection config is returned. Requires reader on the workspace.'
+      tags:
+      - Context Workspaces
+      summary: List workspace data sources
+      operationId: listWorkspaceDataSources
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace.dataSourcesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: 'Attaches one of the account''s discovery connections to a workspace (FL-31601). Stores a reference, never a copy of the connection or its credential, and grants no query access. Idempotent: 201 when attached, 200 when it already was. Requires approver; a new attach of a workspace-only connection (FL-31882) also requires an account Admin (403 otherwise).'
+      tags:
+      - Context Workspaces
+      summary: Attach a workspace data source
+      operationId: attachWorkspaceDataSource
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.DataSource'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.DataSource'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspace.attachDataSourceRequest'
+        description: Connection to attach
+        required: true
+  /api/v1/context/workspaces/{id}/dataSources/{connectionId}:
+    delete:
+      description: Removes a connection from a workspace (FL-31601). Deletes the workspace's reference only; the connection is untouched. Requires approver.
+      tags:
+      - Context Workspaces
+      summary: Remove a workspace data source
+      operationId: removeWorkspaceDataSource
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Discovery connection id
+        name: connectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/workspaces/{id}/instructions:
+    get:
+      description: 'Returns a workspace''s instructions, their version, last editor and time, and entry: the exact text a chat in the workspace must hold in its history for the current version (FL-31666). The app reads it before each send in a workspace chat and adds entry to the user''s message when no earlier user message holds it. entry is empty while the workspace never had instructions. Requires reader on the workspace; a workspace the caller cannot read answers 404.'
+      tags:
+      - Context Workspaces
+      summary: Get a workspace's instructions
+      operationId: getWorkspaceInstructions
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.WorkspaceInstructions'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/workspaces/{id}/members:
+    get:
+      description: Lists a workspace's members with their standing (FL-31450). Requires reader on the workspace.
+      tags:
+      - Context Workspaces
+      summary: List a workspace's members
+      operationId: listWorkspaceMembers
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Max rows to return (default 50, max 200)
+        name: pageSize
+        in: query
+        schema:
+          type: integer
+      - description: Opaque page token from a previous response
+        name: pageToken
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace.membersResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    post:
+      description: Adds a member to a workspace, or previews the D4 disclosure of what they would gain without writing anything when validateOnly is true (FL-31450, F6). Both paths return the same Member shape, carrying counts/dataSources/noDirectGrantOn/dataSourcesAvailable and committed=true|false. The optional role is member (default) or curator. Adding a member requires approver. Adding a curator requires the workspace owner (FL-31698).
+      tags:
+      - Context Workspaces
+      summary: Add a workspace member
+      operationId: addWorkspaceMember
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Member'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspace.addMemberRequest'
+        description: Member to add
+        required: true
+  /api/v1/context/workspaces/{id}/members/{userId}:
+    delete:
+      description: 'Removes a member from a workspace (FL-31450). Requires approver, and standing above the target: only the owner removes a curator or the owner. Access ends within two minutes (the authorization frontier''s cache ceiling) — the X-Flume-Effective-Within header states this, since a 204 carries no body.'
+      tags:
+      - Context Workspaces
+      summary: Remove a workspace member
+      operationId: removeWorkspaceMember
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Member's numeric platform user id
+        name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+          headers:
+            X-Flume-Effective-Within:
+              description: How long a removed member's access may still work, e.g. 120s
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+    patch:
+      description: Sets an existing member's role to member or curator (FL-31698). Curator grants both curator and approver on the workspace. Only the workspace owner may call it, and the owner's own role cannot change. A demotion takes up to two minutes to reach every check (the authorization frontier's cache ceiling).
+      tags:
+      - Context Workspaces
+      summary: Change a workspace member's role
+      operationId: updateWorkspaceMember
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Member's numeric platform user id
+        name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Member'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspace.updateMemberRequest'
+        description: New role
+        required: true
+  /api/v1/context/workspaces/{id}:archive:
+    post:
+      description: 'Sets state to ARCHIVED and records archiveTime (FL-31510, D52 a). Not a deletion — membership and content both survive, and the workspace stays readable. An archived workspace is read-only: rename, describe, instructions, adding a member, a data source, an artifact or a conversation answer 409 until it is unarchived. Removals stay open (FL-32027). Requires approver.'
+      tags:
+      - Context Workspaces
+      summary: Archive a workspace
+      operationId: archiveWorkspace
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Workspace'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/workspaces/{id}:unarchive:
+    post:
+      description: Sets state back to ACTIVE and clears archiveTime (FL-31510, D52 a). Requires approver.
+      tags:
+      - Context Workspaces
+      summary: Unarchive a workspace
+      operationId: unarchiveWorkspace
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Workspace id
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspacemanager.Workspace'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    workspace.updateMemberRequest:
+      type: object
+      properties:
+        role:
+          type: string
+    workspace.listedArtifact:
+      type: object
+      properties:
+        addTime:
+          type: string
+        addedBy:
+          type: string
+        contentHash:
+          type: string
+          example: sha256-9f2c1a
+        conversationId:
+          description: 'ConversationID is the conversation the artifact came from, when the
+
+            caller named one. Informational: it grants nothing.'
+          type: string
+        conversationOpenable:
+          description: 'ConversationOpenable is true when the caller can open the chat named
+
+            by conversationId.'
+          type: boolean
+        conversationTitle:
+          description: 'ConversationTitle is the chat''s title, set only when
+
+            ConversationOpenable is true.'
+          type: string
+        displayName:
+          type: string
+          example: claims-summary.html
+        kind:
+          type: string
+          example: document
+        language:
+          type: string
+        mediaType:
+          type: string
+          example: text/html
+        size:
+          type: integer
+    workspacemanager.WorkspaceArtifact:
+      type: object
+      properties:
+        addTime:
+          type: string
+        addedBy:
+          type: string
+        contentHash:
+          type: string
+          example: sha256-9f2c1a
+        conversationId:
+          description: 'ConversationID is the conversation the artifact came from, when the
+
+            caller named one. Informational: it grants nothing.'
+          type: string
+        displayName:
+          type: string
+          example: claims-summary.html
+        kind:
+          type: string
+          example: document
+        language:
+          type: string
+        mediaType:
+          type: string
+          example: text/html
+        size:
+          type: integer
+    workspacemanager.DataSource:
+      type: object
+      properties:
+        addTime:
+          type: string
+        addedBy:
+          type: string
+        addedByDisplayName:
+          type: string
+        connectionId:
+          type: integer
+        connectionType:
+          type: string
+        displayName:
+          type: string
+        name:
+          type: string
+        state:
+          $ref: '#/components/schemas/workspacemanager.DataSourceState'
+        workspaceOnly:
+          description: 'WorkspaceOnly is true when the connection answers only inside the
+
+            workspaces it is attached to (FL-31882), so the page can say so.'
+          type: boolean
+    workspacemanager.Workspace:
+      type: object
+      properties:
+        archiveTime:
+          type: string
+        callerIsOwner:
+          description: 'CallerIsOwner is true when the caller created the project (FL-31698).
+
+            Set by GetProject and CreateProject only. The workspace has no numeric
+
+            user id of its own, so this is how it knows whether to offer the role
+
+            control. It is a display hint: ChangeMemberRole still checks.'
+          type: boolean
+        counts:
+          $ref: '#/components/schemas/workspacemanager.Counts'
+        createTime:
+          type: string
+        createdBy:
+          type: string
+        description:
+          type: string
+        displayName:
+          type: string
+        id:
+          type: string
+        instructions:
+          description: 'Instructions is the project''s standing guidance for the assistant
+
+            (FL-31666), carried into every chat turn in the project (FL-31667).
+
+            Readers read it; approvers edit it, which covers every curator (D12).
+
+            See instructions.go and instructions_entry.go.'
+          type: string
+        instructionsUpdateTime:
+          type: string
+        instructionsUpdatedBy:
+          description: 'InstructionsUpdatedBy is the numeric platform user id of the last
+
+            editor.'
+          type: string
+        instructionsVersion:
+          description: 'InstructionsVersion counts changes to Instructions; 0 means they have
+
+            never been set.'
+          type: integer
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspacemanager.Member'
+        name:
+          type: string
+        state:
+          $ref: '#/components/schemas/workspacemanager.WorkspaceState'
+    workspacemanager.WorkspaceState:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      x-enum-varnames:
+      - WorkspaceStateActive
+      - WorkspaceStateArchived
+    workspacemanager.Activity:
+      type: object
+      properties:
+        artifactsChangeTime:
+          type: string
+        chatsChangeTime:
+          type: string
+        dataSourcesChangeTime:
+          type: string
+        detailsChangeTime:
+          type: string
+        lastActivityTime:
+          type: string
+        membersChangeTime:
+          type: string
+        runningTurns:
+          type: array
+          items:
+            $ref: '#/components/schemas/conversation.TurnState'
+        workspaceId:
+          type: string
+    workspace.dataSourcesResponse:
+      type: object
+      properties:
+        dataSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspacemanager.DataSource'
+    workspacemanager.Member:
+      type: object
+      properties:
+        addTime:
+          description: 'AddTime is always nil today — not because the data does not exist, but
+
+            because it is not exposed on the wire this package reads. context-db''s
+
+            _authz_tuples dataset carries written_at/written_by on every row
+
+            (crates/context-catalog/src/authz/tuples.rs''s own Arrow schema), but
+
+            TupleWire — what /authz/tuples/query actually returns
+
+            (crates/context-server/src/authz_handlers.rs) — is Subject/Relation/
+
+            Object/ExpiresAt and nothing else. AuthzTuple (knowledgestore package)
+
+            mirrors that wire exactly, which is why this package can go no further.
+
+            FL-31490 is the read-side fix on context-db''s end; once it lands this
+
+            field stops being permanently nil. Nil here follows Counts'' own idiom
+
+            in this file until then: nil means "not yet available," never a
+
+            fabricated zero a client could mistake for "just now."'
+          type: string
+        committed:
+          description: 'Committed is true from AddMember, false from PreviewAddMember — the
+
+            same shape either way. Neither the REST facade''s addMemberRequest.
+
+            ValidateOnly nor the MCP tool''s validate_only argument is safe to trust
+
+            as the caller''s only signal: a caller who mistypes either one gets the
+
+            other branch silently — a preview that commits, or a commit reported
+
+            back byte-identical to a preview, with nothing in the response saying
+
+            which happened. This field is what lets a caller verify the outcome
+
+            from the answer itself rather than trusting the request it sent.'
+          type: boolean
+        counts:
+          description: 'Counts, DataSources, NoDirectGrant, DataSourcesAvailable and Committed
+
+            are the D4 disclosure — set only by AddMember/PreviewAddMember, nil/
+
+            omitted from every other Member this package returns. See
+
+            computeDisclosure.'
+          allOf:
+          - $ref: '#/components/schemas/workspacemanager.Counts'
+        dataSources:
+          description: 'DataSources names the project''s data sources; NoDirectGrant lists, of
+
+            those, the ones the new member has no direct grant on today — the
+
+            warning Casey asked for. Never a conversation title; see the package
+
+            doc.'
+          type: array
+          items:
+            type: string
+        dataSourcesAvailable:
+          description: 'DataSourcesAvailable is false while project-scoped data connections
+
+            remain unbuilt (see the package doc) — DataSources and NoDirectGrant
+
+            are always empty in that state, and a caller must read the state from
+
+            this field, not from the slices being empty, which would also be the
+
+            shape of "no data sources, checked, none found." A *bool, not bool: nil
+
+            means "not applicable to this Member" (every non-disclosure caller),
+
+            false means "computed, and there are none" (the disclosure callers).'
+          type: boolean
+        displayName:
+          description: 'DisplayName is resolved via UserLookup, the same lookup AddMember
+
+            already uses for its tenancy check. Empty when resolution fails — a
+
+            missing name must never block listing the membership itself.'
+          type: string
+        noDirectGrantOn:
+          type: array
+          items:
+            type: string
+        standing:
+          description: 'Standing is "approver", "curator" or "member" — the highest of the
+
+            DIRECT grants (approver_grant, curator_grant, member) this subject
+
+            holds on THIS project, per QueryTuples filtered by object alone.
+
+            Deliberately not the full computed reader/approver/curator relation:
+
+            that can also be true through account-wide inheritance (`approver from
+
+            parent`), which this endpoint would need a Check call per member per
+
+            relation to see, and a project''s member LIST is not the place to pay
+
+            for that. A bare member with neither grant reads "member".'
+          type: string
+        userId:
+          type: string
+    workspace.addArtifactRequest:
+      type: object
+      properties:
+        bytes:
+          type: string
+          format: base64
+        contentHash:
+          type: string
+        conversationId:
+          type: string
+        displayName:
+          type: string
+        kind:
+          type: string
+          example: document
+        language:
+          type: string
+        mediaType:
+          type: string
+          example: text/html
+        source:
+          type: string
+    workspace.createRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        displayName:
+          type: string
+    conversation.TurnState:
+      type: object
+      properties:
+        conversationId:
+          type: string
+        endTime:
+          type: string
+        memberId:
+          type: string
+        phase:
+          type: string
+        stalled:
+          type: boolean
+        startTime:
+          type: string
+        state:
+          type: string
+        step:
+          type: integer
+        stepTime:
+          type: string
+        stopReason:
+          type: string
+        workspaceId:
+          type: string
+    workspace.membersResponse:
+      type: object
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspacemanager.Member'
+        nextPageToken:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    workspacemanager.DataSourceState:
+      type: string
+      enum:
+      - ACTIVE
+      - DISABLED
+      - DELETED
+      x-enum-varnames:
+      - DataSourceStateActive
+      - DataSourceStateDisabled
+      - DataSourceStateDeleted
+    workspacemanager.WorkspaceSummary:
+      type: object
+      properties:
+        archiveTime:
+          description: 'ArchiveTime is nil for an active project — never a zero time, which a
+
+            client would have to know to special-case.'
+          type: string
+        conversationCount:
+          description: 'ConversationCount is nil until FL-31456 (project-scoped conversation
+
+            counting) exists — conversations carry no project_id yet (FL-31451).
+
+            Same "not yet available" idiom as Counts below: nil, never a
+
+            fabricated zero.'
+          type: integer
+        displayName:
+          type: string
+        id:
+          type: string
+        lastActivityTime:
+          description: 'LastActivityTime is the later of the vertex''s last_activity_at (create,
+
+            rename, describe, archive) and the workspace_activity row (FL-32030):
+
+            a chat joining, changing or leaving, a turn landing, an artifact,
+
+            member or data-source change. Every change moves it; there is no
+
+            throttle. It orders the sidebar. For which part changed, read
+
+            GET /workspaces/{id}/activity.'
+          type: string
+        memberCount:
+          description: 'MemberCount is real, computed per row as the number of distinct users
+
+            holding a direct `member` tuple (one extra QueryTuples call per row — the same N+1
+
+            shape this method already accepts for GetNode per row).'
+          type: integer
+        name:
+          type: string
+        state:
+          $ref: '#/components/schemas/workspacemanager.WorkspaceState'
+    workspace.updateRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        displayName:
+          type: string
+        instructions:
+          description: 'Instructions replaces the project''s instructions for the assistant
+
+            (FL-31666); "" clears them. At most 8,000 characters.'
+          type: string
+    workspace.attachDataSourceRequest:
+      type: object
+      properties:
+        connectionId:
+          description: 'A pointer so an absent field ("required") is told apart from a zero or
+
+            negative one ("must be a positive integer").'
+          type: integer
+    workspacemanager.WorkspaceInstructions:
+      type: object
+      properties:
+        callerCanEdit:
+          description: 'CallerCanEdit is true when the caller may change the instructions:
+
+            approver on the workspace, which every curator is (D12). The app shows
+
+            Edit only then. The write path makes its own check; this flag grants
+
+            nothing.'
+          type: boolean
+        entry:
+          description: 'Entry is RenderInstructionsEntry for the current version: the exact text
+
+            a workspace chat''s history must hold. Empty when the version is 0.'
+          type: string
+        instructions:
+          type: string
+        instructionsUpdateTime:
+          type: string
+        instructionsUpdatedBy:
+          description: 'InstructionsUpdatedBy is the numeric platform user id of the last
+
+            editor.'
+          type: string
+        instructionsVersion:
+          type: integer
+        workspaceId:
+          type: string
+    workspace.listResponse:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspacemanager.WorkspaceSummary'
+    workspace.listArtifactsResponse:
+      type: object
+      properties:
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace.listedArtifact'
+        nextPageToken:
+          type: string
+    workspacemanager.Counts:
+      type: object
+      properties:
+        artifacts:
+          type: integer
+        conversations:
+          type: integer
+        knowledgeEntries:
+          type: integer
+    workspace.addMemberRequest:
+      type: object
+      properties:
+        role:
+          type: string
+        userId:
+          type: string
+        validateOnly:
+          type: boolean
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api

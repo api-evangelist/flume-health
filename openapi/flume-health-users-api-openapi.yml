@@ -19,6 +19,63 @@ servers:
 tags:
 - name: Users
 paths:
+  /api/v1/accounts/{account}:syncMembership:
+    post:
+      description: 'Writes account:#member@user: in context-db for every active, non-SystemAdmin user on the target account who does not already hold it (FL-31450, F9). Idempotent — re-running writes nothing new for a user already synced. Needed because the incremental sync on user create/update only covers users touched after it was wired; an existing account''s roster needs this one-time (and safely re-runnable) pass. SystemAdmin only. The account in the path must match the X-Flume-Account-ID header — the sync itself is still scoped by that header, ambient like every other AccountBoundMixin read in this manager; the path segment is the AIP-136 resource address, not a second, independent selector.'
+      tags:
+      - Users
+      summary: Backfill account membership tuples
+      operationId: syncAccountMembershipByAccount
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: Account id — must match X-Flume-Account-ID
+        name: account
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+        '400':
+          description: account path segment does not match X-Flume-Account-ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
   /api/v1/users:
     get:
       description: List users scoped to the account of the executing user
@@ -457,8 +514,207 @@ paths:
         - openid
         - profile
         - email
+  /api/v1/users/{id}/sensitivity-ceiling:
+    put:
+      description: Sets the most restrictive PHI classification a user may see (FL-31456). Not role-derived. SystemAdmin only.
+      tags:
+      - Users
+      summary: Set a user's PHI sensitivity ceiling
+      operationId: setSensitivityCeiling
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      - description: User ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.SensitivityCeilingResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.SensitivityCeilingRequest'
+        description: Sensitivity ceiling payload
+        required: true
+  /api/v1/users:sync-account-membership:
+    post:
+      description: 'Deprecated (FL-31510, F9): kept for one deploy, delegating to the same logic as POST /api/v1/accounts/{account}:syncMembership. Writes account:#member@user: in context-db for every active, non-SystemAdmin user on the request''s account who does not already hold it (FL-31450). Idempotent — re-running writes nothing new for a user already synced. SystemAdmin only.'
+      tags:
+      - Users
+      summary: Backfill account membership (deprecated)
+      operationId: syncAccountMembership
+      deprecated: true
+      parameters:
+      - description: X-Flume-Account-ID
+        name: X-Flume-Account-ID
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - OAuth2Implicit:
+        - openid
+        - profile
+        - email
 components:
   schemas:
+    user.SelfUserPatchModel:
+      type: object
+      properties:
+        receiveEmailAlerts:
+          type: boolean
+    user.SelfUser:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        id:
+          description: 'ID is the caller''s numeric platform user id, the key workspace members
+
+            are listed under. It lives here and not on User, which other responses
+
+            share.'
+          type: integer
+        isAccessGranter:
+          type: boolean
+        receiveEmailAlerts:
+          type: boolean
+        role:
+          $ref: '#/components/schemas/user.Role'
+        sensitivityCeiling:
+          description: 'SensitivityCeiling is the most restrictive PHI classification this user
+
+            may see (FL-31456). Read-only here — set only via
+
+            PUT /api/v1/users/{id}/sensitivity-ceiling (SystemAdmin only).'
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.Sensitivity'
+    user.QueryEngineGrantResponse:
+      type: object
+      properties:
+        expiresAt:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        userId:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    user.ListModel:
+      type: object
+      properties:
+        nextPageToken:
+          type: string
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/user.ReadModel'
+    user.SensitivityCeilingRequest:
+      type: object
+      required:
+      - sensitivityCeiling
+      properties:
+        sensitivityCeiling:
+          $ref: '#/components/schemas/knowledgestore.Sensitivity'
+    user.Role:
+      type: string
+      enum:
+      - SystemAdmin
+      - Admin
+      - Editor
+      - Viewer
+      x-enum-varnames:
+      - RoleSystemAdmin
+      - RoleAdmin
+      - RoleEditor
+      - RoleViewer
     user.QueryEngineGrantRequest:
       type: object
       required:
@@ -471,6 +727,47 @@ components:
           minimum: 1
         reason:
           type: string
+    user.SensitivityCeilingResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        sensitivityCeiling:
+          $ref: '#/components/schemas/knowledgestore.Sensitivity'
+        userId:
+          type: integer
+    user.WriteModel:
+      type: object
+      required:
+      - active
+      - email
+      - firstName
+      - lastName
+      - role
+      properties:
+        active:
+          description: pointer so we can distinguish between false and not set
+          type: boolean
+        aiEnabled:
+          type: boolean
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          $ref: '#/components/schemas/user.Role'
+    knowledgestore.Sensitivity:
+      type: string
+      enum:
+      - none
+      - phi_adjacent
+      - phi_bearing
+      x-enum-varnames:
+      - SensitivityNone
+      - SensitivityPHIAdjacent
+      - SensitivityPHIBearing
     user.ReadModel:
       type: object
       properties:
@@ -500,93 +797,16 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/user.Role'
+        sensitivityCeiling:
+          description: 'SensitivityCeiling is the most restrictive PHI classification this user
+
+            may see (FL-31456). Read-only here — set only via
+
+            PUT /api/v1/users/{id}/sensitivity-ceiling (SystemAdmin only).'
+          allOf:
+          - $ref: '#/components/schemas/knowledgestore.Sensitivity'
         updated:
           type: string
-    user.ListModel:
-      type: object
-      properties:
-        nextPageToken:
-          type: string
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/user.ReadModel'
-    user.Role:
-      type: string
-      enum:
-      - SystemAdmin
-      - Admin
-      - Editor
-      - Viewer
-      x-enum-varnames:
-      - RoleSystemAdmin
-      - RoleAdmin
-      - RoleEditor
-      - RoleViewer
-    user.WriteModel:
-      type: object
-      required:
-      - active
-      - email
-      - firstName
-      - lastName
-      - role
-      properties:
-        active:
-          description: pointer so we can distinguish between false and not set
-          type: boolean
-        aiEnabled:
-          type: boolean
-        email:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        role:
-          $ref: '#/components/schemas/user.Role'
-    user.QueryEngineGrantResponse:
-      type: object
-      properties:
-        expiresAt:
-          type: string
-        message:
-          type: string
-        reason:
-          type: string
-        userId:
-          type: integer
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    user.SelfUserPatchModel:
-      type: object
-      properties:
-        receiveEmailAlerts:
-          type: boolean
-    user.SelfUser:
-      type: object
-      properties:
-        accountId:
-          type: integer
-        aiEnabled:
-          type: boolean
-        email:
-          type: string
-        isAccessGranter:
-          type: boolean
-        receiveEmailAlerts:
-          type: boolean
-        role:
-          $ref: '#/components/schemas/user.Role'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

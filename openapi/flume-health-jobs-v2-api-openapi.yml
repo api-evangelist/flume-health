@@ -80,6 +80,34 @@ paths:
         in: query
         schema:
           type: string
+      - description: Search text, at most 200 characters. Matches the relay name, the name of any of its endpoints or their connection names (case-insensitive), or the relay id when numeric. No other field is searched.
+        name: q
+        in: query
+        schema:
+          type: string
+      - description: 'Protocols to filter for: a relay matches when its destination or any source uses one. If empty, no filtration occurs.'
+        name: protocol
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - description: Relay data types to filter for. If empty, no filtration occurs.
+        name: dataType
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - description: 'If true, the response carries counts: relays per status that match every other filter'
+        name: includeCounts
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: OK
@@ -89,6 +117,18 @@ paths:
                 $ref: '#/components/schemas/job.ListResponse'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -339,18 +379,31 @@ paths:
         required: true
 components:
   schemas:
-    endpoint.State:
+    job.Status:
       type: string
       enum:
-      - Idle
-      - Running
-      - Error
-      - Stopped
+      - Test
+      - Production
+      - Published
+      - Draft
+      - Archived
+      - Paused
       x-enum-varnames:
-      - StateIdle
-      - StateRunning
-      - StateError
-      - StateStopped
+      - StatusTest
+      - StatusProduction
+      - StatusPublished
+      - StatusDraft
+      - StatusArchived
+      - StatusPaused
+    job.TestFile:
+      type: object
+      required:
+      - endpointId
+      properties:
+        endpointId:
+          type: integer
+        file:
+          type: string
     endpoint.DataType:
       type: string
       enum:
@@ -391,29 +444,58 @@ components:
       - DataTypeHmClaimsExtended
       - DataTypeHmProvidersExtended
       - DataTypeStrings
-    job.WriteModel:
+    job.StatusCounts:
+      type: object
+      additionalProperties:
+        type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    job.TestRequest:
       type: object
       required:
-      - name
+      - files
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.TestFile'
+    job.ListResponse:
+      type: object
+      properties:
+        counts:
+          description: Counts is set only when the request asks for it with includeCounts=true.
+          allOf:
+          - $ref: '#/components/schemas/job.StatusCounts'
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/job.ReadModel'
+        nextPageToken:
+          type: string
+    job.EndpointSummary:
+      type: object
       properties:
         aiEnabled:
           type: boolean
-          default: false
-        aiWorkflowSubmitted:
-          type: boolean
-          default: false
-        destinationEndpointId:
+        connectionId:
           type: integer
-        ignoreObjectInstances:
-          type: boolean
+        id:
+          type: integer
         name:
           type: string
-        sourceEndpointIds:
-          type: array
-          items:
-            type: integer
-        status:
-          $ref: '#/components/schemas/job.Status'
+        operation:
+          $ref: '#/components/schemas/endpoint.Operation'
+        state:
+          $ref: '#/components/schemas/endpoint.State'
     job.ReadModel:
       type: object
       required:
@@ -449,15 +531,14 @@ components:
             $ref: '#/components/schemas/endpoint.DataType'
         updated:
           type: string
-    job.ListResponse:
-      type: object
-      properties:
-        jobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/job.ReadModel'
-        nextPageToken:
-          type: string
+    endpoint.Operation:
+      type: string
+      enum:
+      - Map
+      - Transfer
+      x-enum-varnames:
+      - OperationMap
+      - OperationTransfer
     job.UpdateModel:
       type: object
       properties:
@@ -489,74 +570,41 @@ components:
         status:
           allOf:
           - $ref: '#/components/schemas/job.Status'
-    job.Status:
+    endpoint.State:
       type: string
       enum:
-      - Test
-      - Production
-      - Published
-      - Draft
-      - Archived
-      - Paused
+      - Idle
+      - Running
+      - Error
+      - Stopped
       x-enum-varnames:
-      - StatusTest
-      - StatusProduction
-      - StatusPublished
-      - StatusDraft
-      - StatusArchived
-      - StatusPaused
-    job.EndpointSummary:
+      - StateIdle
+      - StateRunning
+      - StateError
+      - StateStopped
+    job.WriteModel:
       type: object
+      required:
+      - name
       properties:
         aiEnabled:
           type: boolean
-        connectionId:
+          default: false
+        aiWorkflowSubmitted:
+          type: boolean
+          default: false
+        destinationEndpointId:
           type: integer
-        id:
-          type: integer
+        ignoreObjectInstances:
+          type: boolean
         name:
           type: string
-        operation:
-          $ref: '#/components/schemas/endpoint.Operation'
-        state:
-          $ref: '#/components/schemas/endpoint.State'
-    endpoint.Operation:
-      type: string
-      enum:
-      - Map
-      - Transfer
-      x-enum-varnames:
-      - OperationMap
-      - OperationTransfer
-    job.TestRequest:
-      type: object
-      required:
-      - files
-      properties:
-        files:
+        sourceEndpointIds:
           type: array
           items:
-            $ref: '#/components/schemas/job.TestFile'
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
-    job.TestFile:
-      type: object
-      required:
-      - endpointId
-      properties:
-        endpointId:
-          type: integer
-        file:
-          type: string
+            type: integer
+        status:
+          $ref: '#/components/schemas/job.Status'
   securitySchemes:
     OAuth2Implicit:
       type: oauth2

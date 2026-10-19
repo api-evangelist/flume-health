@@ -261,17 +261,6 @@ paths:
         - email
 components:
   schemas:
-    responses.ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-        details:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
     flag.ListReadModel:
       type: object
       properties:
@@ -285,6 +274,17 @@ components:
         key:
           type: string
         value:
+          type: string
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
           type: string
   securitySchemes:
     OAuth2Implicit:

@@ -1,0 +1,287 @@
+openapi: 3.2.0
+info:
+  description: 'The API for Relay by Flume Health.
+
+
+    For more information about how Flume can power your health plan, please contact us.
+
+
+    Redoc | Swagger - Try It'
+  title: Flume Console Context Grants API
+  contact: {}
+  version: '1.0'
+  x-logo:
+    altText: Flume Health
+    url: https://public-static.flume.health/front/logo-margin-512.png
+servers:
+- url: https://console.flumehealth.com/
+- url: http://console.flumehealth.com/
+tags:
+- name: Context Grants
+paths:
+  /api/v1/context/grants:
+    get:
+      description: 'Dry run for the account on the request: reads the backend identity''s live grant rows on the account''s context-db database and diffs them against the declared contract (`_graph`, `_lance` and `_authz`, READ and WRITE on each — never ADMIN). Reports present, missing and extra rows. Writes nothing. SystemAdmin only.'
+      tags:
+      - Context Grants
+      summary: Report context-db grants
+      operationId: getContextGrants
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/grants.ReconcileResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: no backend identity configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+  /api/v1/context/grants:reconcile:
+    post:
+      description: 'Diffs the backend identity''s live grant rows against the declared contract for the account on the request (scope "account", default) or every enabled account (scope "all"). Mode "dry-run" (default) reports; mode "apply" writes only the MISSING rows, one per row, idempotently, and never revokes — extra rows are reported for a human. A 403 from context-db on apply is reported per account as applyRefused: it means the environment has not named the backend identity as context-db''s grant provisioner. SystemAdmin only.'
+      tags:
+      - Context Grants
+      summary: Reconcile context-db grants
+      operationId: reconcileContextGrants
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/grants.ReconcileResponse'
+        '400':
+          description: unknown mode or scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '403':
+          description: requires SystemAdmin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+        '501':
+          description: no backend identity configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/grants.ReconcileRequest'
+        description: mode and scope; empty means dry-run on the request account
+components:
+  schemas:
+    grants.Meta:
+      type: object
+      properties:
+        took:
+          type: string
+          example: 412ms
+    knowledgestore.GrantRow:
+      type: object
+      properties:
+        effect:
+          type: string
+        expires_at:
+          type: string
+        granted_at:
+          type: string
+        granted_by:
+          type: string
+        identity:
+          type: string
+        permission:
+          type: string
+        resource_name:
+          type: string
+        resource_type:
+          type: string
+    cdbgrants.Summary:
+      type: object
+      properties:
+        accounts:
+          type: integer
+        expired:
+          type: integer
+        extra:
+          type: integer
+        failed:
+          type: integer
+        missing:
+          type: integer
+        refused:
+          type: integer
+        written:
+          type: integer
+    responses.ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        details:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+    grants.ReconcileRequest:
+      type: object
+      properties:
+        mode:
+          description: 'Mode is "dry-run" (default) or "apply". apply writes ONLY the missing
+
+            rows and never revokes; extra rows are reported.'
+          type: string
+          example: dry-run
+        scope:
+          description: 'Scope is "account" (default: the account on the request) or "all".'
+          type: string
+          example: account
+    cdbgrants.Mode:
+      type: string
+      enum:
+      - dry-run
+      - apply
+      x-enum-varnames:
+      - ModeDryRun
+      - ModeApply
+    cdbgrants.AccountReport:
+      type: object
+      properties:
+        accountId:
+          type: integer
+        applyRefused:
+          description: 'ApplyRefused is set when context-db answered a write with 403. That is not
+
+            an outage — it means the environment has not named the backend identity as
+
+            CONTEXT_DB_GRANT_PROVISIONER_SUBJECT (or the row is outside the shape it
+
+            may write), so the rows stay Missing and a human decides.'
+          type: string
+        error:
+          description: 'Error is a failure that stopped the reconcile for this account: no data
+
+            URI, an unreachable context-db, a write that failed for a reason other
+
+            than authorization. Missing is still filled in where it could be.'
+          type: string
+        expired:
+          description: 'Expired are rows that have lapsed, contract-shaped or not. They satisfy
+
+            nothing (context-db''s evaluator ignores them) but they are not absent
+
+            either, and the difference matters to the human reading the report:
+
+            context-db''s grants table keeps them until someone with ADMIN deletes
+
+            them, and a lapsed contract row is the one thing that can make apply''s
+
+            "already present" answer disagree with this dry run.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+        extra:
+          description: 'Extra are live rows that the contract does not declare — a database-wide
+
+            ADMIN left over from a maintenance window, a table-level row someone
+
+            hand-wrote, a row under a different rendering of the identity. Reported
+
+            for a human; never revoked.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+        missing:
+          description: 'Missing are contract rows that do not exist (or exist only expired). After
+
+            a successful apply this is empty.'
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+        prefix:
+          description: 'Prefix is the context-db database the rows live on, as the backend
+
+            addresses it. Empty when the account has no usable data URI.'
+          type: string
+        present:
+          description: Present are contract rows that exist and are live.
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+        written:
+          description: Written are the rows this call created (apply only).
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+    grants.ReconcileResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/cdbgrants.AccountReport'
+        contract:
+          type: array
+          items:
+            $ref: '#/components/schemas/knowledgestore.GrantRow'
+        identity:
+          type: string
+        meta:
+          $ref: '#/components/schemas/grants.Meta'
+        mode:
+          $ref: '#/components/schemas/cdbgrants.Mode'
+        summary:
+          $ref: '#/components/schemas/cdbgrants.Summary'
+  securitySchemes:
+    OAuth2Implicit:
+      type: oauth2
+      flows:
+        implicit:
+          scopes:
+            email: User email address
+            openid: OpenID Connect scope
+            profile: User profile information
+          authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api
