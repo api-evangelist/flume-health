@@ -285,3 +285,9 @@ components:
             openid: OpenID Connect scope
             profile: User profile information
           authorizationUrl: https://auth.flumehealth.com/authorize?audience=https://console.flumehealth.com/api
+x-provenance:
+  method: harvested
+  publisher: Flume Health
+  source: https://console.flumehealth.com/api/docs/docs.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
